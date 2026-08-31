@@ -1,0 +1,37 @@
+[
+  {
+    "id": "senior-dog-food",
+    "input": "We sell premium dog food for senior dogs, targeting owners who care about joint health and longevity. Grain-free, vet-formulated, subscription-based.",
+    "expectedTopPublishers": ["Pawline", "Ruffco"],
+    "expectedPersonas": ["The Pet Parent", "The Busy Parent"],
+    "shouldExclude": ["Linden Park", "Velvetline"]
+  },
+  {
+    "id": "sustainable-activewear",
+    "input": "A sustainable activewear brand for women. Made from recycled ocean plastic. Price point sits between Lululemon and Girlfriend Collective.",
+    "expectedTopPublishers": ["Movewell", "Cloudfoot", "Stride & Stem"],
+    "expectedPersonas": ["The Sustainability Buyer", "The Fitness Enthusiast"],
+    "shouldExclude": ["Ruffco", "Pawline"]
+  },
+  {
+    "id": "functional-beverage",
+    "input": "We make a non-alcoholic sparkling drink with adaptogens for people who want to feel good without a hangover.",
+    "expectedTopPublishers": ["Pop & Sip", "Daily Form"],
+    "expectedPersonas": ["The Wellness Optimizer", "The Gen Z Aesthete"],
+    "shouldExclude": ["Linden Park", "Ruffco"]
+  },
+  {
+    "id": "luxury-handbags",
+    "input": "Custom-fit leather handbags, Italian-made, handcrafted in Florence. Minimum order ships in 6 weeks. Average price point $1,200.",
+    "expectedTopPublishers": ["Linden Park", "Marlowe & Co."],
+    "expectedPersonas": ["The Affluent Classic", "The Gifter"],
+    "shouldExclude": ["Swiftcart", "Tailcrate"]
+  },
+  {
+    "id": "vague-wellness",
+    "input": "We help people feel better.",
+    "expectedTopPublishers": ["Daily Form", "Studiogrid"],
+    "expectedPersonas": ["The Wellness Optimizer"],
+    "shouldExclude": ["Linden Park", "Marlowe & Co."]
+  }
+]

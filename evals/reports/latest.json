@@ -1,0 +1,192 @@
+{
+  "passed": 5,
+  "total": 5,
+  "averageScore": 100,
+  "results": [
+    {
+      "id": "senior-dog-food",
+      "score": 100,
+      "passed": true,
+      "checks": [
+        {
+          "name": "publisher-fit",
+          "passed": true,
+          "detail": "Top 3: Pawline, Ruffco, Tailcrate"
+        },
+        {
+          "name": "persona-fit",
+          "passed": true,
+          "detail": "Selected: The Pet Parent, The Busy Parent, The Convenience-First Millennial, The Gifter"
+        },
+        {
+          "name": "exclusion-fit",
+          "passed": true,
+          "detail": "Excluded: Strandlab, Velvetline, Everbody, Cloudfoot, Stride & Stem"
+        },
+        {
+          "name": "creative-count",
+          "passed": true,
+          "detail": "4 variants"
+        },
+        {
+          "name": "budget-total",
+          "passed": true,
+          "detail": "100%"
+        },
+        {
+          "name": "schema-validation",
+          "passed": true,
+          "detail": "valid"
+        }
+      ]
+    },
+    {
+      "id": "sustainable-activewear",
+      "score": 100,
+      "passed": true,
+      "checks": [
+        {
+          "name": "publisher-fit",
+          "passed": true,
+          "detail": "Top 3: Stride & Stem, Movewell, Cloudfoot"
+        },
+        {
+          "name": "persona-fit",
+          "passed": true,
+          "detail": "Selected: The Sustainability Buyer, The Fitness Enthusiast, The Wellness Optimizer, The Gen Z Aesthete"
+        },
+        {
+          "name": "exclusion-fit",
+          "passed": true,
+          "detail": "Excluded: Swiftcart, Strandlab, Tailcrate, Velvetline, Ruffco"
+        },
+        {
+          "name": "creative-count",
+          "passed": true,
+          "detail": "4 variants"
+        },
+        {
+          "name": "budget-total",
+          "passed": true,
+          "detail": "100%"
+        },
+        {
+          "name": "schema-validation",
+          "passed": true,
+          "detail": "valid"
+        }
+      ]
+    },
+    {
+      "id": "functional-beverage",
+      "score": 100,
+      "passed": true,
+      "checks": [
+        {
+          "name": "publisher-fit",
+          "passed": true,
+          "detail": "Top 3: Pop & Sip, Pantrygood, Daily Form"
+        },
+        {
+          "name": "persona-fit",
+          "passed": true,
+          "detail": "Selected: The Wellness Optimizer, The Sustainability Buyer, The Fitness Enthusiast, The Gen Z Aesthete"
+        },
+        {
+          "name": "exclusion-fit",
+          "passed": true,
+          "detail": "Excluded: Stride & Stem, Heartfoot, Everbody, Linden Park, Marlowe & Co."
+        },
+        {
+          "name": "creative-count",
+          "passed": true,
+          "detail": "4 variants"
+        },
+        {
+          "name": "budget-total",
+          "passed": true,
+          "detail": "100%"
+        },
+        {
+          "name": "schema-validation",
+          "passed": true,
+          "detail": "valid"
+        }
+      ]
+    },
+    {
+      "id": "luxury-handbags",
+      "score": 100,
+      "passed": true,
+      "checks": [
+        {
+          "name": "publisher-fit",
+          "passed": true,
+          "detail": "Top 3: Linden Park, Marlowe & Co., Stride & Stem"
+        },
+        {
+          "name": "persona-fit",
+          "passed": true,
+          "detail": "Selected: The Gifter, The Affluent Classic, The Value-Conscious Shopper"
+        },
+        {
+          "name": "exclusion-fit",
+          "passed": true,
+          "detail": "Excluded: Pop & Sip, Strandlab, Tailcrate, Kitchenly, Velvetline"
+        },
+        {
+          "name": "creative-count",
+          "passed": true,
+          "detail": "3 variants"
+        },
+        {
+          "name": "budget-total",
+          "passed": true,
+          "detail": "100%"
+        },
+        {
+          "name": "schema-validation",
+          "passed": true,
+          "detail": "valid"
+        }
+      ]
+    },
+    {
+      "id": "vague-wellness",
+      "score": 100,
+      "passed": true,
+      "checks": [
+        {
+          "name": "publisher-fit",
+          "passed": true,
+          "detail": "Top 3: Studiogrid, Daily Form, Pantrygood"
+        },
+        {
+          "name": "persona-fit",
+          "passed": true,
+          "detail": "Selected: The Sustainability Buyer, The Wellness Optimizer, The Gen Z Aesthete, The Pet Parent"
+        },
+        {
+          "name": "exclusion-fit",
+          "passed": true,
+          "detail": "Excluded: Cloudfoot, Stride & Stem, Linden Park, Marlowe & Co., Hearthstone Goods"
+        },
+        {
+          "name": "creative-count",
+          "passed": true,
+          "detail": "4 variants"
+        },
+        {
+          "name": "budget-total",
+          "passed": true,
+          "detail": "100%"
+        },
+        {
+          "name": "schema-validation",
+          "passed": true,
+          "detail": "valid"
+        }
+      ]
+    }
+  ]
+}
