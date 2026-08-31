@@ -24,6 +24,7 @@ html {
 }
 
 body {
+  overflow-x: hidden;
   min-height: 100vh;
   margin: 0;
   color: var(--text);
@@ -60,6 +61,7 @@ button {
 .sidebar-column,
 .output-column {
   display: grid;
+  min-width: 0;
   gap: 16px;
 }
 
@@ -106,6 +108,7 @@ h3 {
 .empty-state,
 .status-band,
 .warning-band {
+  min-width: 0;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--surface);
@@ -127,6 +130,7 @@ h3 {
 .status-band,
 .warning-band {
   display: flex;
+  min-width: 0;
   align-items: center;
 }
 
@@ -205,12 +209,14 @@ button:disabled {
 .catalog-strip span,
 .tag-list span,
 .persona-pill {
+  max-width: 100%;
   border-radius: 999px;
   padding: 6px 10px;
   color: var(--accent-strong);
   background: var(--accent-soft);
   font-size: 0.78rem;
   font-weight: 760;
+  overflow-wrap: anywhere;
 }
 
 .sample-panel,
@@ -229,6 +235,7 @@ button:disabled {
 
 .sample-list {
   display: grid;
+  min-width: 0;
   max-height: 440px;
   gap: 8px;
   overflow: auto;
@@ -238,6 +245,7 @@ button:disabled {
 .sample-button {
   display: grid;
   grid-template-columns: 28px minmax(0, 1fr);
+  min-width: 0;
   gap: 10px;
   width: 100%;
   min-height: 46px;
@@ -249,6 +257,7 @@ button:disabled {
   background: #fbfcfb;
   text-align: left;
   line-height: 1.35;
+  overflow-wrap: anywhere;
 }
 
 .sample-button span {
@@ -307,6 +316,7 @@ button:disabled {
 .config-grid,
 .excluded-grid {
   display: grid;
+  min-width: 0;
   gap: 12px;
 }
 
@@ -320,6 +330,7 @@ button:disabled {
 .creative-card,
 .excluded-card,
 .config-panel {
+  min-width: 0;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: #fbfcfb;
@@ -341,10 +352,12 @@ button:disabled {
 .config-list dd {
   margin: 4px 0 0;
   font-weight: 760;
+  overflow-wrap: anywhere;
 }
 
 .tag-list {
   display: flex;
+  min-width: 0;
   flex-wrap: wrap;
   gap: 8px;
   margin-top: 14px;
@@ -356,6 +369,7 @@ button:disabled {
 
 .publisher-list {
   display: grid;
+  min-width: 0;
   gap: 12px;
 }
 
@@ -388,6 +402,7 @@ button:disabled {
 .persona-card p {
   color: var(--muted);
   line-height: 1.55;
+  overflow-wrap: anywhere;
 }
 
 .rank-label {
@@ -412,11 +427,13 @@ button:disabled {
 
 .reason-list {
   display: grid;
+  min-width: 0;
   gap: 6px;
   margin: 10px 0 0;
   padding-left: 18px;
   color: var(--text);
   line-height: 1.45;
+  overflow-wrap: anywhere;
 }
 
 .risk-copy {
@@ -445,6 +462,7 @@ button:disabled {
 .score-details li {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
+  min-width: 0;
   gap: 4px 10px;
   border-top: 1px solid var(--line);
   padding-top: 8px;
@@ -491,6 +509,7 @@ button:disabled {
 
 .allocation-list {
   display: grid;
+  min-width: 0;
   gap: 8px;
   margin-top: 12px;
 }
@@ -498,6 +517,7 @@ button:disabled {
 .allocation-list div {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto auto;
+  min-width: 0;
   gap: 10px;
   align-items: center;
   border-top: 1px solid var(--line);
@@ -509,6 +529,7 @@ button:disabled {
 }
 
 .json-panel {
+  max-width: 100%;
   max-height: 420px;
   margin: 14px 0 0;
   overflow: auto;
@@ -519,6 +540,8 @@ button:disabled {
   background: #f9fbfa;
   font-size: 0.82rem;
   line-height: 1.5;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
 }
 
 .spin {
@@ -533,8 +556,25 @@ button:disabled {
 
 @media (max-width: 720px) {
   .page-shell {
-    width: min(100% - 24px, 1180px);
+    width: min(1180px, calc(100% - 24px));
     padding-top: 24px;
+  }
+
+  .button-row {
+    flex-wrap: wrap;
+  }
+
+  .primary-button,
+  .ghost-button {
+    flex: 1 1 132px;
+  }
+
+  .allocation-list div {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .allocation-list small {
+    grid-column: 1 / -1;
   }
 
   .planner-layout,
