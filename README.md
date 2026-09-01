@@ -57,7 +57,7 @@ npm run test
 npm run eval
 ```
 
-Unit tests cover scoring mechanics, output validity, Zod contracts, staged-output normalization, stage fallback, candidate retrieval, and pipeline trace summaries. The eval harness runs representative advertiser cases from `evals/fixtures/advertiser-cases.json` and writes reports to `evals/reports/`. Current offline eval score: `100`.
+Unit tests cover scoring mechanics, output validity, Zod contracts, staged-output normalization, stage fallback, candidate retrieval, and pipeline trace summaries. The eval harness runs 11 representative advertiser cases from `evals/fixtures/advertiser-cases.json` and writes reports to `evals/reports/`. The cases cover happy paths, vague inputs, B2B bad-fit behavior, conflicting price signals, category diversity, expected exclusions, extraction quality, candidate recall, and output validity. Current offline eval score: `100`.
 
 ## What I Cut
 

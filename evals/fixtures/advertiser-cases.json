@@ -5,7 +5,10 @@
     "expectedCategory": "pet_food",
     "expectedTopPublishers": ["Pawline", "Ruffco"],
     "expectedPersonas": ["The Pet Parent", "The Busy Parent"],
-    "shouldExclude": ["Linden Park", "Velvetline"]
+    "shouldExclude": ["Linden Park", "Velvetline"],
+    "expectedPriceTier": "premium",
+    "expectedAmbiguityLevel": "low",
+    "expectedProductSignals": ["subscription", "premium", "science-backed"]
   },
   {
     "id": "sustainable-activewear",
@@ -13,7 +16,10 @@
     "expectedCategory": "sustainable_apparel",
     "expectedTopPublishers": ["Movewell", "Cloudfoot", "Stride & Stem"],
     "expectedPersonas": ["The Sustainability Buyer", "The Fitness Enthusiast"],
-    "shouldExclude": ["Ruffco", "Pawline"]
+    "shouldExclude": ["Ruffco", "Pawline"],
+    "expectedPriceTier": "premium",
+    "expectedAmbiguityLevel": "low",
+    "expectedProductSignals": ["sustainability", "value"]
   },
   {
     "id": "functional-beverage",
@@ -21,7 +27,10 @@
     "expectedCategory": "functional_beverages",
     "expectedTopPublishers": ["Pop & Sip", "Daily Form"],
     "expectedPersonas": ["The Wellness Optimizer", "The Gen Z Aesthete"],
-    "shouldExclude": ["Linden Park", "Ruffco"]
+    "shouldExclude": ["Linden Park", "Ruffco"],
+    "expectedPriceTier": "mid_market",
+    "expectedAmbiguityLevel": "low",
+    "expectedProductSignals": ["science-backed"]
   },
   {
     "id": "luxury-handbags",
@@ -29,7 +38,10 @@
     "expectedCategory": "luxury_accessories",
     "expectedTopPublishers": ["Linden Park", "Marlowe & Co."],
     "expectedPersonas": ["The Affluent Classic", "The Gifter"],
-    "shouldExclude": ["Swiftcart", "Tailcrate"]
+    "shouldExclude": ["Swiftcart", "Tailcrate"],
+    "expectedPriceTier": "luxury",
+    "expectedAmbiguityLevel": "low",
+    "expectedProductSignals": ["premium", "value"]
   },
   {
     "id": "vague-wellness",
@@ -37,6 +49,80 @@
     "expectedCategory": "wellness",
     "expectedTopPublishers": ["Daily Form", "Studiogrid"],
     "expectedPersonas": ["The Wellness Optimizer"],
-    "shouldExclude": ["Linden Park", "Marlowe & Co."]
+    "shouldExclude": ["Linden Park", "Marlowe & Co."],
+    "expectedPriceTier": "mid_market",
+    "expectedAmbiguityLevel": "high",
+    "expectedResultWarnings": ["low-signal"]
+  },
+  {
+    "id": "refillable-cleaning",
+    "input": "Refillable non-toxic cleaning concentrates for families who want to cut single-use plastic bottles and keep the home safe.",
+    "expectedCategory": "refillable_products",
+    "expectedTopPublishers": ["Pantrygood", "Hearthstone Goods"],
+    "expectedPersonas": ["The Sustainability Buyer", "The Busy Parent"],
+    "shouldExclude": ["Velvetline", "Tailcrate"],
+    "expectedPriceTier": "mid_market",
+    "expectedAmbiguityLevel": "low",
+    "expectedProductSignals": ["sustainability", "convenience"],
+    "forbiddenTopPublishers": ["Velvetline", "Strandlab"]
+  },
+  {
+    "id": "performance-supplements",
+    "input": "Creatine and protein supplements for serious workout recovery, science-backed and subscription friendly.",
+    "expectedCategory": "supplements",
+    "expectedTopPublishers": ["Daily Form", "Movewell"],
+    "expectedPersonas": ["The Fitness Enthusiast", "The Wellness Optimizer"],
+    "shouldExclude": ["Strandlab", "Marlowe & Co."],
+    "expectedPriceTier": "mid_market",
+    "expectedAmbiguityLevel": "low",
+    "expectedProductSignals": ["subscription", "science-backed", "performance"],
+    "forbiddenTopPublishers": ["Linden Park", "Marlowe & Co."]
+  },
+  {
+    "id": "clean-skincare",
+    "input": "Personalized clean skincare for Gen Z shoppers with a minimalist routine and quiz-based recommendations.",
+    "expectedCategory": "beauty",
+    "expectedTopPublishers": ["Strandlab", "Velvetline"],
+    "expectedPersonas": ["The Gen Z Aesthete", "The Sustainability Buyer"],
+    "shouldExclude": ["Linden Park", "Marlowe & Co."],
+    "expectedPriceTier": "mid_market",
+    "expectedAmbiguityLevel": "medium",
+    "forbiddenTopPublishers": ["Pawline", "Ruffco"]
+  },
+  {
+    "id": "premium-bedding",
+    "input": "Premium linen bedding and bath essentials for design-conscious homeowners, average price $220, giftable packaging.",
+    "expectedCategory": "home_goods",
+    "expectedTopPublishers": ["Northbed", "Hearthstone Goods"],
+    "expectedPersonas": ["The Gifter", "The Affluent Classic"],
+    "shouldExclude": ["Swiftcart", "Velvetline"],
+    "expectedPriceTier": "premium",
+    "expectedAmbiguityLevel": "low",
+    "expectedProductSignals": ["premium", "gifting"],
+    "forbiddenTopPublishers": ["Swiftcart", "Tailcrate"]
+  },
+  {
+    "id": "b2b-saas-bad-fit",
+    "input": "B2B SaaS platform that automates dental patient workflow, billing reminders, and front desk scheduling.",
+    "expectedCategory": "b2b_saas",
+    "expectedTopPublishers": [],
+    "expectedPersonas": [],
+    "shouldExclude": ["Pop & Sip", "Strandlab", "Stride & Stem"],
+    "expectedPriceTier": "mid_market",
+    "expectedAmbiguityLevel": "low",
+    "expectedProductSignals": ["convenience"],
+    "expectedCandidateWarnings": ["consumer-commerce oriented"]
+  },
+  {
+    "id": "conflicting-luxury-value",
+    "input": "Luxury vegan leather handbags with handcrafted details, positioned as affordable everyday style for women.",
+    "expectedCategory": "luxury_accessories",
+    "expectedTopPublishers": ["Linden Park", "Marlowe & Co."],
+    "expectedPersonas": ["The Gifter", "The Affluent Classic"],
+    "shouldExclude": ["Tailcrate", "Swiftcart"],
+    "expectedPriceTier": "luxury",
+    "expectedAmbiguityLevel": "low",
+    "expectedProductSignals": ["premium", "value"],
+    "forbiddenTopPublishers": ["Swiftcart", "Pawline"]
   }
 ]
