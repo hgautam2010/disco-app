@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { advertiserProfileResponseSchema } from "@/lib/campaign/stages/extract-advertiser/schema";
 import {
-  advertiserProfileResponseSchema,
   executionResponseSchema,
   personaSelectionResponseSchema,
   publisherRankingResponseSchema

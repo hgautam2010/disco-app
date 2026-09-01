@@ -1,26 +1,12 @@
 import { z } from "zod";
+import { advertiserProfileResponseSchema } from "../campaign/stages/extract-advertiser/schema";
 
-const priceTierSchema = z.enum(["budget", "value", "mid_market", "premium", "luxury", "unknown"]);
-const ambiguityLevelSchema = z.enum(["low", "medium", "high"]);
 const bidStrategyTypeSchema = z.enum(["balanced_cpm", "efficient_reach", "premium_focus"]);
 
 const scoreSignalSchema = z.object({
   label: z.string().min(1),
   detail: z.string().min(1),
   weight: z.number()
-});
-
-const advertiserProfileResponseSchema = z.object({
-  category: z.string().min(1),
-  secondaryCategories: z.array(z.string()),
-  priceTier: priceTierSchema,
-  audienceHints: z.array(z.string()),
-  productSignals: z.array(z.string()),
-  valuePropositions: z.array(z.string()),
-  purchaseModel: z.string().min(1),
-  likelyObjective: z.string().min(1),
-  ambiguityLevel: ambiguityLevelSchema,
-  confidence: z.number().min(0).max(1)
 });
 
 const strategyPublisherSchema = z.object({
@@ -117,8 +103,7 @@ export const executionResponseSchema = z.object({
 });
 
 export { advertiserProfileResponseSchema };
-
-export type AdvertiserProfileResponse = z.infer<typeof advertiserProfileResponseSchema>;
+export type { AdvertiserProfileResponse } from "../campaign/stages/extract-advertiser/schema";
 export type PublisherRankingResponse = z.infer<typeof publisherRankingResponseSchema>;
 export type PersonaSelectionResponse = z.infer<typeof personaSelectionResponseSchema>;
 export type ExecutionResponse = z.infer<typeof executionResponseSchema>;

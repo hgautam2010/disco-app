@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { generateDeterministicCampaign } from "@/lib/campaignEngine";
 import { assembleFinalCampaign } from "@/lib/pipeline/assembleFinalCampaign";
 import { buildExecutionFallback } from "@/lib/pipeline/buildExecutionFallback";
-import { extractAdvertiserProfile } from "@/lib/pipeline/extractAdvertiserProfile";
+import { extractAdvertiserProfile } from "@/lib/campaign/stages/extract-advertiser/run";
 import { deterministicPersonaStrategyFromCandidates } from "@/lib/pipeline/normalizePersonaStrategy";
 import { deterministicPublisherStrategyFromCandidates } from "@/lib/pipeline/normalizePublisherStrategy";
 import { rankPublisherStrategy } from "@/lib/pipeline/rankPublisherStrategy";

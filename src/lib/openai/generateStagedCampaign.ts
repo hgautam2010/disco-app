@@ -1,7 +1,7 @@
 import type { CampaignStageTrace } from "../types";
 import { assembleFinalCampaign } from "../pipeline/assembleFinalCampaign";
 import { buildExecutionFallback } from "../pipeline/buildExecutionFallback";
-import { extractAdvertiserProfile } from "../pipeline/extractAdvertiserProfile";
+import { extractAdvertiserProfile } from "../campaign/stages/extract-advertiser/run";
 import { rankPublisherStrategy } from "../pipeline/rankPublisherStrategy";
 import { retrieveCampaignCandidates } from "../pipeline/retrieveCampaignCandidates";
 import { selectPersonaStrategy } from "../pipeline/selectPersonaStrategy";

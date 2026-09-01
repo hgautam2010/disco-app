@@ -18,38 +18,6 @@ const scoreSignalSchema: JsonSchema = {
   }
 };
 
-const advertiserAnalysisSchema: JsonSchema = {
-  type: "object",
-  additionalProperties: false,
-  required: [
-    "category",
-    "secondaryCategories",
-    "priceTier",
-    "audienceHints",
-    "productSignals",
-    "valuePropositions",
-    "purchaseModel",
-    "likelyObjective",
-    "ambiguityLevel",
-    "confidence"
-  ],
-  properties: {
-    category: { type: "string" },
-    secondaryCategories: stringArraySchema,
-    priceTier: {
-      type: "string",
-      enum: ["budget", "value", "mid_market", "premium", "luxury", "unknown"]
-    },
-    audienceHints: stringArraySchema,
-    productSignals: stringArraySchema,
-    valuePropositions: stringArraySchema,
-    purchaseModel: { type: "string" },
-    likelyObjective: { type: "string" },
-    ambiguityLevel: { type: "string", enum: ["low", "medium", "high"] },
-    confidence: { type: "number", minimum: 0, maximum: 1 }
-  }
-};
-
 const creativeVariantsSchema: JsonSchema = {
   type: "array",
   minItems: 3,
@@ -213,14 +181,6 @@ const selectedPersonasSchema: JsonSchema = {
         items: scoreSignalSchema
       }
     }
-  }
-};
-
-export const advertiserProfileJsonSchema: JsonSchema = {
-  name: "advertiser_profile",
-  strict: true,
-  schema: {
-    ...advertiserAnalysisSchema
   }
 };
 
