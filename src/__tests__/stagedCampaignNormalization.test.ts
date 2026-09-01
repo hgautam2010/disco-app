@@ -11,7 +11,7 @@ import {
   deterministicPublisherStrategyFromCandidates,
   normalizePublisherStrategy
 } from "@/lib/pipeline/normalizePublisherStrategy";
-import { retrieveCampaignCandidates } from "@/lib/pipeline/retrieveCampaignCandidates";
+import { retrieveCampaignCandidates } from "@/lib/campaign/stages/retrieve-candidates/run";
 import { validateCampaignResult } from "@/lib/schemas";
 import type {
   ExecutionResponse,

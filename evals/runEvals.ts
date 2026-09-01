@@ -1,7 +1,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { generateDeterministicCampaign } from "../src/lib/campaignEngine";
-import { retrieveCampaignCandidates } from "../src/lib/pipeline/retrieveCampaignCandidates";
+import { retrieveCampaignCandidates } from "../src/lib/campaign/stages/retrieve-candidates/run";
 import { validateCampaignResult } from "../src/lib/schemas";
 
 type EvalCase = {

@@ -1,8 +1,8 @@
-import { getPersonas, getPublishers } from "../data";
-import { selectPersonas, scorePersonas } from "../personaScoring";
-import { scorePublishers } from "../publisherScoring";
-import type { ExcludedPublisher, Persona, Publisher, ScoredPersona, ScoredPublisher } from "../types";
-import type { AdvertiserProfile, CampaignCandidates, PipelineStageResult } from "./types";
+import { getPersonas, getPublishers } from "../../../data";
+import { selectPersonas, scorePersonas } from "../../../personaScoring";
+import { scorePublishers } from "../../../publisherScoring";
+import type { ExcludedPublisher, Persona, Publisher, ScoredPersona, ScoredPublisher } from "../../../types";
+import type { AdvertiserProfile, CampaignCandidates, PipelineStageResult } from "../../types";
 
 const defaultPublisherCandidateLimit = 10;
 const defaultPersonaCandidateLimit = 8;

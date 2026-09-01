@@ -6,7 +6,7 @@ import { extractAdvertiserProfile } from "@/lib/campaign/stages/extract-advertis
 import { deterministicPersonaStrategyFromCandidates } from "@/lib/pipeline/normalizePersonaStrategy";
 import { deterministicPublisherStrategyFromCandidates } from "@/lib/pipeline/normalizePublisherStrategy";
 import { rankPublisherStrategy } from "@/lib/pipeline/rankPublisherStrategy";
-import { retrieveCampaignCandidates } from "@/lib/pipeline/retrieveCampaignCandidates";
+import { retrieveCampaignCandidates } from "@/lib/campaign/stages/retrieve-candidates/run";
 import { selectPersonaStrategy } from "@/lib/pipeline/selectPersonaStrategy";
 import type { CampaignStageTrace } from "@/lib/types";
 

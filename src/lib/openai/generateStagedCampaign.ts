@@ -3,7 +3,7 @@ import { assembleFinalCampaign } from "../pipeline/assembleFinalCampaign";
 import { buildExecutionFallback } from "../pipeline/buildExecutionFallback";
 import { extractAdvertiserProfile } from "../campaign/stages/extract-advertiser/run";
 import { rankPublisherStrategy } from "../pipeline/rankPublisherStrategy";
-import { retrieveCampaignCandidates } from "../pipeline/retrieveCampaignCandidates";
+import { retrieveCampaignCandidates } from "../campaign/stages/retrieve-candidates/run";
 import { selectPersonaStrategy } from "../pipeline/selectPersonaStrategy";
 import type { CampaignExecution, LockedCampaignStrategy, PipelineStageResult } from "../pipeline/types";
 import { hasOpenAIKey } from "../campaign/shared/openaiClient";
