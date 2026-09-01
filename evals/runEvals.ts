@@ -1,11 +1,13 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { generateDeterministicCampaign } from "../src/lib/campaignEngine";
+import { retrieveCampaignCandidates } from "../src/lib/pipeline/retrieveCampaignCandidates";
 import { validateCampaignResult } from "../src/lib/schemas";
 
 type EvalCase = {
   id: string;
   input: string;
+  expectedCategory: string;
   expectedTopPublishers: string[];
   expectedPersonas: string[];
   shouldExclude: string[];
@@ -48,6 +50,9 @@ function runEvalCase(evalCase: EvalCase): EvalResult {
   const topThreePublishers = result.recommendedPublishers.slice(0, 3).map((item) => item.publisher.name);
   const selectedPersonas = result.selectedPersonas.map((item) => item.persona.name);
   const excludedPublishers = result.excludedPublishers.map((item) => item.publisher.name);
+  const candidates = retrieveCampaignCandidates(result.advertiserAnalysis).data;
+  const candidatePublishers = candidates.publisherCandidates.map((item) => item.publisher.name);
+  const candidatePersonas = candidates.personaCandidates.map((item) => item.persona.name);
   const validationErrors = validateCampaignResult(result);
   const allocationTotal = result.campaignConfig.budget.allocation.reduce(
     (total, item) => total + item.budgetPercent,
@@ -55,6 +60,21 @@ function runEvalCase(evalCase: EvalCase): EvalResult {
   );
 
   const checks = [
+    {
+      name: "extraction-category",
+      passed: result.advertiserAnalysis.category === evalCase.expectedCategory,
+      detail: `Category: ${result.advertiserAnalysis.category}`
+    },
+    {
+      name: "candidate-publisher-recall",
+      passed: evalCase.expectedTopPublishers.every((name) => candidatePublishers.includes(name)),
+      detail: `Candidates: ${candidatePublishers.join(", ")}`
+    },
+    {
+      name: "candidate-persona-recall",
+      passed: evalCase.expectedPersonas.every((name) => candidatePersonas.includes(name)),
+      detail: `Candidates: ${candidatePersonas.join(", ")}`
+    },
     {
       name: "publisher-fit",
       passed: evalCase.expectedTopPublishers.every((name) => topThreePublishers.includes(name)),

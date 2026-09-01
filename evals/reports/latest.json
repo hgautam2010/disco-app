@@ -9,6 +9,21 @@
       "passed": true,
       "checks": [
         {
+          "name": "extraction-category",
+          "passed": true,
+          "detail": "Category: pet_food"
+        },
+        {
+          "name": "candidate-publisher-recall",
+          "passed": true,
+          "detail": "Candidates: Pawline, Ruffco, Tailcrate, Kitchenly, Movewell, Pantrygood, Daily Form, Pop & Sip, Studiogrid, Swiftcart"
+        },
+        {
+          "name": "candidate-persona-recall",
+          "passed": true,
+          "detail": "Candidates: The Pet Parent, The Busy Parent, The Convenience-First Millennial, The Gifter, The Wellness Optimizer, The Affluent Classic, The Sustainability Buyer, The Fitness Enthusiast"
+        },
+        {
           "name": "publisher-fit",
           "passed": true,
           "detail": "Top 3: Pawline, Ruffco, Tailcrate"
@@ -45,6 +60,21 @@
       "score": 100,
       "passed": true,
       "checks": [
+        {
+          "name": "extraction-category",
+          "passed": true,
+          "detail": "Category: sustainable_apparel"
+        },
+        {
+          "name": "candidate-publisher-recall",
+          "passed": true,
+          "detail": "Candidates: Stride & Stem, Movewell, Cloudfoot, Marlowe & Co., Linden Park, Everbody, Heartfoot, Daily Form, Pantrygood, Studiogrid"
+        },
+        {
+          "name": "candidate-persona-recall",
+          "passed": true,
+          "detail": "Candidates: The Sustainability Buyer, The Fitness Enthusiast, The Wellness Optimizer, The Gen Z Aesthete, The Gifter, The Pet Parent, The Value-Conscious Shopper, The Convenience-First Millennial"
+        },
         {
           "name": "publisher-fit",
           "passed": true,
@@ -83,6 +113,21 @@
       "passed": true,
       "checks": [
         {
+          "name": "extraction-category",
+          "passed": true,
+          "detail": "Category: functional_beverages"
+        },
+        {
+          "name": "candidate-publisher-recall",
+          "passed": true,
+          "detail": "Candidates: Pop & Sip, Pantrygood, Daily Form, Movewell, Swiftcart, Studiogrid, Kitchenly, Ruffco, Northbed, Velvetline"
+        },
+        {
+          "name": "candidate-persona-recall",
+          "passed": true,
+          "detail": "Candidates: The Wellness Optimizer, The Sustainability Buyer, The Fitness Enthusiast, The Gen Z Aesthete, The Pet Parent, The Convenience-First Millennial, The Busy Parent, The Gifter"
+        },
+        {
           "name": "publisher-fit",
           "passed": true,
           "detail": "Top 3: Pop & Sip, Pantrygood, Daily Form"
@@ -120,6 +165,21 @@
       "passed": true,
       "checks": [
         {
+          "name": "extraction-category",
+          "passed": true,
+          "detail": "Category: luxury_accessories"
+        },
+        {
+          "name": "candidate-publisher-recall",
+          "passed": true,
+          "detail": "Candidates: Linden Park, Marlowe & Co., Stride & Stem, Everbody, Heartfoot, Movewell, Cloudfoot, Hearthstone Goods, Northbed, Studiogrid"
+        },
+        {
+          "name": "candidate-persona-recall",
+          "passed": true,
+          "detail": "Candidates: The Gifter, The Affluent Classic, The Value-Conscious Shopper, The Gen Z Aesthete, The Wellness Optimizer, The Pet Parent, The Convenience-First Millennial, The Sustainability Buyer"
+        },
+        {
           "name": "publisher-fit",
           "passed": true,
           "detail": "Top 3: Linden Park, Marlowe & Co., Stride & Stem"
@@ -156,6 +216,21 @@
       "score": 100,
       "passed": true,
       "checks": [
+        {
+          "name": "extraction-category",
+          "passed": true,
+          "detail": "Category: wellness"
+        },
+        {
+          "name": "candidate-publisher-recall",
+          "passed": true,
+          "detail": "Candidates: Studiogrid, Daily Form, Pantrygood, Ruffco, Movewell, Kitchenly, Tailcrate, Pop & Sip, Strandlab, Everbody"
+        },
+        {
+          "name": "candidate-persona-recall",
+          "passed": true,
+          "detail": "Candidates: The Sustainability Buyer, The Wellness Optimizer, The Gen Z Aesthete, The Pet Parent, The Convenience-First Millennial, The Fitness Enthusiast, The Busy Parent, The Value-Conscious Shopper"
+        },
         {
           "name": "publisher-fit",
           "passed": true,

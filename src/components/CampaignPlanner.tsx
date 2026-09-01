@@ -108,6 +108,7 @@ function CampaignResultView({
           <p className="eyebrow">Mode</p>
           <h2>{modeLabel(result.mode)}</h2>
           {openAIStatusCopy ? <p className="status-copy">{openAIStatusCopy}</p> : null}
+          {result.pipeline ? <PipelineSummary result={result} /> : null}
         </div>
         <CheckCircle2 aria-hidden="true" size={28} />
       </section>
@@ -181,10 +182,26 @@ function modeLabel(mode: CampaignResult["mode"]) {
 
 function statusCopy(mode: CampaignResult["mode"], catalogSummary: CampaignPlannerProps["catalogSummary"]) {
   if (mode === "openai_staged") {
-    return `Strategy and execution ran as separate OpenAI calls across ${catalogSummary.publisherCount} publishers and ${catalogSummary.personaCount} personas.`;
+    return `Extraction, ranking, and execution run as separate stages across ${catalogSummary.publisherCount} publishers and ${catalogSummary.personaCount} personas.`;
   }
 
   return "";
+}
+
+function PipelineSummary({ result }: { result: CampaignResult }) {
+  const pipeline = result.pipeline;
+
+  if (!pipeline) {
+    return null;
+  }
+
+  return (
+    <div className="pipeline-summary" aria-label="Pipeline summary">
+      <span>{pipeline.apiCallCount} API calls</span>
+      <span>{pipeline.repairCount} repairs</span>
+      <span>{pipeline.fallbackStages.length} fallbacks</span>
+    </div>
+  );
 }
 
 function Metric({ label, value }: { label: string; value: string }) {

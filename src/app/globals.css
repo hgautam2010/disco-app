@@ -290,6 +290,23 @@ button:disabled {
   line-height: 1.4;
 }
 
+.pipeline-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.pipeline-summary span {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 4px 8px;
+  color: var(--text);
+  background: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 760;
+}
+
 .warning-band {
   align-items: flex-start;
   gap: 10px;
