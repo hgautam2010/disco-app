@@ -16,3 +16,7 @@ export function buildCampaignSystemPrompt() {
     readPrompt("campaign-config.md")
   ].join("\n\n---\n\n");
 }
+
+export function buildFullInlineCampaignPrompt() {
+  return readPrompt("full-campaign-generation.md");
+}

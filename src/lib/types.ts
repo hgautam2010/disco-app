@@ -2,7 +2,7 @@ export type PriceTier = "budget" | "value" | "mid_market" | "premium" | "luxury"
 
 export type AmbiguityLevel = "low" | "medium" | "high";
 
-export type CampaignMode = "openai" | "fallback";
+export type CampaignMode = "openai" | "openai_inline" | "fallback";
 
 export type PublisherAudience = {
   age_skew: string;
