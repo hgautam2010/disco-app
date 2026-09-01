@@ -4,7 +4,7 @@ import { generateFallbackCreative } from "./creativeGenerator";
 import { getPersonas, getPublishers } from "./data";
 import { hasOpenAIKey } from "./openai/client";
 import { withFallbackWarning } from "./openai/fallback";
-import { generateStagedOpenAICampaign } from "./openai/generateStagedCampaign";
+import { generateStagedOpenAICampaign } from "./campaign/pipeline";
 import { scorePersonas, selectPersonas } from "./personaScoring";
 import { scorePublishers } from "./publisherScoring";
 import type { CampaignResult } from "./types";
