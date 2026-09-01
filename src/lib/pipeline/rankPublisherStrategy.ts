@@ -1,12 +1,12 @@
 import { publisherRankingResponseJsonSchema } from "../schemas";
 import type { CampaignStageTrace } from "../types";
-import { getOpenAIModel, hasOpenAIKey } from "../openai/client";
+import { getOpenAIModel, hasOpenAIKey } from "../campaign/shared/openaiClient";
 import { buildPublisherRankingPrompt } from "../openai/prompts";
 import {
   generateAndValidateWithRepairResult,
   StructuredGenerationError,
   type RepairableStructuredRequest
-} from "../openai/repairResponse";
+} from "../campaign/shared/structuredGeneration";
 import { publisherRankingResponseSchema } from "../validation/campaignSchemas";
 import {
   deterministicPublisherStrategyFromCandidates,

@@ -6,7 +6,7 @@ import { rankPublisherStrategy } from "../pipeline/rankPublisherStrategy";
 import { retrieveCampaignCandidates } from "../pipeline/retrieveCampaignCandidates";
 import { selectPersonaStrategy } from "../pipeline/selectPersonaStrategy";
 import type { CampaignExecution, LockedCampaignStrategy, PipelineStageResult } from "../pipeline/types";
-import { hasOpenAIKey } from "./client";
+import { hasOpenAIKey } from "../campaign/shared/openaiClient";
 import { generateExecutionWithMetadata } from "./generateExecution";
 import { normalizeExecution } from "./normalizeExecution";
 

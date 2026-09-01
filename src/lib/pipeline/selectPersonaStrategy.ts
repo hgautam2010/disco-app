@@ -1,12 +1,12 @@
 import { personaSelectionResponseJsonSchema } from "../schemas";
 import type { CampaignStageTrace } from "../types";
-import { getOpenAIModel, hasOpenAIKey } from "../openai/client";
+import { getOpenAIModel, hasOpenAIKey } from "../campaign/shared/openaiClient";
 import { buildPersonaSelectionPrompt } from "../openai/prompts";
 import {
   generateAndValidateWithRepairResult,
   StructuredGenerationError,
   type RepairableStructuredRequest
-} from "../openai/repairResponse";
+} from "../campaign/shared/structuredGeneration";
 import { personaSelectionResponseSchema } from "../validation/campaignSchemas";
 import { deterministicPersonaStrategyFromCandidates, normalizePersonaStrategy } from "./normalizePersonaStrategy";
 import type {

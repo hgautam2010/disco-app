@@ -5,13 +5,13 @@ import {
   advertiserProfileResponseSchema,
   type AdvertiserProfileResponse
 } from "../validation/campaignSchemas";
-import { getOpenAIModel, hasOpenAIKey } from "../openai/client";
+import { getOpenAIModel, hasOpenAIKey } from "../campaign/shared/openaiClient";
 import { buildExtractionPrompt } from "../openai/prompts";
 import {
   generateAndValidateWithRepairResult,
   StructuredGenerationError,
   type RepairableStructuredRequest
-} from "../openai/repairResponse";
+} from "../campaign/shared/structuredGeneration";
 import type { AdvertiserProfile, PipelineStageResult } from "./types";
 
 export async function extractAdvertiserProfile(

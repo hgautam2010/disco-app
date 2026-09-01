@@ -5,8 +5,8 @@ import type {
   ScoredPublisher
 } from "../types";
 import type { ExecutionResponse } from "../validation/campaignSchemas";
-import { fillUniqueFromFallback, nonEmptyArray, positiveNumber } from "./normalizationUtils";
 import type { CampaignExecution, LockedCampaignStrategy } from "../pipeline/types";
+import { fillUniqueFromFallback, nonEmptyArray, positiveNumber } from "../campaign/shared/normalization";
 
 export function normalizeExecution({
   fallbackExecution,

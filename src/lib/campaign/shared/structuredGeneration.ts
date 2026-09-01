@@ -1,7 +1,6 @@
-import type { ZodError, ZodType } from "zod";
-import { getPersonas, getPublishers } from "../data";
-import { createStructuredResponse, getOpenAIModel } from "./client";
-import { buildRepairPrompt } from "./prompts";
+import type { ZodType } from "zod";
+import { createStructuredResponse } from "./openaiClient";
+import { repairStructuredResponse } from "./repairResponse";
 
 export type RepairableStructuredRequest = {
   model: string;
@@ -80,7 +79,7 @@ export async function generateAndValidateWithRepairResult<T>({
   }
 
   try {
-    const repaired = await repairResponse({
+    const repaired = await repairStructuredResponse({
       label,
       schema: request.text.format,
       original,
@@ -96,48 +95,6 @@ export async function generateAndValidateWithRepairResult<T>({
   } catch (error) {
     throw new StructuredGenerationError(errorMessage(error), { apiCalls: 2, repaired: true });
   }
-}
-
-async function repairResponse({
-  label,
-  schema,
-  original,
-  validationError,
-  fallbackCandidates
-}: {
-  label: string;
-  schema: Record<string, unknown>;
-  original: unknown;
-  validationError: ZodError;
-  fallbackCandidates: unknown;
-}) {
-  return createStructuredResponse<unknown>({
-    model: getOpenAIModel(),
-    input: [
-      {
-        role: "system",
-        content: buildRepairPrompt()
-      },
-      {
-        role: "user",
-        content: JSON.stringify({
-          responseLabel: label,
-          validationErrors: validationError.issues.map((issue) => ({
-            path: issue.path.join("."),
-            message: issue.message
-          })),
-          invalidResponse: original,
-          allowedPublisherIds: getPublishers().map((publisher) => publisher.id),
-          allowedPersonaIds: getPersonas().map((persona) => persona.id),
-          fallbackCandidates,
-          schema
-        })
-      }
-    ],
-    text: {
-      format: schema
-    }
-  });
 }
 
 function errorMessage(error: unknown) {

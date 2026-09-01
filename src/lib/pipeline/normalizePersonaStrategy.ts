@@ -1,5 +1,5 @@
 import type { ScoredPersona } from "../types";
-import { clampScore, fillUniqueFromFallback, nonEmptyArray, nonEmptySignals, normalizedScore } from "../openai/normalizationUtils";
+import { clampScore, fillUniqueFromFallback, nonEmptyArray, nonEmptySignals, normalizedScore } from "../campaign/shared/normalization";
 import type { PersonaSelectionResponse } from "../validation/campaignSchemas";
 import type { CampaignCandidates, LockedCampaignStrategy, LockedPublisherStrategy } from "./types";
 

@@ -6,7 +6,7 @@ import {
   nonEmptyArray,
   nonEmptySignals,
   normalizedScore
-} from "../openai/normalizationUtils";
+} from "../campaign/shared/normalization";
 import type { CampaignCandidates, LockedPublisherStrategy } from "./types";
 
 export function deterministicPublisherStrategyFromCandidates(

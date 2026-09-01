@@ -1,4 +1,4 @@
-import type { ScoreSignal } from "../types";
+import type { ScoreSignal } from "../../types";
 
 export function clampScore(value: number) {
   return Math.max(0, Math.min(100, Math.round(Number.isFinite(value) ? value : 0)));

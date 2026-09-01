@@ -2,13 +2,13 @@ import { getPersonas, getPublishers } from "../data";
 import type { LockedCampaignStrategy } from "../pipeline/types";
 import { executionResponseJsonSchema } from "../schemas";
 import { executionResponseSchema, type ExecutionResponse } from "../validation/campaignSchemas";
-import { getOpenAIModel } from "./client";
+import { getOpenAIModel } from "../campaign/shared/openaiClient";
 import { buildExecutionPrompt } from "./prompts";
 import {
   generateAndValidateWithRepairResult,
   type RepairableStructuredRequest,
   type StructuredGenerationResult
-} from "./repairResponse";
+} from "../campaign/shared/structuredGeneration";
 
 export async function generateExecution(
   advertiserDescription: string,

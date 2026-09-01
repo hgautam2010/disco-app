@@ -1,4 +1,4 @@
-import type { CampaignResult } from "../types";
+import type { CampaignResult } from "../../types";
 
 export function withFallbackWarning(result: CampaignResult, message: string): CampaignResult {
   return {
