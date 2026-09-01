@@ -32,6 +32,14 @@ Return:
 - ambiguityLevel: `low` when the pitch is specific, `medium` when some key facts are missing, and `high` when most matching decisions would be assumptions.
 - confidence: 0 to 1 confidence in the extracted profile. Use lower values when category, price, or audience is unclear.
 
+## Extraction Priorities
+
+- Prefer explicit pitch facts over inference.
+- Use a specific category when product type is clear; use a broader category only when the pitch is genuinely ambiguous.
+- Treat premium/luxury price tier as requiring either explicit price, premium language, or strong luxury signals.
+- Keep productSignals factual and compact. They should be useful later for matching and copy, not marketing fluff.
+- Do not turn a benefit into a certification or endorsement unless the pitch states it.
+
 ## Rules
 
 - Do not choose publishers.

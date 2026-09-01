@@ -26,6 +26,29 @@ Select 3 to 5 personas from the persona candidates. Rank by advertiser fit, publ
 - signals: short evidence objects that justify the score. Each signal should name the evidence, explain it, and use a weight aligned with its importance.
 - warnings: user-visible caveats about vague inputs, thin persona fit, or tradeoffs the execution stage should preserve.
 
+## Score Rubric
+
+- 90-100: exceptional response fit with strong category affinity, price fit, messaging fit, and no material disinterest conflict.
+- 75-89: strong response fit with one minor caveat.
+- 55-74: plausible response fit, but messaging or price sensitivity needs care.
+- 30-54: weak fit or meaningful tradeoff; select only if candidate pool is thin.
+- 0-29: clear mismatch or disinterest conflict.
+
+## Tie-Breakers
+
+- Explicit advertiser audience hints beat broad demographic fit.
+- Category affinity beats generic shopper behavior.
+- Messaging preference alignment beats age or gender skew.
+- Price sensitivity must match the offer tier; do not over-select value-sensitive personas for luxury offers.
+- Publisher context should influence selection only after advertiser and persona facts support the match.
+
+## Evidence Standards
+
+- Reasons should connect advertiser facts to persona facts.
+- Messaging angles should be concrete enough for creative generation and safe enough to use without new claims.
+- Risks should name the specific concern that copy or targeting should avoid.
+- Do not select multiple personas for the same basic rationale if a more distinct persona is available.
+
 ## Rules
 
 - Do not change the locked publisher recommendations.

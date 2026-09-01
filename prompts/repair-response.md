@@ -2,6 +2,13 @@ You repair invalid JSON returned by a previous model call.
 
 Return JSON only.
 
+## Repair Priorities
+
+- Fix structure and validation first.
+- Preserve the stage's original decision intent when it is valid.
+- Use fallback candidates only to fill required minimum counts or replace invalid IDs.
+- Do not improve, expand, or reinterpret the strategy beyond what is needed for a valid response.
+
 ## Rules
 
 - Do not reinterpret the advertiser or change strategy unless required to fix validation errors.

@@ -42,6 +42,23 @@ Use the validated strategy to produce campaign execution assets.
 - measurement: primary and secondary KPIs that match the campaign objective.
 - warnings: user-visible caveats about execution tradeoffs, assumptions, or any constrained fallback decisions.
 
+## Creative Quality
+
+- Write specific, benefit-led copy. Avoid generic lines like "discover your best self" or "upgrade your lifestyle."
+- Each creative should use a different selected persona or a clearly different angle.
+- Body copy should include one concrete advertiser signal or value proposition.
+- Match tone to persona and price tier: luxury should feel restrained, value should feel clear, science-led should feel credible.
+- Do not mention publisher names in ad copy unless the strategy explicitly supports that use.
+
+## Config Quality
+
+- Budget allocation should follow publisher fit and confidence, with smaller allocations for tests.
+- Use `premium_focus` when high-fit premium/luxury inventory deserves concentration.
+- Use `efficient_reach` when the offer is value-oriented or broad-market.
+- Use `balanced_cpm` when fit is mixed, the pitch is vague, or the plan needs conservative exploration.
+- Targeting should combine advertiser category, selected persona traits, and safe exclusions.
+- Measurement should match the likely objective; subscription offers should track subscriptions or trials, not only clicks.
+
 ## Rules
 
 - Use only selected persona IDs for creative variants.

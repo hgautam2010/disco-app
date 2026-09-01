@@ -29,6 +29,29 @@ Rank publisher fit before shopper personas, creative, or campaign config are fin
 - signals: short evidence objects that justify the score. Each signal should name the evidence, explain it, and use a weight aligned with its importance.
 - warnings: user-visible caveats about ambiguity, weak candidate pools, directional B2B fit, or tradeoffs that downstream stages should preserve.
 
+## Score Rubric
+
+- 90-100: exceptional fit with multiple strong supplied signals across category, audience, buying context, and price/AOV.
+- 75-89: strong fit with one minor caveat or a narrower evidence base.
+- 55-74: plausible but not clearly superior; usable for testing only if stronger candidates are limited.
+- 30-54: weak fit, meaningful mismatch, or mostly generic audience overlap.
+- 0-29: clear mismatch or exclusion-worthy publisher.
+
+## Tie-Breakers
+
+- Category and subcategory fit beats raw monthly impressions.
+- Price tier and AOV alignment beats broad audience overlap.
+- Explicit advertiser audience hints beat inferred demographic similarity.
+- Catalog notes and buying context beat generic category similarity.
+- When two publishers are close, prefer the one with clearer downstream creative or targeting rationale.
+
+## Evidence Standards
+
+- Each reason should reference at least one supplied advertiser or publisher fact.
+- Each signal should capture a distinct piece of evidence; do not repeat the same idea in different words.
+- Risks should name real tradeoffs, not generic caution.
+- Exclusions should be explainable even if the publisher has some partial fit.
+
 ## Rules
 
 - Do not extract advertiser fields.
