@@ -1,6 +1,6 @@
-import { validateCampaignResult } from "../schemas";
-import type { CampaignPipelineTrace, CampaignResult, CampaignStageTrace } from "../types";
-import type { CampaignExecution, LockedCampaignStrategy } from "./types";
+import { validateCampaignResult } from "../../../schemas";
+import type { CampaignPipelineTrace, CampaignResult, CampaignStageTrace } from "../../../types";
+import type { CampaignExecution, LockedCampaignStrategy } from "../../types";
 
 export function assembleFinalCampaign({
   generatedAt,

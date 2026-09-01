@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { generateDeterministicCampaign } from "@/lib/campaignEngine";
-import { assembleFinalCampaign } from "@/lib/pipeline/assembleFinalCampaign";
+import { assembleFinalCampaign } from "@/lib/campaign/stages/assemble/run";
 import { extractAdvertiserProfile } from "@/lib/campaign/stages/extract-advertiser/run";
 import { buildExecutionFallback } from "@/lib/campaign/stages/generate-execution/fallback";
 import { deterministicPublisherStrategyFromCandidates } from "@/lib/campaign/stages/rank-publishers/normalize";

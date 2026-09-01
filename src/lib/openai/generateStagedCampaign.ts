@@ -1,4 +1,4 @@
-import { assembleFinalCampaign } from "../pipeline/assembleFinalCampaign";
+import { assembleFinalCampaign } from "../campaign/stages/assemble/run";
 import { extractAdvertiserProfile } from "../campaign/stages/extract-advertiser/run";
 import { generateExecutionStage } from "../campaign/stages/generate-execution/run";
 import { rankPublisherStrategy } from "../campaign/stages/rank-publishers/run";
