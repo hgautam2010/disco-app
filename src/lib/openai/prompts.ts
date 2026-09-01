@@ -7,10 +7,6 @@ function readPrompt(name: string) {
   return readFileSync(promptPath(name), "utf8").trim();
 }
 
-export function buildExecutionPrompt() {
-  return readPrompt("execution-generation.md");
-}
-
 export function buildRepairPrompt() {
   return readPrompt("repair-response.md");
 }

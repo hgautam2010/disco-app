@@ -3,10 +3,10 @@ import type {
   CreativeVariant,
   PublisherBudgetAllocation,
   ScoredPublisher
-} from "../types";
-import type { ExecutionResponse } from "../validation/campaignSchemas";
-import type { CampaignExecution, LockedCampaignStrategy } from "../pipeline/types";
-import { fillUniqueFromFallback, nonEmptyArray, positiveNumber } from "../campaign/shared/normalization";
+} from "../../../types";
+import { fillUniqueFromFallback, nonEmptyArray, positiveNumber } from "../../shared/normalization";
+import type { CampaignExecution, LockedCampaignStrategy } from "../../types";
+import type { ExecutionResponse } from "./schema";
 
 export function normalizeExecution({
   fallbackExecution,
