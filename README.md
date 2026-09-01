@@ -16,7 +16,7 @@ Set `OPENAI_API_KEY` in `.env.local` to enable the staged OpenAI pipeline. Witho
 
 The app is optimized for the small catalog provided in the exercise:
 
-- The primary path runs as two OpenAI calls: strategy first, then execution. Strategy extracts the advertiser, picks publishers, picks personas, and names exclusions. Execution writes creative and campaign config from that validated strategy.
+- The primary path runs as three OpenAI-aware stages: extraction first, candidate ranking second, then execution. Deterministic retrieval sits between extraction and ranking so the model only ranks a bounded candidate set.
 - Each stage requests strict structured JSON, validates it with Zod, and gets one repair retry if the response misses the contract.
 - A normalization layer maps every returned ID back to local catalog data, removes invalid or overlapping choices, repairs budget allocation, and falls back where needed.
 - The deterministic TypeScript engine remains as an offline fallback and eval baseline.
@@ -25,12 +25,13 @@ The app is optimized for the small catalog provided in the exercise:
 Core entry points:
 
 - `src/lib/campaignEngine.ts`: orchestrates the full campaign generation flow.
-- `prompts/strategy-generation.md` and `prompts/execution-generation.md`: the two prompts used by the default staged OpenAI path.
+- `prompts/advertiser-extraction.md`, `prompts/campaign-ranking.md`, and `prompts/execution-generation.md`: the prompts used by the default staged OpenAI path.
 - `prompts/repair-response.md`: the repair prompt used when Zod rejects a stage response.
-- `src/lib/openai/generateStagedCampaign.ts`: coordinates strategy, execution, and normalization.
-- `src/lib/openai/generateStrategy.ts` and `src/lib/openai/generateExecution.ts`: call the OpenAI Responses API with strict JSON schemas.
+- `src/lib/openai/generateStagedCampaign.ts`: coordinates extraction, retrieval, ranking, execution, and final assembly.
+- `src/lib/pipeline/retrieveCampaignCandidates.ts`: builds the bounded deterministic candidate set.
+- `src/lib/pipeline/rankCampaignStrategy.ts` and `src/lib/openai/generateExecution.ts`: call the OpenAI Responses API with strict JSON schemas.
 - `src/lib/openai/repairResponse.ts`: validates model output with Zod and retries once with schema errors.
-- `src/lib/openai/normalizeStrategy.ts` and `src/lib/openai/normalizeExecution.ts`: repair model output against the local catalog.
+- `src/lib/pipeline/normalizeRankedStrategy.ts` and `src/lib/openai/normalizeExecution.ts`: repair model output against the candidate set and locked strategy.
 - `src/lib/validation/campaignSchemas.ts`: Zod contracts for strategy and execution responses.
 - `src/lib/publisherScoring.ts` and `src/lib/personaScoring.ts`: deterministic fallback and eval baseline.
 - `src/app/api/campaign/route.ts`: server-only API route that keeps the API key out of the browser.

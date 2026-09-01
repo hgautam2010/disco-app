@@ -1,16 +1,20 @@
 import { describe, expect, it } from "vitest";
-import { executionResponseSchema, strategyResponseSchema } from "@/lib/validation/campaignSchemas";
+import {
+  advertiserProfileResponseSchema,
+  executionResponseSchema,
+  rankingResponseSchema
+} from "@/lib/validation/campaignSchemas";
 
 describe("campaign Zod schemas", () => {
-  it("accepts valid staged strategy output", () => {
-    expect(strategyResponseSchema.safeParse(validStrategyResponse()).success).toBe(true);
+  it("accepts valid advertiser profile output", () => {
+    expect(advertiserProfileResponseSchema.safeParse(validAdvertiserProfileResponse()).success).toBe(true);
   });
 
-  it("rejects out-of-contract strategy scores", () => {
-    const response = validStrategyResponse();
+  it("rejects out-of-contract ranking scores", () => {
+    const response = validRankingResponse();
     response.recommendedPublishers[0].score = 140;
 
-    expect(strategyResponseSchema.safeParse(response).success).toBe(false);
+    expect(rankingResponseSchema.safeParse(response).success).toBe(false);
   });
 
   it("rejects execution output with too few creatives", () => {
@@ -21,20 +25,23 @@ describe("campaign Zod schemas", () => {
   });
 });
 
-function validStrategyResponse() {
+function validAdvertiserProfileResponse() {
   return {
-    advertiserAnalysis: {
-      category: "pet_health",
-      secondaryCategories: ["subscription"],
-      priceTier: "premium",
-      audienceHints: ["senior dog owners"],
-      productSignals: ["mobility support"],
-      valuePropositions: ["clear ingredients"],
-      purchaseModel: "subscription",
-      likelyObjective: "subscription acquisition",
-      ambiguityLevel: "low",
-      confidence: 0.9
-    },
+    category: "pet_health",
+    secondaryCategories: ["subscription"],
+    priceTier: "premium",
+    audienceHints: ["senior dog owners"],
+    productSignals: ["mobility support"],
+    valuePropositions: ["clear ingredients"],
+    purchaseModel: "subscription",
+    likelyObjective: "subscription acquisition",
+    ambiguityLevel: "low",
+    confidence: 0.9
+  };
+}
+
+function validRankingResponse() {
+  return {
     recommendedPublishers: ["pub_001", "pub_002", "pub_003"].map((publisherId) => ({
       publisherId,
       score: 90,

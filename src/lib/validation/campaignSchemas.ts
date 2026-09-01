@@ -54,10 +54,6 @@ export const rankingResponseSchema = z.object({
   warnings: z.array(z.string())
 });
 
-export const strategyResponseSchema = rankingResponseSchema.extend({
-  advertiserAnalysis: advertiserProfileResponseSchema
-});
-
 const creativeVariantSchema = z.object({
   id: z.string().min(1),
   personaId: z.string().min(1),
@@ -120,5 +116,4 @@ export { advertiserProfileResponseSchema };
 
 export type AdvertiserProfileResponse = z.infer<typeof advertiserProfileResponseSchema>;
 export type RankingResponse = z.infer<typeof rankingResponseSchema>;
-export type StrategyResponse = z.infer<typeof strategyResponseSchema>;
 export type ExecutionResponse = z.infer<typeof executionResponseSchema>;

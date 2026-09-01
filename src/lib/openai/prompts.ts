@@ -11,10 +11,6 @@ export function buildExtractionPrompt() {
   return readPrompt("advertiser-extraction.md");
 }
 
-export function buildStrategyPrompt() {
-  return readPrompt("strategy-generation.md");
-}
-
 export function buildRankingPrompt() {
   return readPrompt("campaign-ranking.md");
 }
