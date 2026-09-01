@@ -1,10 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { advertiserProfileResponseSchema } from "@/lib/campaign/stages/extract-advertiser/schema";
 import { publisherRankingResponseSchema } from "@/lib/campaign/stages/rank-publishers/schema";
-import {
-  executionResponseSchema,
-  personaSelectionResponseSchema
-} from "@/lib/validation/campaignSchemas";
+import { personaSelectionResponseSchema } from "@/lib/campaign/stages/select-personas/schema";
+import { executionResponseSchema } from "@/lib/validation/campaignSchemas";
 
 describe("campaign Zod schemas", () => {
   it("accepts valid advertiser profile output", () => {

@@ -1,7 +1,13 @@
-import type { ScoredPersona } from "../types";
-import { clampScore, fillUniqueFromFallback, nonEmptyArray, nonEmptySignals, normalizedScore } from "../campaign/shared/normalization";
-import type { PersonaSelectionResponse } from "../validation/campaignSchemas";
-import type { CampaignCandidates, LockedCampaignStrategy, LockedPublisherStrategy } from "./types";
+import type { ScoredPersona } from "../../../types";
+import {
+  clampScore,
+  fillUniqueFromFallback,
+  nonEmptyArray,
+  nonEmptySignals,
+  normalizedScore
+} from "../../shared/normalization";
+import type { CampaignCandidates, LockedCampaignStrategy, LockedPublisherStrategy } from "../../types";
+import type { PersonaSelectionResponse } from "./schema";
 
 export function deterministicPersonaStrategyFromCandidates(
   candidates: CampaignCandidates,

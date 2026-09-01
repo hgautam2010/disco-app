@@ -7,17 +7,6 @@ const stringArraySchema: JsonSchema = {
   items: { type: "string" }
 };
 
-const scoreSignalSchema: JsonSchema = {
-  type: "object",
-  additionalProperties: false,
-  required: ["label", "detail", "weight"],
-  properties: {
-    label: { type: "string" },
-    detail: { type: "string" },
-    weight: { type: "number" }
-  }
-};
-
 const creativeVariantsSchema: JsonSchema = {
   type: "array",
   minItems: 3,
@@ -117,42 +106,6 @@ const campaignConfigSchema: JsonSchema = {
         primaryKpi: { type: "string" },
         secondaryKpis: stringArraySchema
       }
-    }
-  }
-};
-
-const selectedPersonasSchema: JsonSchema = {
-  type: "array",
-  minItems: 3,
-  maxItems: 5,
-  items: {
-    type: "object",
-    additionalProperties: false,
-    required: ["personaId", "score", "reasons", "risks", "messagingAngles", "signals"],
-    properties: {
-      personaId: { type: "string" },
-      score: { type: "number", minimum: 0, maximum: 100 },
-      reasons: stringArraySchema,
-      risks: stringArraySchema,
-      messagingAngles: stringArraySchema,
-      signals: {
-        type: "array",
-        items: scoreSignalSchema
-      }
-    }
-  }
-};
-
-export const personaSelectionResponseJsonSchema: JsonSchema = {
-  name: "persona_selection_response",
-  strict: true,
-  schema: {
-    type: "object",
-    additionalProperties: false,
-    required: ["selectedPersonas", "warnings"],
-    properties: {
-      selectedPersonas: selectedPersonasSchema,
-      warnings: stringArraySchema
     }
   }
 };

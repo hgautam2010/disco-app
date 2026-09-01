@@ -4,7 +4,7 @@ import { buildExecutionFallback } from "../pipeline/buildExecutionFallback";
 import { extractAdvertiserProfile } from "../campaign/stages/extract-advertiser/run";
 import { rankPublisherStrategy } from "../campaign/stages/rank-publishers/run";
 import { retrieveCampaignCandidates } from "../campaign/stages/retrieve-candidates/run";
-import { selectPersonaStrategy } from "../pipeline/selectPersonaStrategy";
+import { selectPersonaStrategy } from "../campaign/stages/select-personas/run";
 import type { CampaignExecution, LockedCampaignStrategy, PipelineStageResult } from "../pipeline/types";
 import { hasOpenAIKey } from "../campaign/shared/openaiClient";
 import { generateExecutionWithMetadata } from "./generateExecution";

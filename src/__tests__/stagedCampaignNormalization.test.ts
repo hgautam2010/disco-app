@@ -6,7 +6,7 @@ import { buildExecutionFallback } from "@/lib/pipeline/buildExecutionFallback";
 import {
   deterministicPersonaStrategyFromCandidates,
   normalizePersonaStrategy
-} from "@/lib/pipeline/normalizePersonaStrategy";
+} from "@/lib/campaign/stages/select-personas/normalize";
 import {
   deterministicPublisherStrategyFromCandidates,
   normalizePublisherStrategy
@@ -14,9 +14,9 @@ import {
 import { retrieveCampaignCandidates } from "@/lib/campaign/stages/retrieve-candidates/run";
 import { validateCampaignResult } from "@/lib/schemas";
 import type { PublisherRankingResponse } from "@/lib/campaign/stages/rank-publishers/schema";
+import type { PersonaSelectionResponse } from "@/lib/campaign/stages/select-personas/schema";
 import type {
   ExecutionResponse,
-  PersonaSelectionResponse
 } from "@/lib/validation/campaignSchemas";
 
 describe("staged campaign normalization", () => {

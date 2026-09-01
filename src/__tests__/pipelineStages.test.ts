@@ -3,11 +3,11 @@ import { generateDeterministicCampaign } from "@/lib/campaignEngine";
 import { assembleFinalCampaign } from "@/lib/pipeline/assembleFinalCampaign";
 import { buildExecutionFallback } from "@/lib/pipeline/buildExecutionFallback";
 import { extractAdvertiserProfile } from "@/lib/campaign/stages/extract-advertiser/run";
-import { deterministicPersonaStrategyFromCandidates } from "@/lib/pipeline/normalizePersonaStrategy";
 import { deterministicPublisherStrategyFromCandidates } from "@/lib/campaign/stages/rank-publishers/normalize";
 import { rankPublisherStrategy } from "@/lib/campaign/stages/rank-publishers/run";
 import { retrieveCampaignCandidates } from "@/lib/campaign/stages/retrieve-candidates/run";
-import { selectPersonaStrategy } from "@/lib/pipeline/selectPersonaStrategy";
+import { deterministicPersonaStrategyFromCandidates } from "@/lib/campaign/stages/select-personas/normalize";
+import { selectPersonaStrategy } from "@/lib/campaign/stages/select-personas/run";
 import type { CampaignStageTrace } from "@/lib/types";
 
 describe("production pipeline stages", () => {

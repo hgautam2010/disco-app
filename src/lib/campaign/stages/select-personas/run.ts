@@ -1,20 +1,19 @@
-import { personaSelectionResponseJsonSchema } from "../schemas";
-import type { CampaignStageTrace } from "../types";
-import { getOpenAIModel, hasOpenAIKey } from "../campaign/shared/openaiClient";
-import { buildPersonaSelectionPrompt } from "../openai/prompts";
+import type { CampaignStageTrace } from "../../../types";
+import { getOpenAIModel, hasOpenAIKey } from "../../shared/openaiClient";
+import { readStagePrompt } from "../../shared/prompts";
 import {
   generateAndValidateWithRepairResult,
   StructuredGenerationError,
   type RepairableStructuredRequest
-} from "../campaign/shared/structuredGeneration";
-import { personaSelectionResponseSchema } from "../validation/campaignSchemas";
-import { deterministicPersonaStrategyFromCandidates, normalizePersonaStrategy } from "./normalizePersonaStrategy";
+} from "../../shared/structuredGeneration";
+import { deterministicPersonaStrategyFromCandidates, normalizePersonaStrategy } from "./normalize";
+import { personaSelectionResponseJsonSchema, personaSelectionResponseSchema } from "./schema";
 import type {
   CampaignCandidates,
   LockedCampaignStrategy,
   LockedPublisherStrategy,
   PipelineStageResult
-} from "./types";
+} from "../../types";
 
 export async function selectPersonaStrategy(
   candidates: CampaignCandidates,
@@ -37,7 +36,7 @@ export async function selectPersonaStrategy(
     input: [
       {
         role: "system",
-        content: buildPersonaSelectionPrompt()
+        content: readStagePrompt("select-personas")
       },
       {
         role: "user",
