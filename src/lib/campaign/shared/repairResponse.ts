@@ -1,7 +1,7 @@
 import type { ZodError } from "zod";
 import { getPersonas, getPublishers } from "../../data";
-import { buildRepairPrompt } from "../../openai/prompts";
 import { createStructuredResponse, getOpenAIModel } from "./openaiClient";
+import { readSharedPrompt } from "./prompts";
 
 export async function repairStructuredResponse({
   label,
@@ -21,7 +21,7 @@ export async function repairStructuredResponse({
     input: [
       {
         role: "system",
-        content: buildRepairPrompt()
+        content: readSharedPrompt("repair-response.md")
       },
       {
         role: "user",
