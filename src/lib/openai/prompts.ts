@@ -3,7 +3,7 @@ import path from "node:path";
 
 const promptPath = (...segments: string[]) => path.join(process.cwd(), "prompts", ...segments);
 
-export function readPrompt(name: string) {
+function readPrompt(name: string) {
   return readFileSync(promptPath(name), "utf8").trim();
 }
 

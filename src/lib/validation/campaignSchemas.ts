@@ -1,16 +1,16 @@
 import { z } from "zod";
 
-export const priceTierSchema = z.enum(["budget", "value", "mid_market", "premium", "luxury", "unknown"]);
-export const ambiguityLevelSchema = z.enum(["low", "medium", "high"]);
-export const bidStrategyTypeSchema = z.enum(["balanced_cpm", "efficient_reach", "premium_focus"]);
+const priceTierSchema = z.enum(["budget", "value", "mid_market", "premium", "luxury", "unknown"]);
+const ambiguityLevelSchema = z.enum(["low", "medium", "high"]);
+const bidStrategyTypeSchema = z.enum(["balanced_cpm", "efficient_reach", "premium_focus"]);
 
-export const scoreSignalSchema = z.object({
+const scoreSignalSchema = z.object({
   label: z.string().min(1),
   detail: z.string().min(1),
   weight: z.number()
 });
 
-export const advertiserAnalysisSchema = z.object({
+const advertiserAnalysisSchema = z.object({
   category: z.string().min(1),
   secondaryCategories: z.array(z.string()),
   priceTier: priceTierSchema,
@@ -23,7 +23,7 @@ export const advertiserAnalysisSchema = z.object({
   confidence: z.number().min(0).max(1)
 });
 
-export const strategyPublisherSchema = z.object({
+const strategyPublisherSchema = z.object({
   publisherId: z.string().min(1),
   score: z.number().min(0).max(100),
   reasons: z.array(z.string().min(1)).min(1),
@@ -31,14 +31,14 @@ export const strategyPublisherSchema = z.object({
   signals: z.array(scoreSignalSchema)
 });
 
-export const excludedPublisherSchema = z.object({
+const excludedPublisherSchema = z.object({
   publisherId: z.string().min(1),
   score: z.number().min(0).max(100),
   reason: z.string().min(1),
   signals: z.array(scoreSignalSchema)
 });
 
-export const strategyPersonaSchema = z.object({
+const strategyPersonaSchema = z.object({
   personaId: z.string().min(1),
   score: z.number().min(0).max(100),
   reasons: z.array(z.string().min(1)).min(1),
@@ -55,7 +55,7 @@ export const strategyResponseSchema = z.object({
   warnings: z.array(z.string())
 });
 
-export const creativeVariantSchema = z.object({
+const creativeVariantSchema = z.object({
   id: z.string().min(1),
   personaId: z.string().min(1),
   personaName: z.string().min(1),
@@ -65,7 +65,7 @@ export const creativeVariantSchema = z.object({
   tone: z.string().min(1)
 });
 
-export const publisherBudgetAllocationSchema = z.object({
+const publisherBudgetAllocationSchema = z.object({
   publisherId: z.string().min(1),
   publisherName: z.string().min(1),
   budgetPercent: z.number().min(0).max(100),
@@ -73,7 +73,7 @@ export const publisherBudgetAllocationSchema = z.object({
   rationale: z.string().min(1)
 });
 
-export const campaignConfigSchema = z.object({
+const campaignConfigSchema = z.object({
   objective: z.string().min(1),
   budget: z.object({
     totalUsd: z.number().positive(),
