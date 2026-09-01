@@ -86,19 +86,32 @@ export function CampaignPlanner({ examples, catalogSummary }: CampaignPlannerPro
         {loading ? <LoadingState /> : null}
         {error ? <ErrorState message={error} /> : null}
         {!loading && !error && !result ? <EmptyState /> : null}
-        {result ? <CampaignResultView result={result} /> : null}
+        {result ? <CampaignResultView result={result} catalogSummary={catalogSummary} /> : null}
       </section>
     </div>
   );
 }
 
-function CampaignResultView({ result }: { result: CampaignResult }) {
+function CampaignResultView({
+  result,
+  catalogSummary
+}: {
+  result: CampaignResult;
+  catalogSummary: CampaignPlannerProps["catalogSummary"];
+}) {
+  const isInlineOpenAI = result.mode === "openai_inline";
+
   return (
     <>
       <section className="status-band">
         <div>
           <p className="eyebrow">Mode</p>
-          <h2>{result.mode === "openai" ? "OpenAI assisted" : "Deterministic fallback"}</h2>
+          <h2>{modeLabel(result.mode)}</h2>
+          {isInlineOpenAI ? (
+            <p className="status-copy">
+              Model reviewed all {catalogSummary.publisherCount} publishers and {catalogSummary.personaCount} personas.
+            </p>
+          ) : null}
         </div>
         <CheckCircle2 aria-hidden="true" size={28} />
       </section>
@@ -160,6 +173,18 @@ function CampaignResultView({ result }: { result: CampaignResult }) {
       <CampaignConfig config={result.campaignConfig} />
     </>
   );
+}
+
+function modeLabel(mode: CampaignResult["mode"]) {
+  if (mode === "openai_inline") {
+    return "Full-catalog OpenAI";
+  }
+
+  if (mode === "openai") {
+    return "OpenAI assisted";
+  }
+
+  return "Deterministic fallback";
 }
 
 function Metric({ label, value }: { label: string; value: string }) {

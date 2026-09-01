@@ -283,6 +283,13 @@ button:disabled {
   background: linear-gradient(90deg, #ffffff, var(--accent-soft));
 }
 
+.status-copy {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.4;
+}
+
 .warning-band {
   align-items: flex-start;
   gap: 10px;
