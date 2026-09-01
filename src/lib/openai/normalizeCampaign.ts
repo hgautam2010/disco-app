@@ -316,7 +316,7 @@ function normalizeAllocation(
     return {
       publisherId: item.publisher.id,
       publisherName: item.publisher.name,
-      budgetPercent: positiveNumber(allocation?.budgetPercent) || 0,
+      budgetPercent: positiveNumber(allocation?.budgetPercent) || baselineAllocation?.budgetPercent || item.score,
       bidCpmUsd: positiveNumber(allocation?.bidCpmUsd) || baselineAllocation?.bidCpmUsd || defaultBidCpm(item),
       rationale:
         allocation?.rationale ||
