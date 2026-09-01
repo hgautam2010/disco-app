@@ -14,13 +14,15 @@ Set `OPENAI_API_KEY` in `.env.local` to enable the staged OpenAI pipeline. Witho
 
 ## What I Built
 
-The app is optimized for the small catalog provided in the exercise:
+The app is optimized for predictable, inspectable campaign generation:
 
-- The primary path runs as three OpenAI-aware stages: extraction first, candidate ranking second, then execution. Deterministic retrieval sits between extraction and ranking so the model only ranks a bounded candidate set.
-- Each stage requests strict structured JSON, validates it with Zod, and gets one repair retry if the response misses the contract.
+- The primary path is `extract -> retrieve -> rank -> execute -> assemble`.
+- Extraction, ranking, and execution are separate OpenAI-aware stages. Deterministic retrieval sits between extraction and ranking so the model only ranks a bounded candidate set.
+- Each OpenAI stage requests strict structured JSON, validates it with Zod, and gets one repair retry if the response misses the contract.
 - A normalization layer maps every returned ID back to local catalog data, removes invalid or overlapping choices, repairs budget allocation, and falls back where needed.
-- The deterministic TypeScript engine remains as an offline fallback and eval baseline.
-- The UI shows recommended publishers, exclusions, personas, creative variants, config, and score signals so the output stays inspectable.
+- The deterministic TypeScript engine powers candidate retrieval, stage fallback, and the offline eval baseline.
+- The UI shows recommended publishers, exclusions, personas, creative variants, config, score signals, API call count, repair count, and fallback count so the output stays inspectable.
+- Normal OpenAI usage is 3 calls per campaign: extraction, ranking, and execution. Worst case is 6 calls if all three stages need one repair retry.
 
 Core entry points:
 
@@ -28,11 +30,13 @@ Core entry points:
 - `prompts/advertiser-extraction.md`, `prompts/campaign-ranking.md`, and `prompts/execution-generation.md`: the prompts used by the default staged OpenAI path.
 - `prompts/repair-response.md`: the repair prompt used when Zod rejects a stage response.
 - `src/lib/openai/generateStagedCampaign.ts`: coordinates extraction, retrieval, ranking, execution, and final assembly.
+- `src/lib/pipeline/extractAdvertiserProfile.ts`: extracts a narrow advertiser profile without publisher or persona decisions.
 - `src/lib/pipeline/retrieveCampaignCandidates.ts`: builds the bounded deterministic candidate set.
+- `src/lib/pipeline/assembleFinalCampaign.ts`: performs final assembly and records pipeline trace metadata.
 - `src/lib/pipeline/rankCampaignStrategy.ts` and `src/lib/openai/generateExecution.ts`: call the OpenAI Responses API with strict JSON schemas.
 - `src/lib/openai/repairResponse.ts`: validates model output with Zod and retries once with schema errors.
 - `src/lib/pipeline/normalizeRankedStrategy.ts` and `src/lib/openai/normalizeExecution.ts`: repair model output against the candidate set and locked strategy.
-- `src/lib/validation/campaignSchemas.ts`: Zod contracts for strategy and execution responses.
+- `src/lib/validation/campaignSchemas.ts`: Zod contracts for extraction, ranking, and execution responses.
 - `src/lib/publisherScoring.ts` and `src/lib/personaScoring.ts`: deterministic fallback and eval baseline.
 - `src/app/api/campaign/route.ts`: server-only API route that keeps the API key out of the browser.
 
@@ -45,16 +49,16 @@ npm run test
 npm run eval
 ```
 
-Unit tests cover scoring mechanics, output validity, Zod contracts, and staged-output normalization. The eval harness runs representative advertiser cases from `evals/fixtures/advertiser-cases.json` and writes reports to `evals/reports/`. Current offline eval score: `100`.
+Unit tests cover scoring mechanics, output validity, Zod contracts, staged-output normalization, stage fallback, candidate retrieval, and pipeline trace summaries. The eval harness runs representative advertiser cases from `evals/fixtures/advertiser-cases.json` and writes reports to `evals/reports/`. Current offline eval score: `100`.
 
 ## What I Cut
 
-I intentionally kept this to text creative and a small local catalog. I did not add authentication, campaign persistence, image generation, auction simulation, or a real publisher inventory database. Since the provided catalog is only 20 publishers and 10 personas, the staged prompt still includes the full catalog for the strategy step.
+I intentionally kept this to text creative and a small local catalog. I did not add authentication, campaign persistence, image generation, auction simulation, or a real publisher inventory database. The ranking prompt receives a bounded candidate set rather than the full catalog.
 
 ## What Is Hard
 
-The hard part is not rendering cards or calling an LLM. The hard part is keeping recommendations grounded in catalog facts while still letting the model make nuanced judgment calls. The staged design helps because extraction, matching, creative, and config are separable failure points. Publisher matching still gets harder as the catalog grows because "fit" becomes a retrieval and ranking problem, not a prompt-size problem.
+The hard part is not rendering cards or calling an LLM. The hard part is keeping recommendations grounded in catalog facts while still letting the model make nuanced judgment calls. The staged design helps because extraction, retrieval, ranking, creative, and config are separable failure points. Publisher matching still gets harder as the catalog grows because "fit" becomes a retrieval and ranking problem, not a prompt-size problem.
 
 ## Another Week
 
-I would replace full-catalog strategy prompting with filters, embeddings-backed publisher retrieval, and deterministic reranking before the LLM sees a short candidate set. I would also add richer advertiser extraction, saved campaign drafts, human feedback capture, regression evals, and monitoring for schema failures, repair rate, fallback rate, latency, and overridden recommendations.
+I would add embeddings-backed retrieval, richer advertiser extraction, saved campaign drafts, human feedback capture, regression evals, and monitoring for schema failures, repair rate, fallback rate, latency, and overridden recommendations.

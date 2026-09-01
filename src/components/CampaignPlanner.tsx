@@ -182,7 +182,7 @@ function modeLabel(mode: CampaignResult["mode"]) {
 
 function statusCopy(mode: CampaignResult["mode"], catalogSummary: CampaignPlannerProps["catalogSummary"]) {
   if (mode === "openai_staged") {
-    return `Extraction, ranking, and execution run as separate stages across ${catalogSummary.publisherCount} publishers and ${catalogSummary.personaCount} personas.`;
+    return `Extraction, deterministic retrieval, candidate ranking, and execution are split across ${catalogSummary.publisherCount} publishers and ${catalogSummary.personaCount} personas.`;
   }
 
   return "";
