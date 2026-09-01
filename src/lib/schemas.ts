@@ -345,6 +345,62 @@ export const inlineCampaignResultJsonSchema: JsonSchema = {
   }
 };
 
+export const strategyResponseJsonSchema: JsonSchema = {
+  name: "strategy_response",
+  strict: true,
+  schema: {
+    type: "object",
+    additionalProperties: false,
+    required: [
+      "advertiserAnalysis",
+      "recommendedPublishers",
+      "excludedPublishers",
+      "selectedPersonas",
+      "warnings"
+    ],
+    properties: {
+      advertiserAnalysis: advertiserAnalysisSchema,
+      recommendedPublishers: inlineCampaignResultJsonSchema.schema
+        ? (
+            inlineCampaignResultJsonSchema.schema as {
+              properties: Record<string, unknown>;
+            }
+          ).properties.recommendedPublishers
+        : {},
+      excludedPublishers: inlineCampaignResultJsonSchema.schema
+        ? (
+            inlineCampaignResultJsonSchema.schema as {
+              properties: Record<string, unknown>;
+            }
+          ).properties.excludedPublishers
+        : {},
+      selectedPersonas: inlineCampaignResultJsonSchema.schema
+        ? (
+            inlineCampaignResultJsonSchema.schema as {
+              properties: Record<string, unknown>;
+            }
+          ).properties.selectedPersonas
+        : {},
+      warnings: stringArraySchema
+    }
+  }
+};
+
+export const executionResponseJsonSchema: JsonSchema = {
+  name: "execution_response",
+  strict: true,
+  schema: {
+    type: "object",
+    additionalProperties: false,
+    required: ["creativeVariants", "campaignConfig", "warnings"],
+    properties: {
+      creativeVariants: creativeVariantsSchema,
+      campaignConfig: campaignConfigSchema,
+      warnings: stringArraySchema
+    }
+  }
+};
+
 export function validateCreativeVariants(variants: CreativeVariant[]) {
   const errors: string[] = [];
 

@@ -20,3 +20,15 @@ export function buildCampaignSystemPrompt() {
 export function buildFullInlineCampaignPrompt() {
   return readPrompt("full-campaign-generation.md");
 }
+
+export function buildStrategyPrompt() {
+  return readPrompt("strategy-generation.md");
+}
+
+export function buildExecutionPrompt() {
+  return readPrompt("execution-generation.md");
+}
+
+export function buildRepairPrompt() {
+  return readPrompt("repair-response.md");
+}
