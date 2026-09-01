@@ -216,6 +216,35 @@ const selectedPersonasSchema: JsonSchema = {
   }
 };
 
+export const advertiserProfileJsonSchema: JsonSchema = {
+  name: "advertiser_profile",
+  strict: true,
+  schema: {
+    ...advertiserAnalysisSchema
+  }
+};
+
+export const rankingResponseJsonSchema: JsonSchema = {
+  name: "ranking_response",
+  strict: true,
+  schema: {
+    type: "object",
+    additionalProperties: false,
+    required: [
+      "recommendedPublishers",
+      "excludedPublishers",
+      "selectedPersonas",
+      "warnings"
+    ],
+    properties: {
+      recommendedPublishers: recommendedPublishersSchema,
+      excludedPublishers: excludedPublishersSchema,
+      selectedPersonas: selectedPersonasSchema,
+      warnings: stringArraySchema
+    }
+  }
+};
+
 export const strategyResponseJsonSchema: JsonSchema = {
   name: "strategy_response",
   strict: true,

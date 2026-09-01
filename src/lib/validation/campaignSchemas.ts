@@ -10,7 +10,7 @@ const scoreSignalSchema = z.object({
   weight: z.number()
 });
 
-const advertiserAnalysisSchema = z.object({
+const advertiserProfileResponseSchema = z.object({
   category: z.string().min(1),
   secondaryCategories: z.array(z.string()),
   priceTier: priceTierSchema,
@@ -47,12 +47,15 @@ const strategyPersonaSchema = z.object({
   signals: z.array(scoreSignalSchema)
 });
 
-export const strategyResponseSchema = z.object({
-  advertiserAnalysis: advertiserAnalysisSchema,
+export const rankingResponseSchema = z.object({
   recommendedPublishers: z.array(strategyPublisherSchema).min(3).max(5),
   excludedPublishers: z.array(excludedPublisherSchema).min(3).max(8),
   selectedPersonas: z.array(strategyPersonaSchema).min(3).max(5),
   warnings: z.array(z.string())
+});
+
+export const strategyResponseSchema = rankingResponseSchema.extend({
+  advertiserAnalysis: advertiserProfileResponseSchema
 });
 
 const creativeVariantSchema = z.object({
@@ -113,5 +116,9 @@ export const executionResponseSchema = z.object({
   warnings: z.array(z.string())
 });
 
+export { advertiserProfileResponseSchema };
+
+export type AdvertiserProfileResponse = z.infer<typeof advertiserProfileResponseSchema>;
+export type RankingResponse = z.infer<typeof rankingResponseSchema>;
 export type StrategyResponse = z.infer<typeof strategyResponseSchema>;
 export type ExecutionResponse = z.infer<typeof executionResponseSchema>;

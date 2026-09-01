@@ -4,6 +4,27 @@ export type AmbiguityLevel = "low" | "medium" | "high";
 
 export type CampaignMode = "openai_staged" | "fallback";
 
+export type CampaignStageName = "extract" | "retrieve" | "rank" | "execute" | "assemble";
+
+export type CampaignStageSource = "deterministic" | "openai" | "hybrid" | "fallback";
+
+export type CampaignStageTrace = {
+  name: CampaignStageName;
+  source: CampaignStageSource;
+  durationMs: number;
+  apiCalls: number;
+  repaired: boolean;
+  warnings: string[];
+  fallbackReason?: string;
+};
+
+export type CampaignPipelineTrace = {
+  apiCallCount: number;
+  repairCount: number;
+  fallbackStages: CampaignStageName[];
+  stages: CampaignStageTrace[];
+};
+
 export type PublisherAudience = {
   age_skew: string;
   gender_split: {
@@ -142,6 +163,7 @@ export type CampaignResult = {
   creativeVariants: CreativeVariant[];
   campaignConfig: CampaignConfig;
   warnings: string[];
+  pipeline?: CampaignPipelineTrace;
 };
 
 export type ExampleAdvertiser = {
