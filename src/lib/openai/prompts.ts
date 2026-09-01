@@ -7,20 +7,6 @@ export function readPrompt(name: string) {
   return readFileSync(promptPath(name), "utf8").trim();
 }
 
-export function buildCampaignSystemPrompt() {
-  return [
-    readPrompt("campaign-generation.md"),
-    readPrompt("advertiser-analysis.md"),
-    readPrompt("publisher-ranking.md"),
-    readPrompt("creative-generation.md"),
-    readPrompt("campaign-config.md")
-  ].join("\n\n---\n\n");
-}
-
-export function buildFullInlineCampaignPrompt() {
-  return readPrompt("full-campaign-generation.md");
-}
-
 export function buildStrategyPrompt() {
   return readPrompt("strategy-generation.md");
 }

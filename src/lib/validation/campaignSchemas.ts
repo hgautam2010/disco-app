@@ -113,51 +113,5 @@ export const executionResponseSchema = z.object({
   warnings: z.array(z.string())
 });
 
-export const inlineCampaignDraftSchema = strategyResponseSchema.extend({
-  creativeVariants: executionResponseSchema.shape.creativeVariants,
-  campaignConfig: executionResponseSchema.shape.campaignConfig
-});
-
-export const campaignResultSchema = z.object({
-  mode: z.enum(["openai", "openai_inline", "openai_staged", "fallback"]),
-  generatedAt: z.string().min(1),
-  advertiserAnalysis: advertiserAnalysisSchema.extend({
-    originalDescription: z.string()
-  }),
-  recommendedPublishers: z.array(
-    z.object({
-      publisher: z.unknown(),
-      score: z.number().min(0).max(100),
-      normalizedScore: z.number().min(0).max(1),
-      reasons: z.array(z.string()),
-      risks: z.array(z.string()),
-      signals: z.array(scoreSignalSchema)
-    })
-  ),
-  excludedPublishers: z.array(
-    z.object({
-      publisher: z.unknown(),
-      score: z.number().min(0).max(100),
-      reason: z.string(),
-      signals: z.array(scoreSignalSchema)
-    })
-  ),
-  selectedPersonas: z.array(
-    z.object({
-      persona: z.unknown(),
-      score: z.number().min(0).max(100),
-      normalizedScore: z.number().min(0).max(1),
-      reasons: z.array(z.string()),
-      risks: z.array(z.string()),
-      messagingAngles: z.array(z.string()),
-      signals: z.array(scoreSignalSchema)
-    })
-  ),
-  creativeVariants: executionResponseSchema.shape.creativeVariants,
-  campaignConfig: campaignConfigSchema,
-  warnings: z.array(z.string())
-});
-
 export type StrategyResponse = z.infer<typeof strategyResponseSchema>;
 export type ExecutionResponse = z.infer<typeof executionResponseSchema>;
-export type InlineCampaignDraft = z.infer<typeof inlineCampaignDraftSchema>;

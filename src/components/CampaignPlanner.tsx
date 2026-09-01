@@ -176,24 +176,12 @@ function modeLabel(mode: CampaignResult["mode"]) {
     return "Staged OpenAI pipeline";
   }
 
-  if (mode === "openai_inline") {
-    return "Full-catalog OpenAI";
-  }
-
-  if (mode === "openai") {
-    return "OpenAI assisted";
-  }
-
   return "Deterministic fallback";
 }
 
 function statusCopy(mode: CampaignResult["mode"], catalogSummary: CampaignPlannerProps["catalogSummary"]) {
   if (mode === "openai_staged") {
     return `Strategy and execution ran as separate OpenAI calls across ${catalogSummary.publisherCount} publishers and ${catalogSummary.personaCount} personas.`;
-  }
-
-  if (mode === "openai_inline") {
-    return `Model reviewed all ${catalogSummary.publisherCount} publishers and ${catalogSummary.personaCount} personas.`;
   }
 
   return "";

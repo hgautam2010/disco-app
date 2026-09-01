@@ -19,7 +19,7 @@ The app is optimized for the small catalog provided in the exercise:
 - The primary path runs as two OpenAI calls: strategy first, then execution. Strategy extracts the advertiser, picks publishers, picks personas, and names exclusions. Execution writes creative and campaign config from that validated strategy.
 - Each stage requests strict structured JSON, validates it with Zod, and gets one repair retry if the response misses the contract.
 - A normalization layer maps every returned ID back to local catalog data, removes invalid or overlapping choices, repairs budget allocation, and falls back where needed.
-- The deterministic TypeScript engine remains as an offline fallback and eval baseline. The older full-inline prompt path is still in the repo for comparison, but it is no longer the default.
+- The deterministic TypeScript engine remains as an offline fallback and eval baseline.
 - The UI shows recommended publishers, exclusions, personas, creative variants, config, and score signals so the output stays inspectable.
 
 Core entry points:
@@ -31,7 +31,7 @@ Core entry points:
 - `src/lib/openai/generateStrategy.ts` and `src/lib/openai/generateExecution.ts`: call the OpenAI Responses API with strict JSON schemas.
 - `src/lib/openai/repairResponse.ts`: validates model output with Zod and retries once with schema errors.
 - `src/lib/openai/normalizeStrategy.ts` and `src/lib/openai/normalizeExecution.ts`: repair model output against the local catalog.
-- `src/lib/validation/campaignSchemas.ts`: Zod contracts for strategy, execution, inline drafts, and complete campaign results.
+- `src/lib/validation/campaignSchemas.ts`: Zod contracts for strategy and execution responses.
 - `src/lib/publisherScoring.ts` and `src/lib/personaScoring.ts`: deterministic fallback and eval baseline.
 - `src/app/api/campaign/route.ts`: server-only API route that keeps the API key out of the browser.
 
@@ -44,7 +44,7 @@ npm run test
 npm run eval
 ```
 
-Unit tests cover scoring mechanics, output validity, Zod contracts, inline-output normalization, and staged-output normalization. The eval harness runs representative advertiser cases from `evals/fixtures/advertiser-cases.json` and writes reports to `evals/reports/`. `evals/fixtures/inline-cases.json` lists manual checks for API-key runs. Current offline eval score: `100`.
+Unit tests cover scoring mechanics, output validity, Zod contracts, and staged-output normalization. The eval harness runs representative advertiser cases from `evals/fixtures/advertiser-cases.json` and writes reports to `evals/reports/`. Current offline eval score: `100`.
 
 ## What I Cut
 

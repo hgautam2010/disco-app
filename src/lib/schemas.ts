@@ -153,194 +153,65 @@ const campaignConfigSchema: JsonSchema = {
   }
 };
 
-export const campaignResultJsonSchema: JsonSchema = {
-  name: "campaign_result",
-  strict: true,
-  schema: {
+const recommendedPublishersSchema: JsonSchema = {
+  type: "array",
+  minItems: 3,
+  maxItems: 5,
+  items: {
     type: "object",
     additionalProperties: false,
-    required: [
-      "advertiserAnalysis",
-      "publisherNarratives",
-      "excludedPublisherNarratives",
-      "personaNarratives",
-      "creativeVariants",
-      "campaignConfig",
-      "warnings"
-    ],
+    required: ["publisherId", "score", "reasons", "risks", "signals"],
     properties: {
-      advertiserAnalysis: advertiserAnalysisSchema,
-      publisherNarratives: {
+      publisherId: { type: "string" },
+      score: { type: "number", minimum: 0, maximum: 100 },
+      reasons: stringArraySchema,
+      risks: stringArraySchema,
+      signals: {
         type: "array",
-        minItems: 1,
-        maxItems: 5,
-        items: {
-          type: "object",
-          additionalProperties: false,
-          required: ["publisherId", "rationale", "risk", "budgetRationale"],
-          properties: {
-            publisherId: { type: "string" },
-            rationale: { type: "string" },
-            risk: { type: "string" },
-            budgetRationale: { type: "string" }
-          }
-        }
-      },
-      excludedPublisherNarratives: {
-        type: "array",
-        minItems: 3,
-        maxItems: 8,
-        items: {
-          type: "object",
-          additionalProperties: false,
-          required: ["publisherId", "reason"],
-          properties: {
-            publisherId: { type: "string" },
-            reason: { type: "string" }
-          }
-        }
-      },
-      personaNarratives: {
-        type: "array",
-        minItems: 3,
-        maxItems: 5,
-        items: {
-          type: "object",
-          additionalProperties: false,
-          required: ["personaId", "rationale", "messagingAngles"],
-          properties: {
-            personaId: { type: "string" },
-            rationale: { type: "string" },
-            messagingAngles: stringArraySchema
-          }
-        }
-      },
-      creativeVariants: creativeVariantsSchema,
-      campaignConfig: {
-        type: "object",
-        additionalProperties: false,
-        required: ["objective", "targeting", "bidStrategy", "measurement"],
-        properties: {
-          objective: { type: "string" },
-          targeting: {
-            type: "object",
-            additionalProperties: false,
-            required: ["categories", "audienceAttributes", "geos", "excludedAttributes"],
-            properties: {
-              categories: stringArraySchema,
-              audienceAttributes: stringArraySchema,
-              geos: stringArraySchema,
-              excludedAttributes: stringArraySchema
-            }
-          },
-          bidStrategy: {
-            type: "object",
-            additionalProperties: false,
-            required: ["type", "rationale"],
-            properties: {
-              type: {
-                type: "string",
-                enum: ["balanced_cpm", "efficient_reach", "premium_focus"]
-              },
-              rationale: { type: "string" }
-            }
-          },
-          measurement: {
-            type: "object",
-            additionalProperties: false,
-            required: ["primaryKpi", "secondaryKpis"],
-            properties: {
-              primaryKpi: { type: "string" },
-              secondaryKpis: stringArraySchema
-            }
-          }
-        }
-      },
-      warnings: stringArraySchema
+        items: scoreSignalSchema
+      }
     }
   }
 };
 
-export const inlineCampaignResultJsonSchema: JsonSchema = {
-  name: "inline_campaign_result",
-  strict: true,
-  schema: {
+const excludedPublishersSchema: JsonSchema = {
+  type: "array",
+  minItems: 3,
+  maxItems: 8,
+  items: {
     type: "object",
     additionalProperties: false,
-    required: [
-      "advertiserAnalysis",
-      "recommendedPublishers",
-      "excludedPublishers",
-      "selectedPersonas",
-      "creativeVariants",
-      "campaignConfig",
-      "warnings"
-    ],
+    required: ["publisherId", "score", "reason", "signals"],
     properties: {
-      advertiserAnalysis: advertiserAnalysisSchema,
-      recommendedPublishers: {
+      publisherId: { type: "string" },
+      score: { type: "number", minimum: 0, maximum: 100 },
+      reason: { type: "string" },
+      signals: {
         type: "array",
-        minItems: 3,
-        maxItems: 5,
-        items: {
-          type: "object",
-          additionalProperties: false,
-          required: ["publisherId", "score", "reasons", "risks", "signals"],
-          properties: {
-            publisherId: { type: "string" },
-            score: { type: "number", minimum: 0, maximum: 100 },
-            reasons: stringArraySchema,
-            risks: stringArraySchema,
-            signals: {
-              type: "array",
-              items: scoreSignalSchema
-            }
-          }
-        }
-      },
-      excludedPublishers: {
+        items: scoreSignalSchema
+      }
+    }
+  }
+};
+
+const selectedPersonasSchema: JsonSchema = {
+  type: "array",
+  minItems: 3,
+  maxItems: 5,
+  items: {
+    type: "object",
+    additionalProperties: false,
+    required: ["personaId", "score", "reasons", "risks", "messagingAngles", "signals"],
+    properties: {
+      personaId: { type: "string" },
+      score: { type: "number", minimum: 0, maximum: 100 },
+      reasons: stringArraySchema,
+      risks: stringArraySchema,
+      messagingAngles: stringArraySchema,
+      signals: {
         type: "array",
-        minItems: 3,
-        maxItems: 8,
-        items: {
-          type: "object",
-          additionalProperties: false,
-          required: ["publisherId", "score", "reason", "signals"],
-          properties: {
-            publisherId: { type: "string" },
-            score: { type: "number", minimum: 0, maximum: 100 },
-            reason: { type: "string" },
-            signals: {
-              type: "array",
-              items: scoreSignalSchema
-            }
-          }
-        }
-      },
-      selectedPersonas: {
-        type: "array",
-        minItems: 3,
-        maxItems: 5,
-        items: {
-          type: "object",
-          additionalProperties: false,
-          required: ["personaId", "score", "reasons", "risks", "messagingAngles", "signals"],
-          properties: {
-            personaId: { type: "string" },
-            score: { type: "number", minimum: 0, maximum: 100 },
-            reasons: stringArraySchema,
-            risks: stringArraySchema,
-            messagingAngles: stringArraySchema,
-            signals: {
-              type: "array",
-              items: scoreSignalSchema
-            }
-          }
-        }
-      },
-      creativeVariants: creativeVariantsSchema,
-      campaignConfig: campaignConfigSchema,
-      warnings: stringArraySchema
+        items: scoreSignalSchema
+      }
     }
   }
 };
@@ -360,27 +231,9 @@ export const strategyResponseJsonSchema: JsonSchema = {
     ],
     properties: {
       advertiserAnalysis: advertiserAnalysisSchema,
-      recommendedPublishers: inlineCampaignResultJsonSchema.schema
-        ? (
-            inlineCampaignResultJsonSchema.schema as {
-              properties: Record<string, unknown>;
-            }
-          ).properties.recommendedPublishers
-        : {},
-      excludedPublishers: inlineCampaignResultJsonSchema.schema
-        ? (
-            inlineCampaignResultJsonSchema.schema as {
-              properties: Record<string, unknown>;
-            }
-          ).properties.excludedPublishers
-        : {},
-      selectedPersonas: inlineCampaignResultJsonSchema.schema
-        ? (
-            inlineCampaignResultJsonSchema.schema as {
-              properties: Record<string, unknown>;
-            }
-          ).properties.selectedPersonas
-        : {},
+      recommendedPublishers: recommendedPublishersSchema,
+      excludedPublishers: excludedPublishersSchema,
+      selectedPersonas: selectedPersonasSchema,
       warnings: stringArraySchema
     }
   }
@@ -401,7 +254,7 @@ export const executionResponseJsonSchema: JsonSchema = {
   }
 };
 
-export function validateCreativeVariants(variants: CreativeVariant[]) {
+function validateCreativeVariants(variants: CreativeVariant[]) {
   const errors: string[] = [];
 
   if (variants.length < 3 || variants.length > 5) {
