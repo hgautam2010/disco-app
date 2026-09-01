@@ -7,6 +7,10 @@ function readPrompt(name: string) {
   return readFileSync(promptPath(name), "utf8").trim();
 }
 
+export function buildExtractionPrompt() {
+  return readPrompt("advertiser-extraction.md");
+}
+
 export function buildStrategyPrompt() {
   return readPrompt("strategy-generation.md");
 }

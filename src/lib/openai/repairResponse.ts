@@ -21,27 +21,81 @@ type GenerateAndValidateOptions<T> = {
   fallbackCandidates: unknown;
 };
 
+export type StructuredGenerationResult<T> = {
+  data: T;
+  apiCalls: number;
+  repaired: boolean;
+};
+
+export class StructuredGenerationError extends Error {
+  apiCalls: number;
+  repaired: boolean;
+
+  constructor(message: string, { apiCalls, repaired }: { apiCalls: number; repaired: boolean }) {
+    super(message);
+    this.name = "StructuredGenerationError";
+    this.apiCalls = apiCalls;
+    this.repaired = repaired;
+  }
+}
+
 export async function generateAndValidateWithRepair<T>({
   label,
   schema,
   request,
   fallbackCandidates
 }: GenerateAndValidateOptions<T>) {
-  const original = await createStructuredResponse<unknown>(request);
+  return (
+    await generateAndValidateWithRepairResult({
+      label,
+      schema,
+      request,
+      fallbackCandidates
+    })
+  ).data;
+}
+
+export async function generateAndValidateWithRepairResult<T>({
+  label,
+  schema,
+  request,
+  fallbackCandidates
+}: GenerateAndValidateOptions<T>): Promise<StructuredGenerationResult<T>> {
+  let original: unknown;
+
+  try {
+    original = await createStructuredResponse<unknown>(request);
+  } catch (error) {
+    throw new StructuredGenerationError(errorMessage(error), { apiCalls: 1, repaired: false });
+  }
+
   const parsed = schema.safeParse(original);
 
   if (parsed.success) {
-    return parsed.data;
+    return {
+      data: parsed.data,
+      apiCalls: 1,
+      repaired: false
+    };
   }
 
-  const repaired = await repairResponse({
-    label,
-    schema: request.text.format,
-    original,
-    validationError: parsed.error,
-    fallbackCandidates
-  });
-  return schema.parse(repaired);
+  try {
+    const repaired = await repairResponse({
+      label,
+      schema: request.text.format,
+      original,
+      validationError: parsed.error,
+      fallbackCandidates
+    });
+
+    return {
+      data: schema.parse(repaired),
+      apiCalls: 2,
+      repaired: true
+    };
+  } catch (error) {
+    throw new StructuredGenerationError(errorMessage(error), { apiCalls: 2, repaired: true });
+  }
 }
 
 async function repairResponse({
@@ -84,4 +138,8 @@ async function repairResponse({
       format: schema
     }
   });
+}
+
+function errorMessage(error: unknown) {
+  return error instanceof Error ? error.message : "Structured generation failed.";
 }
