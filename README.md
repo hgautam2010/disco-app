@@ -10,23 +10,28 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Set `OPENAI_API_KEY` in `.env.local` to enable full-catalog OpenAI generation. Without a key, the app still runs with deterministic fallback output. `OPENAI_MODEL` defaults to `gpt-5.1`.
+Set `OPENAI_API_KEY` in `.env.local` to enable the staged OpenAI pipeline. Without a key, the app still runs with deterministic fallback output. `OPENAI_MODEL` defaults to `gpt-5.1`.
 
 ## What I Built
 
 The app is optimized for the small catalog provided in the exercise:
 
-- The primary path sends the full publisher and persona catalog to OpenAI with the advertiser pitch and asks for strict structured JSON.
+- The primary path runs as two OpenAI calls: strategy first, then execution. Strategy extracts the advertiser, picks publishers, picks personas, and names exclusions. Execution writes creative and campaign config from that validated strategy.
+- Each stage requests strict structured JSON, validates it with Zod, and gets one repair retry if the response misses the contract.
 - A normalization layer maps every returned ID back to local catalog data, removes invalid or overlapping choices, repairs budget allocation, and falls back where needed.
-- The deterministic TypeScript engine remains as an offline fallback and eval baseline. It also shows how this would evolve when the catalog is too large to fit inline.
+- The deterministic TypeScript engine remains as an offline fallback and eval baseline. The older full-inline prompt path is still in the repo for comparison, but it is no longer the default.
 - The UI shows recommended publishers, exclusions, personas, creative variants, config, and score signals so the output stays inspectable.
 
 Core entry points:
 
 - `src/lib/campaignEngine.ts`: orchestrates the full campaign generation flow.
-- `prompts/full-campaign-generation.md`: the full inline prompt used for the primary OpenAI path.
-- `src/lib/openai/generateInlineCampaign.ts`: calls the OpenAI Responses API with the full catalog and a strict JSON schema.
-- `src/lib/openai/normalizeCampaign.ts`: validates and repairs model output against the local catalog.
+- `prompts/strategy-generation.md` and `prompts/execution-generation.md`: the two prompts used by the default staged OpenAI path.
+- `prompts/repair-response.md`: the repair prompt used when Zod rejects a stage response.
+- `src/lib/openai/generateStagedCampaign.ts`: coordinates strategy, execution, and normalization.
+- `src/lib/openai/generateStrategy.ts` and `src/lib/openai/generateExecution.ts`: call the OpenAI Responses API with strict JSON schemas.
+- `src/lib/openai/repairResponse.ts`: validates model output with Zod and retries once with schema errors.
+- `src/lib/openai/normalizeStrategy.ts` and `src/lib/openai/normalizeExecution.ts`: repair model output against the local catalog.
+- `src/lib/validation/campaignSchemas.ts`: Zod contracts for strategy, execution, inline drafts, and complete campaign results.
 - `src/lib/publisherScoring.ts` and `src/lib/personaScoring.ts`: deterministic fallback and eval baseline.
 - `src/app/api/campaign/route.ts`: server-only API route that keeps the API key out of the browser.
 
@@ -39,16 +44,16 @@ npm run test
 npm run eval
 ```
 
-Unit tests cover scoring mechanics, output validity, and inline-output normalization. The eval harness runs representative advertiser cases from `evals/fixtures/advertiser-cases.json` and writes reports to `evals/reports/`. `evals/fixtures/inline-cases.json` lists manual checks for API-key runs. Current offline eval score: `100`.
+Unit tests cover scoring mechanics, output validity, Zod contracts, inline-output normalization, and staged-output normalization. The eval harness runs representative advertiser cases from `evals/fixtures/advertiser-cases.json` and writes reports to `evals/reports/`. `evals/fixtures/inline-cases.json` lists manual checks for API-key runs. Current offline eval score: `100`.
 
 ## What I Cut
 
-I intentionally kept this to text creative and a small local catalog. I did not add authentication, campaign persistence, image generation, auction simulation, or a real publisher inventory database. Since the provided catalog is only 20 publishers and 10 personas, I chose the simplest high-quality path first: pass the full catalog inline and make the model show its work.
+I intentionally kept this to text creative and a small local catalog. I did not add authentication, campaign persistence, image generation, auction simulation, or a real publisher inventory database. Since the provided catalog is only 20 publishers and 10 personas, the staged prompt still includes the full catalog for the strategy step.
 
 ## What Is Hard
 
-The hard part is not rendering cards or calling an LLM. The hard part is keeping recommendations grounded in catalog facts while still letting the model make nuanced judgment calls. Publisher matching also gets harder as the catalog grows because "fit" becomes a retrieval and ranking problem, not a prompt-size problem.
+The hard part is not rendering cards or calling an LLM. The hard part is keeping recommendations grounded in catalog facts while still letting the model make nuanced judgment calls. The staged design helps because extraction, matching, creative, and config are separable failure points. Publisher matching still gets harder as the catalog grows because "fit" becomes a retrieval and ranking problem, not a prompt-size problem.
 
 ## Another Week
 
-I would replace full-inline catalog prompting with filters, embeddings-backed publisher retrieval, and deterministic reranking before the LLM sees a short candidate set. I would also add richer advertiser extraction, saved campaign drafts, human feedback capture, regression evals, and monitoring for schema failures, fallback rate, latency, and overridden recommendations.
+I would replace full-catalog strategy prompting with filters, embeddings-backed publisher retrieval, and deterministic reranking before the LLM sees a short candidate set. I would also add richer advertiser extraction, saved campaign drafts, human feedback capture, regression evals, and monitoring for schema failures, repair rate, fallback rate, latency, and overridden recommendations.
