@@ -7,7 +7,6 @@ export type CampaignMode = "openai_staged" | "fallback";
 export type CampaignStageName =
   | "extract"
   | "retrieve"
-  | "rank"
   | "rank_publishers"
   | "select_personas"
   | "execute"

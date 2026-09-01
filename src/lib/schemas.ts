@@ -224,27 +224,6 @@ export const advertiserProfileJsonSchema: JsonSchema = {
   }
 };
 
-export const rankingResponseJsonSchema: JsonSchema = {
-  name: "ranking_response",
-  strict: true,
-  schema: {
-    type: "object",
-    additionalProperties: false,
-    required: [
-      "recommendedPublishers",
-      "excludedPublishers",
-      "selectedPersonas",
-      "warnings"
-    ],
-    properties: {
-      recommendedPublishers: recommendedPublishersSchema,
-      excludedPublishers: excludedPublishersSchema,
-      selectedPersonas: selectedPersonasSchema,
-      warnings: stringArraySchema
-    }
-  }
-};
-
 export const publisherRankingResponseJsonSchema: JsonSchema = {
   name: "publisher_ranking_response",
   strict: true,
