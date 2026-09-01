@@ -7,10 +7,6 @@ function readPrompt(name: string) {
   return readFileSync(promptPath(name), "utf8").trim();
 }
 
-export function buildPublisherRankingPrompt() {
-  return readPrompt("publisher-ranking.md");
-}
-
 export function buildPersonaSelectionPrompt() {
   return readPrompt("persona-selection.md");
 }

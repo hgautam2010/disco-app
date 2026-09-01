@@ -1,18 +1,14 @@
-import { publisherRankingResponseJsonSchema } from "../schemas";
-import type { CampaignStageTrace } from "../types";
-import { getOpenAIModel, hasOpenAIKey } from "../campaign/shared/openaiClient";
-import { buildPublisherRankingPrompt } from "../openai/prompts";
+import type { CampaignStageTrace } from "../../../types";
+import { getOpenAIModel, hasOpenAIKey } from "../../shared/openaiClient";
+import { readStagePrompt } from "../../shared/prompts";
 import {
   generateAndValidateWithRepairResult,
   StructuredGenerationError,
   type RepairableStructuredRequest
-} from "../campaign/shared/structuredGeneration";
-import { publisherRankingResponseSchema } from "../validation/campaignSchemas";
-import {
-  deterministicPublisherStrategyFromCandidates,
-  normalizePublisherStrategy
-} from "./normalizePublisherStrategy";
-import type { CampaignCandidates, LockedPublisherStrategy, PipelineStageResult } from "./types";
+} from "../../shared/structuredGeneration";
+import { deterministicPublisherStrategyFromCandidates, normalizePublisherStrategy } from "./normalize";
+import { publisherRankingResponseJsonSchema, publisherRankingResponseSchema } from "./schema";
+import type { CampaignCandidates, LockedPublisherStrategy, PipelineStageResult } from "../../types";
 
 export async function rankPublisherStrategy(
   candidates: CampaignCandidates
@@ -29,7 +25,7 @@ export async function rankPublisherStrategy(
     input: [
       {
         role: "system",
-        content: buildPublisherRankingPrompt()
+        content: readStagePrompt("rank-publishers")
       },
       {
         role: "user",

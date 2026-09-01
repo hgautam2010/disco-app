@@ -1,13 +1,13 @@
-import type { ExcludedPublisher, ScoredPublisher } from "../types";
-import type { PublisherRankingResponse } from "../validation/campaignSchemas";
+import type { ExcludedPublisher, ScoredPublisher } from "../../../types";
+import type { PublisherRankingResponse } from "./schema";
 import {
   clampScore,
   fillUniqueFromFallback,
   nonEmptyArray,
   nonEmptySignals,
   normalizedScore
-} from "../campaign/shared/normalization";
-import type { CampaignCandidates, LockedPublisherStrategy } from "./types";
+} from "../../shared/normalization";
+import type { CampaignCandidates, LockedPublisherStrategy } from "../../types";
 
 export function deterministicPublisherStrategyFromCandidates(
   candidates: CampaignCandidates

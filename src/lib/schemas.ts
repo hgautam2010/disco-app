@@ -121,47 +121,6 @@ const campaignConfigSchema: JsonSchema = {
   }
 };
 
-const recommendedPublishersSchema: JsonSchema = {
-  type: "array",
-  minItems: 3,
-  maxItems: 5,
-  items: {
-    type: "object",
-    additionalProperties: false,
-    required: ["publisherId", "score", "reasons", "risks", "signals"],
-    properties: {
-      publisherId: { type: "string" },
-      score: { type: "number", minimum: 0, maximum: 100 },
-      reasons: stringArraySchema,
-      risks: stringArraySchema,
-      signals: {
-        type: "array",
-        items: scoreSignalSchema
-      }
-    }
-  }
-};
-
-const excludedPublishersSchema: JsonSchema = {
-  type: "array",
-  minItems: 3,
-  maxItems: 8,
-  items: {
-    type: "object",
-    additionalProperties: false,
-    required: ["publisherId", "score", "reason", "signals"],
-    properties: {
-      publisherId: { type: "string" },
-      score: { type: "number", minimum: 0, maximum: 100 },
-      reason: { type: "string" },
-      signals: {
-        type: "array",
-        items: scoreSignalSchema
-      }
-    }
-  }
-};
-
 const selectedPersonasSchema: JsonSchema = {
   type: "array",
   minItems: 3,
@@ -180,21 +139,6 @@ const selectedPersonasSchema: JsonSchema = {
         type: "array",
         items: scoreSignalSchema
       }
-    }
-  }
-};
-
-export const publisherRankingResponseJsonSchema: JsonSchema = {
-  name: "publisher_ranking_response",
-  strict: true,
-  schema: {
-    type: "object",
-    additionalProperties: false,
-    required: ["recommendedPublishers", "excludedPublishers", "warnings"],
-    properties: {
-      recommendedPublishers: recommendedPublishersSchema,
-      excludedPublishers: excludedPublishersSchema,
-      warnings: stringArraySchema
     }
   }
 };

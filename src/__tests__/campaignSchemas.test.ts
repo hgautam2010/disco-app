@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { advertiserProfileResponseSchema } from "@/lib/campaign/stages/extract-advertiser/schema";
+import { publisherRankingResponseSchema } from "@/lib/campaign/stages/rank-publishers/schema";
 import {
   executionResponseSchema,
-  personaSelectionResponseSchema,
-  publisherRankingResponseSchema
+  personaSelectionResponseSchema
 } from "@/lib/validation/campaignSchemas";
 
 describe("campaign Zod schemas", () => {

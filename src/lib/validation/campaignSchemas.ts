@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { advertiserProfileResponseSchema } from "../campaign/stages/extract-advertiser/schema";
+import { publisherRankingResponseSchema } from "../campaign/stages/rank-publishers/schema";
 
 const bidStrategyTypeSchema = z.enum(["balanced_cpm", "efficient_reach", "premium_focus"]);
 
@@ -9,21 +10,6 @@ const scoreSignalSchema = z.object({
   weight: z.number()
 });
 
-const strategyPublisherSchema = z.object({
-  publisherId: z.string().min(1),
-  score: z.number().min(0).max(100),
-  reasons: z.array(z.string().min(1)).min(1),
-  risks: z.array(z.string()),
-  signals: z.array(scoreSignalSchema)
-});
-
-const excludedPublisherSchema = z.object({
-  publisherId: z.string().min(1),
-  score: z.number().min(0).max(100),
-  reason: z.string().min(1),
-  signals: z.array(scoreSignalSchema)
-});
-
 const strategyPersonaSchema = z.object({
   personaId: z.string().min(1),
   score: z.number().min(0).max(100),
@@ -31,12 +17,6 @@ const strategyPersonaSchema = z.object({
   risks: z.array(z.string()),
   messagingAngles: z.array(z.string()),
   signals: z.array(scoreSignalSchema)
-});
-
-export const publisherRankingResponseSchema = z.object({
-  recommendedPublishers: z.array(strategyPublisherSchema).min(3).max(5),
-  excludedPublishers: z.array(excludedPublisherSchema).min(3).max(8),
-  warnings: z.array(z.string())
 });
 
 export const personaSelectionResponseSchema = z.object({
@@ -103,7 +83,8 @@ export const executionResponseSchema = z.object({
 });
 
 export { advertiserProfileResponseSchema };
+export { publisherRankingResponseSchema };
 export type { AdvertiserProfileResponse } from "../campaign/stages/extract-advertiser/schema";
-export type PublisherRankingResponse = z.infer<typeof publisherRankingResponseSchema>;
+export type { PublisherRankingResponse } from "../campaign/stages/rank-publishers/schema";
 export type PersonaSelectionResponse = z.infer<typeof personaSelectionResponseSchema>;
 export type ExecutionResponse = z.infer<typeof executionResponseSchema>;

@@ -10,13 +10,13 @@ import {
 import {
   deterministicPublisherStrategyFromCandidates,
   normalizePublisherStrategy
-} from "@/lib/pipeline/normalizePublisherStrategy";
+} from "@/lib/campaign/stages/rank-publishers/normalize";
 import { retrieveCampaignCandidates } from "@/lib/campaign/stages/retrieve-candidates/run";
 import { validateCampaignResult } from "@/lib/schemas";
+import type { PublisherRankingResponse } from "@/lib/campaign/stages/rank-publishers/schema";
 import type {
   ExecutionResponse,
-  PersonaSelectionResponse,
-  PublisherRankingResponse
+  PersonaSelectionResponse
 } from "@/lib/validation/campaignSchemas";
 
 describe("staged campaign normalization", () => {
