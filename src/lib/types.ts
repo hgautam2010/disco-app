@@ -4,7 +4,14 @@ export type AmbiguityLevel = "low" | "medium" | "high";
 
 export type CampaignMode = "openai_staged" | "fallback";
 
-export type CampaignStageName = "extract" | "retrieve" | "rank" | "execute" | "assemble";
+export type CampaignStageName =
+  | "extract"
+  | "retrieve"
+  | "rank"
+  | "rank_publishers"
+  | "select_personas"
+  | "execute"
+  | "assemble";
 
 export type CampaignStageSource = "deterministic" | "openai" | "hybrid" | "fallback";
 

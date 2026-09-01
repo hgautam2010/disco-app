@@ -15,6 +15,14 @@ export function buildRankingPrompt() {
   return readPrompt("campaign-ranking.md");
 }
 
+export function buildPublisherRankingPrompt() {
+  return readPrompt("publisher-ranking.md");
+}
+
+export function buildPersonaSelectionPrompt() {
+  return readPrompt("persona-selection.md");
+}
+
 export function buildExecutionPrompt() {
   return readPrompt("execution-generation.md");
 }

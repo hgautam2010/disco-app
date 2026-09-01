@@ -245,6 +245,35 @@ export const rankingResponseJsonSchema: JsonSchema = {
   }
 };
 
+export const publisherRankingResponseJsonSchema: JsonSchema = {
+  name: "publisher_ranking_response",
+  strict: true,
+  schema: {
+    type: "object",
+    additionalProperties: false,
+    required: ["recommendedPublishers", "excludedPublishers", "warnings"],
+    properties: {
+      recommendedPublishers: recommendedPublishersSchema,
+      excludedPublishers: excludedPublishersSchema,
+      warnings: stringArraySchema
+    }
+  }
+};
+
+export const personaSelectionResponseJsonSchema: JsonSchema = {
+  name: "persona_selection_response",
+  strict: true,
+  schema: {
+    type: "object",
+    additionalProperties: false,
+    required: ["selectedPersonas", "warnings"],
+    properties: {
+      selectedPersonas: selectedPersonasSchema,
+      warnings: stringArraySchema
+    }
+  }
+};
+
 export const executionResponseJsonSchema: JsonSchema = {
   name: "execution_response",
   strict: true,
