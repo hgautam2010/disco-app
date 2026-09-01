@@ -1,11 +1,14 @@
 import { getPersonas, getPublishers } from "../data";
 import { strategyResponseJsonSchema } from "../schemas";
 import { strategyResponseSchema, type StrategyResponse } from "../validation/campaignSchemas";
-import { createStructuredResponse, getOpenAIModel } from "./client";
+import { getOpenAIModel } from "./client";
 import { buildStrategyPrompt } from "./prompts";
+import { generateAndValidateWithRepair, type RepairableStructuredRequest } from "./repairResponse";
 
 export async function generateStrategy(advertiserDescription: string): Promise<StrategyResponse> {
-  const draft = await createStructuredResponse<unknown>({
+  const publishers = getPublishers();
+  const personas = getPersonas();
+  const request: RepairableStructuredRequest = {
     model: getOpenAIModel(),
     input: [
       {
@@ -16,8 +19,8 @@ export async function generateStrategy(advertiserDescription: string): Promise<S
         role: "user",
         content: JSON.stringify({
           advertiserDescription,
-          publishers: getPublishers(),
-          personas: getPersonas()
+          publishers,
+          personas
         })
       }
     ],
@@ -27,7 +30,15 @@ export async function generateStrategy(advertiserDescription: string): Promise<S
         ...strategyResponseJsonSchema
       }
     }
-  });
+  };
 
-  return strategyResponseSchema.parse(draft);
+  return generateAndValidateWithRepair({
+    label: "strategy",
+    schema: strategyResponseSchema,
+    request,
+    fallbackCandidates: {
+      publishers,
+      personas
+    }
+  });
 }

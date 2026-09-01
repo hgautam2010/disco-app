@@ -1,8 +1,9 @@
 import { getPersonas, getPublishers } from "../data";
 import { executionResponseJsonSchema } from "../schemas";
 import { executionResponseSchema, type ExecutionResponse, type StrategyResponse } from "../validation/campaignSchemas";
-import { createStructuredResponse, getOpenAIModel } from "./client";
+import { getOpenAIModel } from "./client";
 import { buildExecutionPrompt } from "./prompts";
+import { generateAndValidateWithRepair, type RepairableStructuredRequest } from "./repairResponse";
 
 export async function generateExecution(
   advertiserDescription: string,
@@ -13,7 +14,10 @@ export async function generateExecution(
   const recommendedPublisherIds = new Set(strategy.recommendedPublishers.map((item) => item.publisherId));
   const excludedPublisherIds = new Set(strategy.excludedPublishers.map((item) => item.publisherId));
   const selectedPersonaIds = new Set(strategy.selectedPersonas.map((item) => item.personaId));
-  const draft = await createStructuredResponse<unknown>({
+  const recommendedPublishers = publishers.filter((publisher) => recommendedPublisherIds.has(publisher.id));
+  const excludedPublishers = publishers.filter((publisher) => excludedPublisherIds.has(publisher.id));
+  const selectedPersonas = personas.filter((persona) => selectedPersonaIds.has(persona.id));
+  const request: RepairableStructuredRequest = {
     model: getOpenAIModel(),
     input: [
       {
@@ -25,9 +29,9 @@ export async function generateExecution(
         content: JSON.stringify({
           advertiserDescription,
           strategy,
-          recommendedPublishers: publishers.filter((publisher) => recommendedPublisherIds.has(publisher.id)),
-          excludedPublishers: publishers.filter((publisher) => excludedPublisherIds.has(publisher.id)),
-          selectedPersonas: personas.filter((persona) => selectedPersonaIds.has(persona.id))
+          recommendedPublishers,
+          excludedPublishers,
+          selectedPersonas
         })
       }
     ],
@@ -37,7 +41,17 @@ export async function generateExecution(
         ...executionResponseJsonSchema
       }
     }
-  });
+  };
 
-  return executionResponseSchema.parse(draft);
+  return generateAndValidateWithRepair({
+    label: "execution",
+    schema: executionResponseSchema,
+    request,
+    fallbackCandidates: {
+      strategy,
+      recommendedPublishers,
+      excludedPublishers,
+      selectedPersonas
+    }
+  });
 }
