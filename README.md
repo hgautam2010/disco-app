@@ -16,8 +16,9 @@ Set `OPENAI_API_KEY` in `.env.local` to enable the staged OpenAI pipeline. Witho
 
 The app is optimized for predictable, inspectable campaign generation:
 
-- The primary path is `extract -> retrieve -> rank_publishers -> select_personas -> execute -> assemble`.
+- The primary path lives in `src/lib/campaign` and runs `extract -> retrieve -> rank_publishers -> select_personas -> generate_execution -> assemble`.
 - Extraction, publisher ranking, persona selection, and execution are separate OpenAI-aware stages. Deterministic retrieval sits between extraction and ranking so the model only works from bounded candidate sets.
+- Each stage has its own folder with the local prompt, schema, runner, and any normalizer or fallback logic needed for that responsibility.
 - Each OpenAI stage requests strict structured JSON, validates it with Zod, and gets one repair retry if the response misses the contract.
 - A normalization layer maps every returned ID back to local catalog data, removes invalid or overlapping choices, repairs budget allocation, and falls back where needed.
 - The deterministic TypeScript engine powers candidate retrieval, stage fallback, and the offline eval baseline.
@@ -27,17 +28,18 @@ The app is optimized for predictable, inspectable campaign generation:
 Core entry points:
 
 - `src/lib/campaignEngine.ts`: orchestrates the full campaign generation flow.
-- `prompts/advertiser-extraction.md`, `prompts/publisher-ranking.md`, `prompts/persona-selection.md`, and `prompts/execution-generation.md`: the prompts used by the default staged OpenAI path.
-- `prompts/repair-response.md`: the repair prompt used when Zod rejects a stage response.
-- `src/lib/openai/generateStagedCampaign.ts`: coordinates extraction, retrieval, publisher ranking, persona selection, execution, and final assembly.
-- `src/lib/pipeline/extractAdvertiserProfile.ts`: extracts a narrow advertiser profile without publisher or persona decisions.
-- `src/lib/pipeline/retrieveCampaignCandidates.ts`: builds the bounded deterministic candidate set.
-- `src/lib/pipeline/assembleFinalCampaign.ts`: performs final assembly and records pipeline trace metadata.
-- `src/lib/pipeline/rankPublisherStrategy.ts`, `src/lib/pipeline/selectPersonaStrategy.ts`, and `src/lib/openai/generateExecution.ts`: call the OpenAI Responses API with strict JSON schemas.
-- `src/lib/openai/repairResponse.ts`: validates model output with Zod and retries once with schema errors.
-- `src/lib/pipeline/normalizePublisherStrategy.ts`, `src/lib/pipeline/normalizePersonaStrategy.ts`, and `src/lib/openai/normalizeExecution.ts`: repair model output against the candidate set and locked strategy.
-- `src/lib/validation/campaignSchemas.ts`: Zod contracts for extraction, publisher ranking, persona selection, and execution responses.
+- `src/lib/campaign/pipeline.ts`: coordinates extraction, retrieval, publisher ranking, persona selection, execution, and final assembly.
+- `src/lib/campaign/types.ts`: shared internal contracts passed between stages.
+- `src/lib/campaign/stages/extract-advertiser`: extracts a narrow advertiser profile without publisher or persona decisions.
+- `src/lib/campaign/stages/retrieve-candidates`: builds the bounded deterministic publisher and persona candidate set.
+- `src/lib/campaign/stages/rank-publishers`: ranks recommended publishers and exclusions from publisher candidates.
+- `src/lib/campaign/stages/select-personas`: selects shopper personas from persona candidates and locked publisher decisions.
+- `src/lib/campaign/stages/generate-execution`: writes persona-specific ad copy and campaign config.
+- `src/lib/campaign/stages/assemble`: performs final assembly and records pipeline trace metadata.
+- `src/lib/campaign/shared`: shared OpenAI client, structured response repair, prompt loading, fallback, and normalization helpers.
+- `src/lib/campaign/shared/repair-response.md`: repair prompt used when Zod rejects a stage response.
 - `src/lib/publisherScoring.ts` and `src/lib/personaScoring.ts`: deterministic fallback and eval baseline.
+- `src/lib/schemas.ts`: final campaign result validation.
 - `src/app/api/campaign/route.ts`: server-only API route that keeps the API key out of the browser.
 
 ## Implementation Roadmap
