@@ -99,7 +99,7 @@ function CampaignResultView({
   result: CampaignResult;
   catalogSummary: CampaignPlannerProps["catalogSummary"];
 }) {
-  const isInlineOpenAI = result.mode === "openai_inline";
+  const openAIStatusCopy = statusCopy(result.mode, catalogSummary);
 
   return (
     <>
@@ -107,11 +107,7 @@ function CampaignResultView({
         <div>
           <p className="eyebrow">Mode</p>
           <h2>{modeLabel(result.mode)}</h2>
-          {isInlineOpenAI ? (
-            <p className="status-copy">
-              Model reviewed all {catalogSummary.publisherCount} publishers and {catalogSummary.personaCount} personas.
-            </p>
-          ) : null}
+          {openAIStatusCopy ? <p className="status-copy">{openAIStatusCopy}</p> : null}
         </div>
         <CheckCircle2 aria-hidden="true" size={28} />
       </section>
@@ -176,6 +172,10 @@ function CampaignResultView({
 }
 
 function modeLabel(mode: CampaignResult["mode"]) {
+  if (mode === "openai_staged") {
+    return "Staged OpenAI pipeline";
+  }
+
   if (mode === "openai_inline") {
     return "Full-catalog OpenAI";
   }
@@ -185,6 +185,18 @@ function modeLabel(mode: CampaignResult["mode"]) {
   }
 
   return "Deterministic fallback";
+}
+
+function statusCopy(mode: CampaignResult["mode"], catalogSummary: CampaignPlannerProps["catalogSummary"]) {
+  if (mode === "openai_staged") {
+    return `Strategy and execution ran as separate OpenAI calls across ${catalogSummary.publisherCount} publishers and ${catalogSummary.personaCount} personas.`;
+  }
+
+  if (mode === "openai_inline") {
+    return `Model reviewed all ${catalogSummary.publisherCount} publishers and ${catalogSummary.personaCount} personas.`;
+  }
+
+  return "";
 }
 
 function Metric({ label, value }: { label: string; value: string }) {
