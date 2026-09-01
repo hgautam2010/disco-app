@@ -19,6 +19,19 @@ Return:
 - ambiguity level
 - confidence
 
+## Field Semantics
+
+- category: one concise, machine-friendly primary category inferred from the pitch. Prefer a specific commerce category over a broad market when the pitch supports it.
+- secondaryCategories: adjacent categories, use cases, or buying contexts that may affect matching. Do not repeat the primary category.
+- priceTier: calibrated position of the offer: `budget`, `value`, `mid_market`, `premium`, `luxury`, or `unknown`.
+- audienceHints: explicit or strongly implied shopper segments from the pitch.
+- productSignals: concrete product attributes that can influence publisher, persona, or creative decisions.
+- valuePropositions: supportable benefits or reasons to buy. Keep them grounded in the pitch.
+- purchaseModel: how the product is sold, such as one-time purchase, subscription, replenishment, gift, or `unknown`.
+- likelyObjective: the most likely campaign goal, such as acquisition, subscription growth, trial, gifting, or awareness.
+- ambiguityLevel: `low` when the pitch is specific, `medium` when some key facts are missing, and `high` when most matching decisions would be assumptions.
+- confidence: 0 to 1 confidence in the extracted profile. Use lower values when category, price, or audience is unclear.
+
 ## Rules
 
 - Do not choose publishers.
