@@ -2,7 +2,8 @@ import { describe, expect, it } from "vitest";
 import {
   advertiserProfileResponseSchema,
   executionResponseSchema,
-  rankingResponseSchema
+  personaSelectionResponseSchema,
+  publisherRankingResponseSchema
 } from "@/lib/validation/campaignSchemas";
 
 describe("campaign Zod schemas", () => {
@@ -10,11 +11,18 @@ describe("campaign Zod schemas", () => {
     expect(advertiserProfileResponseSchema.safeParse(validAdvertiserProfileResponse()).success).toBe(true);
   });
 
-  it("rejects out-of-contract ranking scores", () => {
-    const response = validRankingResponse();
+  it("rejects out-of-contract publisher ranking scores", () => {
+    const response = validPublisherRankingResponse();
     response.recommendedPublishers[0].score = 140;
 
-    expect(rankingResponseSchema.safeParse(response).success).toBe(false);
+    expect(publisherRankingResponseSchema.safeParse(response).success).toBe(false);
+  });
+
+  it("rejects persona selection output with too few personas", () => {
+    const response = validPersonaSelectionResponse();
+    response.selectedPersonas = response.selectedPersonas.slice(0, 2);
+
+    expect(personaSelectionResponseSchema.safeParse(response).success).toBe(false);
   });
 
   it("rejects execution output with too few creatives", () => {
@@ -40,7 +48,7 @@ function validAdvertiserProfileResponse() {
   };
 }
 
-function validRankingResponse() {
+function validPublisherRankingResponse() {
   return {
     recommendedPublishers: ["pub_001", "pub_002", "pub_003"].map((publisherId) => ({
       publisherId,
@@ -55,6 +63,12 @@ function validRankingResponse() {
       reason: "Lower fit.",
       signals: [{ label: "Low fit", detail: "Less relevant audience.", weight: 20 }]
     })),
+    warnings: []
+  };
+}
+
+function validPersonaSelectionResponse() {
+  return {
     selectedPersonas: ["persona_001", "persona_002", "persona_003"].map((personaId) => ({
       personaId,
       score: 88,

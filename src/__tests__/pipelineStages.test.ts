@@ -1,11 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { generateDeterministicCampaign } from "@/lib/campaignEngine";
-import { extractAdvertiserProfile } from "@/lib/pipeline/extractAdvertiserProfile";
-import { retrieveCampaignCandidates } from "@/lib/pipeline/retrieveCampaignCandidates";
-import { rankCampaignStrategy } from "@/lib/pipeline/rankCampaignStrategy";
 import { assembleFinalCampaign } from "@/lib/pipeline/assembleFinalCampaign";
 import { buildExecutionFallback } from "@/lib/pipeline/buildExecutionFallback";
-import { deterministicStrategyFromCandidates } from "@/lib/pipeline/normalizeRankedStrategy";
+import { extractAdvertiserProfile } from "@/lib/pipeline/extractAdvertiserProfile";
+import { deterministicPersonaStrategyFromCandidates } from "@/lib/pipeline/normalizePersonaStrategy";
+import { deterministicPublisherStrategyFromCandidates } from "@/lib/pipeline/normalizePublisherStrategy";
+import { rankPublisherStrategy } from "@/lib/pipeline/rankPublisherStrategy";
+import { retrieveCampaignCandidates } from "@/lib/pipeline/retrieveCampaignCandidates";
+import { selectPersonaStrategy } from "@/lib/pipeline/selectPersonaStrategy";
 import type { CampaignStageTrace } from "@/lib/types";
 
 describe("production pipeline stages", () => {
@@ -38,29 +40,46 @@ describe("production pipeline stages", () => {
     expect(personaNames).toContain("The Sustainability Buyer");
   });
 
-  it("falls back to deterministic candidate order for ranking without an OpenAI key", async () => {
+  it("falls back to deterministic candidate order for publisher ranking without an OpenAI key", async () => {
     await withoutOpenAIKey(async () => {
       const profile = generateDeterministicCampaign("Custom Italian leather handbags at a $1,200 price point.")
         .advertiserAnalysis;
       const candidates = retrieveCampaignCandidates(profile).data;
-      const result = await rankCampaignStrategy(candidates);
+      const result = await rankPublisherStrategy(candidates);
 
-      expect(result.trace.name).toBe("rank");
+      expect(result.trace.name).toBe("rank_publishers");
       expect(result.trace.source).toBe("deterministic");
       expect(result.trace.apiCalls).toBe(0);
       expect(result.data.recommendedPublishers[0].publisher.id).toBe(candidates.publisherCandidates[0].publisher.id);
     });
   });
 
+  it("falls back to deterministic candidate order for persona selection without an OpenAI key", async () => {
+    await withoutOpenAIKey(async () => {
+      const profile = generateDeterministicCampaign("Custom Italian leather handbags at a $1,200 price point.")
+        .advertiserAnalysis;
+      const candidates = retrieveCampaignCandidates(profile).data;
+      const publisherStrategy = deterministicPublisherStrategyFromCandidates(candidates);
+      const result = await selectPersonaStrategy(candidates, publisherStrategy);
+
+      expect(result.trace.name).toBe("select_personas");
+      expect(result.trace.source).toBe("deterministic");
+      expect(result.trace.apiCalls).toBe(0);
+      expect(result.data.selectedPersonas[0].persona.id).toBe(candidates.personaCandidates[0].persona.id);
+    });
+  });
+
   it("summarizes pipeline calls, repairs, and fallback stages during final assembly", () => {
     const profile = generateDeterministicCampaign("Non-alcoholic sparkling drink with adaptogens.").advertiserAnalysis;
     const candidates = retrieveCampaignCandidates(profile).data;
-    const strategy = deterministicStrategyFromCandidates(candidates);
+    const publisherStrategy = deterministicPublisherStrategyFromCandidates(candidates);
+    const strategy = deterministicPersonaStrategyFromCandidates(candidates, publisherStrategy);
     const execution = buildExecutionFallback(strategy);
     const traces: CampaignStageTrace[] = [
       stageTrace("extract", "openai", 1, false),
       stageTrace("retrieve", "deterministic", 0, false),
-      stageTrace("rank", "openai", 2, true),
+      stageTrace("rank_publishers", "openai", 2, true),
+      stageTrace("select_personas", "openai", 1, false),
       stageTrace("execute", "fallback", 1, false)
     ];
 
@@ -71,13 +90,14 @@ describe("production pipeline stages", () => {
       stageTraces: traces
     });
 
-    expect(result.pipeline?.apiCallCount).toBe(4);
+    expect(result.pipeline?.apiCallCount).toBe(5);
     expect(result.pipeline?.repairCount).toBe(1);
     expect(result.pipeline?.fallbackStages).toEqual(["execute"]);
     expect(result.pipeline?.stages.map((stage) => stage.name)).toEqual([
       "extract",
       "retrieve",
-      "rank",
+      "rank_publishers",
+      "select_personas",
       "execute",
       "assemble"
     ]);

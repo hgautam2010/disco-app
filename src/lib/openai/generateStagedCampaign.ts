@@ -2,8 +2,9 @@ import type { CampaignStageTrace } from "../types";
 import { assembleFinalCampaign } from "../pipeline/assembleFinalCampaign";
 import { buildExecutionFallback } from "../pipeline/buildExecutionFallback";
 import { extractAdvertiserProfile } from "../pipeline/extractAdvertiserProfile";
-import { rankCampaignStrategy } from "../pipeline/rankCampaignStrategy";
+import { rankPublisherStrategy } from "../pipeline/rankPublisherStrategy";
 import { retrieveCampaignCandidates } from "../pipeline/retrieveCampaignCandidates";
+import { selectPersonaStrategy } from "../pipeline/selectPersonaStrategy";
 import type { CampaignExecution, LockedCampaignStrategy, PipelineStageResult } from "../pipeline/types";
 import { hasOpenAIKey } from "./client";
 import { generateExecutionWithMetadata } from "./generateExecution";
@@ -13,14 +14,15 @@ export async function generateStagedOpenAICampaign(advertiserDescription: string
   const generatedAt = new Date().toISOString();
   const extraction = await extractAdvertiserProfile(advertiserDescription);
   const candidates = retrieveCampaignCandidates(extraction.data);
-  const strategy = await rankCampaignStrategy(candidates.data);
+  const publisherStrategy = await rankPublisherStrategy(candidates.data);
+  const strategy = await selectPersonaStrategy(candidates.data, publisherStrategy.data);
   const execution = await generateExecutionStage(advertiserDescription, strategy.data);
 
   return assembleFinalCampaign({
     generatedAt,
     strategy: strategy.data,
     execution: execution.data,
-    stageTraces: [extraction.trace, candidates.trace, strategy.trace, execution.trace]
+    stageTraces: [extraction.trace, candidates.trace, publisherStrategy.trace, strategy.trace, execution.trace]
   });
 }
 

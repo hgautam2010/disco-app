@@ -4,23 +4,30 @@ import { normalizeExecution } from "@/lib/openai/normalizeExecution";
 import { assembleFinalCampaign } from "@/lib/pipeline/assembleFinalCampaign";
 import { buildExecutionFallback } from "@/lib/pipeline/buildExecutionFallback";
 import {
-  deterministicStrategyFromCandidates,
-  normalizeRankedStrategy
-} from "@/lib/pipeline/normalizeRankedStrategy";
+  deterministicPersonaStrategyFromCandidates,
+  normalizePersonaStrategy
+} from "@/lib/pipeline/normalizePersonaStrategy";
+import {
+  deterministicPublisherStrategyFromCandidates,
+  normalizePublisherStrategy
+} from "@/lib/pipeline/normalizePublisherStrategy";
 import { retrieveCampaignCandidates } from "@/lib/pipeline/retrieveCampaignCandidates";
 import { validateCampaignResult } from "@/lib/schemas";
-import type { ExecutionResponse, RankingResponse } from "@/lib/validation/campaignSchemas";
+import type {
+  ExecutionResponse,
+  PersonaSelectionResponse,
+  PublisherRankingResponse
+} from "@/lib/validation/campaignSchemas";
 
 describe("staged campaign normalization", () => {
-  it("cleans ranking IDs and fills required recommendations from retrieved candidates", () => {
+  it("cleans publisher ranking IDs and fills required recommendations from retrieved candidates", () => {
     const description =
       "Premium dog supplements for senior pets with mobility support, sold as a monthly subscription.";
     const profile = generateDeterministicCampaign(description).advertiserAnalysis;
     const candidates = retrieveCampaignCandidates(profile).data;
     const knownRecommendedIds = candidates.publisherCandidates.map((item) => item.publisher.id);
     const knownExcludedIds = candidates.exclusionCandidates.map((item) => item.publisher.id);
-    const knownPersonaIds = candidates.personaCandidates.map((item) => item.persona.id);
-    const ranking: RankingResponse = {
+    const ranking: PublisherRankingResponse = {
       recommendedPublishers: [
         strategyPublisher(knownRecommendedIds[0], 98),
         strategyPublisher(knownRecommendedIds[0], 92),
@@ -33,6 +40,34 @@ describe("staged campaign normalization", () => {
         excludedPublisher(knownExcludedIds[0], 18),
         excludedPublisher(knownExcludedIds[1], 22)
       ],
+      warnings: ["Model noted category overlap."]
+    };
+
+    const result = normalizePublisherStrategy(candidates, ranking);
+    const recommendedIds = result.recommendedPublishers.map((item) => item.publisher.id);
+    const excludedIds = result.excludedPublishers.map((item) => item.publisher.id);
+
+    expect(recommendedIds).toContain(knownRecommendedIds[0]);
+    expect(recommendedIds).not.toContain("pub_missing");
+    expect(new Set(recommendedIds).size).toBe(recommendedIds.length);
+    expect(excludedIds).not.toContain(knownRecommendedIds[0]);
+    expect(result.recommendedPublishers.length).toBeGreaterThanOrEqual(3);
+    expect(result.warnings).toEqual(
+      expect.arrayContaining([
+        "Dropped recommended publisher outside candidate set: pub_missing.",
+        "Filled recommended publishers from deterministic candidate retrieval."
+      ])
+    );
+  });
+
+  it("cleans persona selection IDs and fills required personas from retrieved candidates", () => {
+    const description =
+      "Premium dog supplements for senior pets with mobility support, sold as a monthly subscription.";
+    const profile = generateDeterministicCampaign(description).advertiserAnalysis;
+    const candidates = retrieveCampaignCandidates(profile).data;
+    const publisherStrategy = deterministicPublisherStrategyFromCandidates(candidates);
+    const knownPersonaIds = candidates.personaCandidates.map((item) => item.persona.id);
+    const selection: PersonaSelectionResponse = {
       selectedPersonas: [
         strategyPersona(knownPersonaIds[0], 95),
         strategyPersona("persona_missing", 90),
@@ -41,23 +76,17 @@ describe("staged campaign normalization", () => {
       warnings: ["Model noted category overlap."]
     };
 
-    const result = normalizeRankedStrategy(candidates, ranking);
-    const recommendedIds = result.recommendedPublishers.map((item) => item.publisher.id);
-    const excludedIds = result.excludedPublishers.map((item) => item.publisher.id);
+    const result = normalizePersonaStrategy(candidates, publisherStrategy, selection);
     const personaIds = result.selectedPersonas.map((item) => item.persona.id);
 
-    expect(recommendedIds).toContain(knownRecommendedIds[0]);
-    expect(recommendedIds).not.toContain("pub_missing");
-    expect(new Set(recommendedIds).size).toBe(recommendedIds.length);
-    expect(excludedIds).not.toContain(knownRecommendedIds[0]);
+    expect(personaIds).toContain(knownPersonaIds[0]);
     expect(personaIds).not.toContain("persona_missing");
-    expect(result.recommendedPublishers.length).toBeGreaterThanOrEqual(3);
+    expect(new Set(personaIds).size).toBe(personaIds.length);
     expect(result.selectedPersonas.length).toBeGreaterThanOrEqual(3);
     expect(result.warnings).toEqual(
       expect.arrayContaining([
-        "Dropped recommended publisher outside candidate set: pub_missing.",
         "Dropped persona outside candidate set: persona_missing.",
-        "Filled recommended publishers from deterministic candidate retrieval."
+        "Filled selected personas from deterministic candidate retrieval."
       ])
     );
   });
@@ -67,7 +96,8 @@ describe("staged campaign normalization", () => {
       "Premium dog supplements for senior pets with mobility support, sold as a monthly subscription.";
     const profile = generateDeterministicCampaign(description).advertiserAnalysis;
     const candidates = retrieveCampaignCandidates(profile).data;
-    const strategy = deterministicStrategyFromCandidates(candidates);
+    const publisherStrategy = deterministicPublisherStrategyFromCandidates(candidates);
+    const strategy = deterministicPersonaStrategyFromCandidates(candidates, publisherStrategy);
     const fallbackExecution = buildExecutionFallback(strategy);
     const selectedPersonaIds = strategy.selectedPersonas.map((item) => item.persona.id);
     const recommendedPublisherIds = strategy.recommendedPublishers.map((item) => item.publisher.id);
@@ -141,7 +171,7 @@ describe("staged campaign normalization", () => {
   });
 });
 
-function strategyPublisher(publisherId: string, score = 90): RankingResponse["recommendedPublishers"][number] {
+function strategyPublisher(publisherId: string, score = 90): PublisherRankingResponse["recommendedPublishers"][number] {
   return {
     publisherId,
     score,
@@ -151,7 +181,7 @@ function strategyPublisher(publisherId: string, score = 90): RankingResponse["re
   };
 }
 
-function excludedPublisher(publisherId: string, score = 20): RankingResponse["excludedPublishers"][number] {
+function excludedPublisher(publisherId: string, score = 20): PublisherRankingResponse["excludedPublishers"][number] {
   return {
     publisherId,
     score,
@@ -160,7 +190,7 @@ function excludedPublisher(publisherId: string, score = 20): RankingResponse["ex
   };
 }
 
-function strategyPersona(personaId: string, score = 90): RankingResponse["selectedPersonas"][number] {
+function strategyPersona(personaId: string, score = 90): PersonaSelectionResponse["selectedPersonas"][number] {
   return {
     personaId,
     score,
