@@ -24,6 +24,11 @@ export type LockedCampaignStrategy = Pick<
   "advertiserAnalysis" | "recommendedPublishers" | "excludedPublishers" | "selectedPersonas" | "warnings"
 >;
 
+export type LockedPublisherStrategy = Pick<
+  CampaignResult,
+  "advertiserAnalysis" | "recommendedPublishers" | "excludedPublishers" | "warnings"
+>;
+
 export type CampaignExecution = {
   creativeVariants: CreativeVariant[];
   campaignConfig: CampaignConfig;
