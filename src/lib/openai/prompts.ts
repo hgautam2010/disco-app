@@ -15,6 +15,10 @@ export function buildStrategyPrompt() {
   return readPrompt("strategy-generation.md");
 }
 
+export function buildRankingPrompt() {
+  return readPrompt("campaign-ranking.md");
+}
+
 export function buildExecutionPrompt() {
   return readPrompt("execution-generation.md");
 }
