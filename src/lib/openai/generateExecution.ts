@@ -1,15 +1,26 @@
 import { getPersonas, getPublishers } from "../data";
+import type { LockedCampaignStrategy } from "../pipeline/types";
 import { executionResponseJsonSchema } from "../schemas";
 import { executionResponseSchema, type ExecutionResponse } from "../validation/campaignSchemas";
 import { getOpenAIModel } from "./client";
-import type { NormalizedStrategy } from "./normalizeStrategy";
 import { buildExecutionPrompt } from "./prompts";
-import { generateAndValidateWithRepair, type RepairableStructuredRequest } from "./repairResponse";
+import {
+  generateAndValidateWithRepairResult,
+  type RepairableStructuredRequest,
+  type StructuredGenerationResult
+} from "./repairResponse";
 
 export async function generateExecution(
   advertiserDescription: string,
-  strategy: NormalizedStrategy
+  strategy: LockedCampaignStrategy
 ): Promise<ExecutionResponse> {
+  return (await generateExecutionWithMetadata(advertiserDescription, strategy)).data;
+}
+
+export async function generateExecutionWithMetadata(
+  advertiserDescription: string,
+  strategy: LockedCampaignStrategy
+): Promise<StructuredGenerationResult<ExecutionResponse>> {
   const publishers = getPublishers();
   const personas = getPersonas();
   const strategyPayload = {
@@ -69,7 +80,7 @@ export async function generateExecution(
     }
   };
 
-  return generateAndValidateWithRepair({
+  return generateAndValidateWithRepairResult({
     label: "execution",
     schema: executionResponseSchema,
     request,

@@ -1,54 +1,48 @@
-import { generateFallbackCreative } from "../creativeGenerator";
 import type {
-  AdvertiserAnalysis,
   CampaignConfig,
-  CampaignResult,
   CreativeVariant,
   PublisherBudgetAllocation,
   ScoredPublisher
 } from "../types";
 import type { ExecutionResponse } from "../validation/campaignSchemas";
 import { fillUniqueFromFallback, nonEmptyArray, positiveNumber } from "./normalizationUtils";
-import type { NormalizedStrategy } from "./normalizeStrategy";
+import type { CampaignExecution, LockedCampaignStrategy } from "../pipeline/types";
 
 export function normalizeExecution({
-  baseline,
+  fallbackExecution,
   strategy,
   execution
 }: {
-  baseline: CampaignResult;
-  strategy: NormalizedStrategy;
+  fallbackExecution: CampaignExecution;
+  strategy: LockedCampaignStrategy;
   execution: ExecutionResponse;
-}): CampaignResult {
+}): CampaignExecution {
   const warnings = new Set([...strategy.warnings, ...execution.warnings]);
   const selectedPersonaIds = new Set(strategy.selectedPersonas.map((item) => item.persona.id));
   const creativeVariants = normalizeCreativeVariants(
     execution.creativeVariants,
-    baseline,
-    strategy.advertiserAnalysis,
+    fallbackExecution,
     strategy,
     selectedPersonaIds,
     warnings
   );
 
   return {
-    mode: "openai_staged",
-    generatedAt: baseline.generatedAt,
-    advertiserAnalysis: strategy.advertiserAnalysis,
-    recommendedPublishers: strategy.recommendedPublishers,
-    excludedPublishers: strategy.excludedPublishers,
-    selectedPersonas: strategy.selectedPersonas,
     creativeVariants,
-    campaignConfig: normalizeCampaignConfig(execution.campaignConfig, baseline, strategy.recommendedPublishers, warnings),
+    campaignConfig: normalizeCampaignConfig(
+      execution.campaignConfig,
+      fallbackExecution,
+      strategy.recommendedPublishers,
+      warnings
+    ),
     warnings: Array.from(warnings)
   };
 }
 
 function normalizeCreativeVariants(
   variants: CreativeVariant[],
-  baseline: CampaignResult,
-  advertiserAnalysis: AdvertiserAnalysis,
-  strategy: NormalizedStrategy,
+  fallbackExecution: CampaignExecution,
+  strategy: LockedCampaignStrategy,
   selectedPersonaIds: Set<string>,
   warnings: Set<string>
 ) {
@@ -65,10 +59,9 @@ function normalizeCreativeVariants(
     }));
 
   if (normalized.length < 3) {
-    const fallbackVariants = generateFallbackCreative(advertiserAnalysis, strategy.selectedPersonas);
     fillUniqueFromFallback({
       target: normalized,
-      fallback: fallbackVariants,
+      fallback: fallbackExecution.creativeVariants,
       getId: (item) => item.personaId,
       min: 3,
       max: 5,
@@ -79,7 +72,7 @@ function normalizeCreativeVariants(
 
   fillUniqueFromFallback({
     target: normalized,
-    fallback: baseline.creativeVariants,
+    fallback: fallbackExecution.creativeVariants,
     getId: (item) => item.personaId,
     min: 3,
     max: 5,
@@ -92,12 +85,12 @@ function normalizeCreativeVariants(
 
 function normalizeCampaignConfig(
   config: CampaignConfig,
-  baseline: CampaignResult,
+  fallbackExecution: CampaignExecution,
   recommendedPublishers: ScoredPublisher[],
   warnings: Set<string>
 ): CampaignConfig {
-  const totalUsd = positiveNumber(config.budget.totalUsd) || baseline.campaignConfig.budget.totalUsd;
-  const allocation = normalizeAllocation(config.budget.allocation, baseline, recommendedPublishers, warnings);
+  const totalUsd = positiveNumber(config.budget.totalUsd) || fallbackExecution.campaignConfig.budget.totalUsd;
+  const allocation = normalizeAllocation(config.budget.allocation, fallbackExecution, recommendedPublishers, warnings);
   const placementByPublisher = new Map(config.placements.map((placement) => [placement.publisherId, placement]));
   const placements = recommendedPublishers.map((item, index) => {
     const placement = placementByPublisher.get(item.publisher.id);
@@ -107,7 +100,7 @@ function normalizeCampaignConfig(
       publisherName: item.publisher.name,
       placementType:
         placement?.placementType ||
-        baseline.campaignConfig.placements.find((candidate) => candidate.publisherId === item.publisher.id)
+        fallbackExecution.campaignConfig.placements.find((candidate) => candidate.publisherId === item.publisher.id)
           ?.placementType ||
         "native checkout recommendation",
       priority: placement?.priority || (index < 3 ? "primary" : "test")
@@ -115,31 +108,31 @@ function normalizeCampaignConfig(
   });
 
   return {
-    objective: config.objective || baseline.campaignConfig.objective,
+    objective: config.objective || fallbackExecution.campaignConfig.objective,
     budget: {
       totalUsd,
       dailyUsd: positiveNumber(config.budget.dailyUsd) || Math.round(totalUsd / 30),
       allocation
     },
     targeting: {
-      categories: nonEmptyArray(config.targeting.categories, baseline.campaignConfig.targeting.categories[0]),
+      categories: nonEmptyArray(config.targeting.categories, fallbackExecution.campaignConfig.targeting.categories[0]),
       audienceAttributes: nonEmptyArray(
         config.targeting.audienceAttributes,
-        baseline.campaignConfig.targeting.audienceAttributes[0]
+        fallbackExecution.campaignConfig.targeting.audienceAttributes[0]
       ),
-      geos: nonEmptyArray(config.targeting.geos, baseline.campaignConfig.targeting.geos[0] ?? "nationwide"),
+      geos: nonEmptyArray(config.targeting.geos, fallbackExecution.campaignConfig.targeting.geos[0] ?? "nationwide"),
       excludedAttributes: config.targeting.excludedAttributes
     },
     placements,
     bidStrategy: {
-      type: config.bidStrategy.type || baseline.campaignConfig.bidStrategy.type,
-      rationale: config.bidStrategy.rationale || baseline.campaignConfig.bidStrategy.rationale
+      type: config.bidStrategy.type || fallbackExecution.campaignConfig.bidStrategy.type,
+      rationale: config.bidStrategy.rationale || fallbackExecution.campaignConfig.bidStrategy.rationale
     },
     measurement: {
-      primaryKpi: config.measurement.primaryKpi || baseline.campaignConfig.measurement.primaryKpi,
+      primaryKpi: config.measurement.primaryKpi || fallbackExecution.campaignConfig.measurement.primaryKpi,
       secondaryKpis: nonEmptyArray(
         config.measurement.secondaryKpis,
-        baseline.campaignConfig.measurement.secondaryKpis[0] ?? "conversion rate"
+        fallbackExecution.campaignConfig.measurement.secondaryKpis[0] ?? "conversion rate"
       )
     }
   };
@@ -147,13 +140,13 @@ function normalizeCampaignConfig(
 
 function normalizeAllocation(
   allocations: PublisherBudgetAllocation[],
-  baseline: CampaignResult,
+  fallbackExecution: CampaignExecution,
   recommendedPublishers: ScoredPublisher[],
   warnings: Set<string>
 ): PublisherBudgetAllocation[] {
   const allocationByPublisher = new Map(allocations.map((item) => [item.publisherId, item]));
   const baselineByPublisher = new Map(
-    baseline.campaignConfig.budget.allocation.map((item) => [item.publisherId, item])
+    fallbackExecution.campaignConfig.budget.allocation.map((item) => [item.publisherId, item])
   );
   const raw = recommendedPublishers.map((item) => {
     const allocation = allocationByPublisher.get(item.publisher.id);

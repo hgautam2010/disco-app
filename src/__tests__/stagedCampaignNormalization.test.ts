@@ -1,22 +1,26 @@
 import { describe, expect, it } from "vitest";
 import { generateDeterministicCampaign } from "@/lib/campaignEngine";
-import { getPersonas, getPublishers } from "@/lib/data";
 import { normalizeExecution } from "@/lib/openai/normalizeExecution";
-import { normalizeStrategy } from "@/lib/openai/normalizeStrategy";
+import { assembleFinalCampaign } from "@/lib/pipeline/assembleFinalCampaign";
+import { buildExecutionFallback } from "@/lib/pipeline/buildExecutionFallback";
+import {
+  deterministicStrategyFromCandidates,
+  normalizeRankedStrategy
+} from "@/lib/pipeline/normalizeRankedStrategy";
+import { retrieveCampaignCandidates } from "@/lib/pipeline/retrieveCampaignCandidates";
 import { validateCampaignResult } from "@/lib/schemas";
-import type { CampaignResult } from "@/lib/types";
-import type { ExecutionResponse, StrategyResponse } from "@/lib/validation/campaignSchemas";
+import type { ExecutionResponse, RankingResponse } from "@/lib/validation/campaignSchemas";
 
 describe("staged campaign normalization", () => {
-  it("cleans strategy IDs and fills required recommendations from deterministic fallback", () => {
+  it("cleans ranking IDs and fills required recommendations from retrieved candidates", () => {
     const description =
       "Premium dog supplements for senior pets with mobility support, sold as a monthly subscription.";
-    const baseline = generateDeterministicCampaign(description);
-    const knownRecommendedIds = baseline.recommendedPublishers.map((item) => item.publisher.id);
-    const knownExcludedIds = baseline.excludedPublishers.map((item) => item.publisher.id);
-    const knownPersonaIds = baseline.selectedPersonas.map((item) => item.persona.id);
-    const strategy: StrategyResponse = {
-      advertiserAnalysis: analysisFrom(baseline),
+    const profile = generateDeterministicCampaign(description).advertiserAnalysis;
+    const candidates = retrieveCampaignCandidates(profile).data;
+    const knownRecommendedIds = candidates.publisherCandidates.map((item) => item.publisher.id);
+    const knownExcludedIds = candidates.exclusionCandidates.map((item) => item.publisher.id);
+    const knownPersonaIds = candidates.personaCandidates.map((item) => item.persona.id);
+    const ranking: RankingResponse = {
       recommendedPublishers: [
         strategyPublisher(knownRecommendedIds[0], 98),
         strategyPublisher(knownRecommendedIds[0], 92),
@@ -37,13 +41,7 @@ describe("staged campaign normalization", () => {
       warnings: ["Model noted category overlap."]
     };
 
-    const result = normalizeStrategy({
-      advertiserDescription: description,
-      baseline,
-      strategy,
-      publishers: getPublishers(),
-      personas: getPersonas()
-    });
+    const result = normalizeRankedStrategy(candidates, ranking);
     const recommendedIds = result.recommendedPublishers.map((item) => item.publisher.id);
     const excludedIds = result.excludedPublishers.map((item) => item.publisher.id);
     const personaIds = result.selectedPersonas.map((item) => item.persona.id);
@@ -57,25 +55,20 @@ describe("staged campaign normalization", () => {
     expect(result.selectedPersonas.length).toBeGreaterThanOrEqual(3);
     expect(result.warnings).toEqual(
       expect.arrayContaining([
-        "Dropped unknown recommended publisher id: pub_missing.",
-        "Dropped unknown persona id: persona_missing.",
-        "Added deterministic publisher fallback to keep at least 3 recommendations."
+        "Dropped recommended publisher outside candidate set: pub_missing.",
+        "Dropped persona outside candidate set: persona_missing.",
+        "Filled recommended publishers from deterministic candidate retrieval."
       ])
     );
   });
 
-  it("normalizes execution output against selected personas and recommended publishers", () => {
+  it("normalizes execution output against locked personas and recommended publishers", () => {
     const description =
       "Premium dog supplements for senior pets with mobility support, sold as a monthly subscription.";
-    const baseline = generateDeterministicCampaign(description);
-    const strategyDraft = baselineStrategy(baseline);
-    const strategy = normalizeStrategy({
-      advertiserDescription: description,
-      baseline,
-      strategy: strategyDraft,
-      publishers: getPublishers(),
-      personas: getPersonas()
-    });
+    const profile = generateDeterministicCampaign(description).advertiserAnalysis;
+    const candidates = retrieveCampaignCandidates(profile).data;
+    const strategy = deterministicStrategyFromCandidates(candidates);
+    const fallbackExecution = buildExecutionFallback(strategy);
     const selectedPersonaIds = strategy.selectedPersonas.map((item) => item.persona.id);
     const recommendedPublisherIds = strategy.recommendedPublishers.map((item) => item.publisher.id);
     const execution: ExecutionResponse = {
@@ -118,7 +111,13 @@ describe("staged campaign normalization", () => {
       warnings: []
     };
 
-    const result = normalizeExecution({ baseline, strategy, execution });
+    const normalizedExecution = normalizeExecution({ fallbackExecution, strategy, execution });
+    const result = assembleFinalCampaign({
+      generatedAt: new Date().toISOString(),
+      strategy,
+      execution: normalizedExecution,
+      stageTraces: []
+    });
     const allocationTotal = result.campaignConfig.budget.allocation.reduce(
       (total, item) => total + item.budgetPercent,
       0
@@ -142,37 +141,7 @@ describe("staged campaign normalization", () => {
   });
 });
 
-function baselineStrategy(baseline: CampaignResult): StrategyResponse {
-  return {
-    advertiserAnalysis: analysisFrom(baseline),
-    recommendedPublishers: baseline.recommendedPublishers.slice(0, 3).map((item) => strategyPublisher(item.publisher.id)),
-    excludedPublishers: baseline.excludedPublishers.slice(0, 3).map((item) => excludedPublisher(item.publisher.id)),
-    selectedPersonas: baseline.selectedPersonas.slice(0, 3).map((item) => strategyPersona(item.persona.id)),
-    warnings: []
-  };
-}
-
-function analysisFrom(baseline: CampaignResult): StrategyResponse["advertiserAnalysis"] {
-  const analysis = baseline.advertiserAnalysis;
-
-  return {
-    category: analysis.category,
-    secondaryCategories: analysis.secondaryCategories,
-    priceTier: analysis.priceTier,
-    audienceHints: analysis.audienceHints,
-    productSignals: analysis.productSignals,
-    valuePropositions: analysis.valuePropositions,
-    purchaseModel: analysis.purchaseModel,
-    likelyObjective: analysis.likelyObjective,
-    ambiguityLevel: analysis.ambiguityLevel,
-    confidence: analysis.confidence
-  };
-}
-
-function strategyPublisher(
-  publisherId: string,
-  score = 90
-): StrategyResponse["recommendedPublishers"][number] {
+function strategyPublisher(publisherId: string, score = 90): RankingResponse["recommendedPublishers"][number] {
   return {
     publisherId,
     score,
@@ -182,7 +151,7 @@ function strategyPublisher(
   };
 }
 
-function excludedPublisher(publisherId: string, score = 20): StrategyResponse["excludedPublishers"][number] {
+function excludedPublisher(publisherId: string, score = 20): RankingResponse["excludedPublishers"][number] {
   return {
     publisherId,
     score,
@@ -191,7 +160,7 @@ function excludedPublisher(publisherId: string, score = 20): StrategyResponse["e
   };
 }
 
-function strategyPersona(personaId: string, score = 90): StrategyResponse["selectedPersonas"][number] {
+function strategyPersona(personaId: string, score = 90): RankingResponse["selectedPersonas"][number] {
   return {
     personaId,
     score,

@@ -10,15 +10,15 @@ import { scorePublishers } from "./publisherScoring";
 import type { CampaignResult } from "./types";
 
 export async function generateCampaign(advertiserDescription: string): Promise<CampaignResult> {
-  const baseline = generateDeterministicCampaign(advertiserDescription);
-
   if (!hasOpenAIKey()) {
+    const baseline = generateDeterministicCampaign(advertiserDescription);
     return withFallbackWarning(baseline, "OPENAI_API_KEY is not configured; using deterministic fallback output.");
   }
 
   try {
-    return await generateStagedOpenAICampaign(advertiserDescription, baseline);
+    return await generateStagedOpenAICampaign(advertiserDescription);
   } catch (error) {
+    const baseline = generateDeterministicCampaign(advertiserDescription);
     const message = error instanceof Error ? error.message : "Unknown OpenAI generation error.";
     return withFallbackWarning(baseline, `OpenAI generation failed; using deterministic fallback. ${message}`);
   }
