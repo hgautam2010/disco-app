@@ -4,7 +4,7 @@ import { generateFallbackCreative } from "./creativeGenerator";
 import { getPersonas, getPublishers } from "./data";
 import { hasOpenAIKey } from "./openai/client";
 import { withFallbackWarning } from "./openai/fallback";
-import { generateOpenAICampaign } from "./openai/generateCampaign";
+import { generateInlineOpenAICampaign } from "./openai/generateInlineCampaign";
 import { scorePersonas, selectPersonas } from "./personaScoring";
 import { scorePublishers } from "./publisherScoring";
 import type { CampaignResult } from "./types";
@@ -17,7 +17,7 @@ export async function generateCampaign(advertiserDescription: string): Promise<C
   }
 
   try {
-    return await generateOpenAICampaign(baseline);
+    return await generateInlineOpenAICampaign(advertiserDescription, baseline);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown OpenAI generation error.";
     return withFallbackWarning(baseline, `OpenAI generation failed; using deterministic fallback. ${message}`);
