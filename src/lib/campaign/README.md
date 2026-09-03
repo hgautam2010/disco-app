@@ -13,6 +13,19 @@ Each stage folder owns one responsibility and keeps related files together:
 
 Shared helpers live in `shared` when they are used by multiple stages.
 
+## Runtime Shape
+
+The campaign path is intentionally linear:
+
+1. `extract-advertiser` turns the pitch into controlled advertiser fields.
+2. `retrieve-candidates` builds bounded publisher and persona candidate sets in code.
+3. `rank-publishers` asks OpenAI to choose recommended and excluded publishers from those candidates.
+4. `select-personas` asks OpenAI to choose personas from the locked candidate set and publisher strategy.
+5. `generate-execution` asks OpenAI for persona-specific creative and campaign config.
+6. `assemble` validates the final result and attaches pipeline trace metadata.
+
+Every stage returns `PipelineStageResult<T>`, which means the data and trace move together. The final `pipeline` object includes API calls, attempts, repair count, model name, latency, warnings, and token usage per stage.
+
 ## Stage Anatomy
 
 - `run.ts`: the stage entry point. It should return a `PipelineStageResult`.
@@ -24,6 +37,7 @@ Shared helpers live in `shared` when they are used by multiple stages.
 
 - Change prompt behavior in the stage's `prompt.md`.
 - Change expected model JSON in that stage's `schema.ts`.
+- Change allowed extraction categories or product signals in `../advertiserTaxonomy.ts`.
 - Change data passed between stages in `types.ts`.
 - Change catalog shortlist logic in `retrieve-candidates/run.ts`, `publisherScoring.ts`, or `personaScoring.ts`.
 - Change safety repair in the stage's `normalize.ts` or in `shared/repairResponse.ts`.

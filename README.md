@@ -20,9 +20,10 @@ The app is optimized for predictable, inspectable campaign generation:
 - Extraction, publisher ranking, persona selection, and execution are separate OpenAI stages. Deterministic retrieval sits between extraction and ranking so the model only works from bounded candidate sets.
 - Each stage has its own folder with the local prompt, schema, runner, and any normalizer needed for that responsibility.
 - Each OpenAI stage requests strict structured JSON, validates it with Zod, and gets one repair retry if the response misses the contract.
+- Advertiser extraction uses a small controlled taxonomy for `category`, `secondaryCategories`, and `productSignals`, which keeps matching predictable.
 - A normalization layer maps every returned ID back to local catalog data, removes invalid or overlapping choices, and repairs budget allocation.
 - Deterministic TypeScript code is only used for catalog shortlisting, normalization, and offline evals.
-- The UI shows recommended publishers, exclusions, personas, creative variants, config, score signals, API call count, and repair count so the output stays inspectable.
+- The UI shows recommended publishers, exclusions, personas, creative variants, config, score signals, API calls, repair count, and an expandable per-stage trace with model, attempts, latency, and token usage.
 - Normal OpenAI usage is 4 calls per campaign: extraction, publisher ranking, persona selection, and execution. Worst case is 8 calls if all four stages need one repair retry.
 
 Core entry points:
@@ -38,17 +39,18 @@ Core entry points:
 - `src/lib/campaign/stages/assemble`: performs final assembly and records pipeline trace metadata.
 - `src/lib/campaign/shared`: shared OpenAI client, structured response repair, prompt loading, and normalization helpers.
 - `src/lib/campaign/shared/repair-response.md`: repair prompt used when Zod rejects a stage response.
+- `src/lib/advertiserTaxonomy.ts`: controlled extraction categories and product-signal values.
 - `src/lib/publisherScoring.ts` and `src/lib/personaScoring.ts`: deterministic catalog shortlist scoring.
 - `src/lib/schemas.ts`: final campaign result validation.
 - `src/app/api/campaign/route.ts`: server-only API route that keeps the API key out of the browser.
 
-## Implementation Roadmap
+## Remaining Roadmap
 
 1. Keep the current split pipeline as the production path: narrow extraction, deterministic candidate retrieval, publisher ranking, persona selection, execution generation, and final normalization.
 2. Expand evals from end-to-end campaign cases into per-stage fixtures so publisher ranking, persona selection, and execution can fail independently without hiding regressions.
-3. Add production telemetry for latency, token usage, schema failures, repair rate, and normalized/dropped IDs.
+3. Add persisted run logs for schema failures, repair rate, token usage, latency, and normalized/dropped IDs.
 4. Move catalog retrieval to embeddings or indexed search when publisher and persona data grows beyond what deterministic top-k scoring can scan cheaply.
-5. Add saved campaign drafts and human feedback labels so future deterministic scoring and prompt changes can be evaluated against real reviewer preferences.
+5. Add saved campaign drafts and human feedback labels so prompt and retrieval changes can be evaluated against real reviewer preferences.
 
 ## Evals
 
@@ -59,7 +61,7 @@ npm run test
 npm run eval
 ```
 
-Unit tests cover scoring mechanics, Zod contracts, staged-output normalization, candidate retrieval, pipeline trace summaries, and the OpenAI API key requirement. The eval harness runs 11 representative advertiser cases from `evals/fixtures/advertiser-cases.json` and writes reports to `evals/reports/`. The cases cover happy paths, vague inputs, B2B bad-fit behavior, conflicting price signals, category diversity, expected exclusions, extraction fixtures, and candidate recall. Current offline eval score: `100`.
+Unit tests cover scoring mechanics, Zod contracts, staged-output normalization, candidate retrieval, pipeline trace summaries, and the OpenAI API key requirement. The eval harness runs 14 representative advertiser cases from `evals/fixtures/advertiser-cases.json` and writes reports to `evals/reports/`. The cases cover happy paths, vague inputs, unknown-category handling, B2B bad-fit behavior, conflicting price signals, category diversity, expected exclusions, extraction taxonomy checks, and candidate recall. Current offline eval score: `100`.
 
 ## What I Cut
 
