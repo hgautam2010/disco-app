@@ -1,7 +1,7 @@
 "use client";
 
-import { AlertTriangle, CheckCircle2, Loader2 } from "lucide-react";
-import { useState } from "react";
+import { AlertTriangle, CheckCircle2, Copy, Loader2, Maximize2, X } from "lucide-react";
+import { useEffect, useState, type ReactNode } from "react";
 import type { CampaignResult, ExampleAdvertiser } from "@/lib/types";
 import { AdvertiserForm } from "./AdvertiserForm";
 import { CampaignConfig } from "./CampaignConfig";
@@ -18,6 +18,12 @@ type CampaignPlannerProps = {
     personaCount: number;
     categories: string[];
   };
+};
+
+type TraceJsonPanelData = {
+  stageName: string;
+  title: string;
+  value: unknown;
 };
 
 export function CampaignPlanner({ examples, catalogSummary }: CampaignPlannerProps) {
@@ -165,6 +171,7 @@ function statusCopy(catalogSummary: CampaignPlannerProps["catalogSummary"]) {
 
 function PipelineSummary({ result }: { result: CampaignResult }) {
   const pipeline = result.pipeline;
+  const [selectedJsonPanel, setSelectedJsonPanel] = useState<TraceJsonPanelData | null>(null);
 
   if (!pipeline) {
     return null;
@@ -183,11 +190,12 @@ function PipelineSummary({ result }: { result: CampaignResult }) {
         <div className="pipeline-stage-list">
           {pipeline.stages.map((stage) => {
             const warningCount = stage.warnings.length;
+            const stageName = formatStageName(stage.name);
 
             return (
               <div className="pipeline-stage" key={stage.name}>
                 <div>
-                  <strong>{formatStageName(stage.name)}</strong>
+                  <strong>{stageName}</strong>
                   <span>{stage.source === "openai" ? stage.model : "code"}</span>
                 </div>
                 <div className="pipeline-stage-metrics">
@@ -201,13 +209,25 @@ function PipelineSummary({ result }: { result: CampaignResult }) {
                   <summary>Trace data</summary>
                   <div className="pipeline-io-grid">
                     <TraceJsonPanel
+                      stageName={stageName}
                       title={stage.source === "openai" ? "Prompt input" : "Stage input"}
                       value={stage.promptInput}
+                      onOpen={setSelectedJsonPanel}
                     />
                     {stage.source === "openai" ? (
-                      <TraceJsonPanel title="Model output" value={stage.modelOutput} />
+                      <TraceJsonPanel
+                        stageName={stageName}
+                        title="Model output"
+                        value={stage.modelOutput}
+                        onOpen={setSelectedJsonPanel}
+                      />
                     ) : null}
-                    <TraceJsonPanel title="Stage output" value={stage.stageOutput} />
+                    <TraceJsonPanel
+                      stageName={stageName}
+                      title="Stage output"
+                      value={stage.stageOutput}
+                      onOpen={setSelectedJsonPanel}
+                    />
                   </div>
                 </details>
                 {warningCount > 0 ? (
@@ -225,15 +245,92 @@ function PipelineSummary({ result }: { result: CampaignResult }) {
           })}
         </div>
       </details>
+      {selectedJsonPanel ? (
+        <TraceJsonModal panel={selectedJsonPanel} onClose={() => setSelectedJsonPanel(null)} />
+      ) : null}
     </div>
   );
 }
 
-function TraceJsonPanel({ title, value }: { title: string; value: unknown }) {
+function TraceJsonPanel({
+  stageName,
+  title,
+  value,
+  onOpen
+}: TraceJsonPanelData & {
+  onOpen: (panel: TraceJsonPanelData) => void;
+}) {
   return (
     <div className="pipeline-io-panel">
-      <h4>{title}</h4>
+      <div className="pipeline-io-panel-heading">
+        <h4>{title}</h4>
+        <button
+          type="button"
+          className="json-view-button"
+          onClick={() => onOpen({ stageName, title, value })}
+          aria-label={`View ${stageName} ${title} JSON`}
+          title={`View ${title} JSON`}
+        >
+          <Maximize2 aria-hidden="true" size={14} />
+          <span>View JSON</span>
+        </button>
+      </div>
       <pre>{formatTraceJson(value)}</pre>
+    </div>
+  );
+}
+
+function TraceJsonModal({ panel, onClose }: { panel: TraceJsonPanelData; onClose: () => void }) {
+  const [copied, setCopied] = useState(false);
+  const json = formatTraceJson(panel.value);
+
+  useEffect(() => {
+    function closeOnEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        onClose();
+      }
+    }
+
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [onClose]);
+
+  async function copyJson() {
+    try {
+      await navigator.clipboard.writeText(json);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1400);
+    } catch {
+      setCopied(false);
+    }
+  }
+
+  return (
+    <div className="json-modal-backdrop" onClick={onClose}>
+      <section
+        className="json-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="json-modal-title"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <div className="json-modal-header">
+          <div>
+            <p className="eyebrow">{panel.stageName}</p>
+            <h2 id="json-modal-title">{panel.title}</h2>
+          </div>
+          <div className="json-modal-actions">
+            <button type="button" className="json-modal-button" onClick={copyJson}>
+              <Copy aria-hidden="true" size={16} />
+              <span>{copied ? "Copied" : "Copy"}</span>
+            </button>
+            <button type="button" className="json-modal-close" onClick={onClose} aria-label="Close JSON modal">
+              <X aria-hidden="true" size={18} />
+            </button>
+          </div>
+        </div>
+        <pre className="highlighted-json">{highlightJson(json)}</pre>
+      </section>
     </div>
   );
 }
@@ -260,6 +357,53 @@ function formatWarningCount(count: number) {
 
 function formatTraceJson(value: unknown) {
   return JSON.stringify(value, null, 2) ?? "null";
+}
+
+function highlightJson(json: string): ReactNode[] {
+  const nodes: ReactNode[] = [];
+  const tokenPattern = /("(?:\\.|[^"\\])*"|-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?|true|false|null)/g;
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = tokenPattern.exec(json))) {
+    if (match.index > lastIndex) {
+      nodes.push(json.slice(lastIndex, match.index));
+    }
+
+    const token = match[0];
+    const className = json.slice(match.index + token.length).match(/^\s*:/)
+      ? "json-token-key"
+      : jsonTokenClassName(token);
+
+    nodes.push(
+      <span className={className} key={`${match.index}-${nodes.length}`}>
+        {token}
+      </span>
+    );
+    lastIndex = match.index + token.length;
+  }
+
+  if (lastIndex < json.length) {
+    nodes.push(json.slice(lastIndex));
+  }
+
+  return nodes;
+}
+
+function jsonTokenClassName(token: string) {
+  if (token.startsWith('"')) {
+    return "json-token-string";
+  }
+
+  if (token === "true" || token === "false") {
+    return "json-token-boolean";
+  }
+
+  if (token === "null") {
+    return "json-token-null";
+  }
+
+  return "json-token-number";
 }
 
 function Metric({ label, value }: { label: string; value: string }) {
