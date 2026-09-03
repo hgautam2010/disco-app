@@ -209,10 +209,16 @@ function PipelineSummary({ result }: { result: CampaignResult }) {
                   <span>{stage.repaired ? "repaired" : "valid"}</span>
                 </div>
                 <details className="pipeline-stage-io">
-                  <summary>Input/output</summary>
+                  <summary>Trace data</summary>
                   <div className="pipeline-io-grid">
-                    <TraceJsonPanel title="Input" value={stage.input} />
-                    <TraceJsonPanel title="Output" value={stage.output} />
+                    <TraceJsonPanel
+                      title={stage.source === "openai" ? "Prompt input" : "Stage input"}
+                      value={stage.promptInput}
+                    />
+                    {stage.source === "openai" ? (
+                      <TraceJsonPanel title="Model output" value={stage.modelOutput} />
+                    ) : null}
+                    <TraceJsonPanel title="Stage output" value={stage.stageOutput} />
                   </div>
                 </details>
                 {warningCount > 0 ? (

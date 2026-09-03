@@ -25,14 +25,14 @@ describe("production pipeline stages", () => {
     expect(result.trace.attempts).toBe(0);
     expect(result.trace.model).toBe("code");
     expect(result.trace.tokenUsage.totalTokens).toBe(0);
-    expect(result.trace.input).toMatchObject({
+    expect(result.trace.promptInput).toMatchObject({
       advertiserProfile: profile,
       publisherCandidateLimit: 10,
       personaCandidateLimit: 8,
       exclusionCandidateLimit: 8
     });
-    expect(result.trace.output).toMatchObject({
-      advertiserProfile: profile,
+    expect(result.trace.modelOutput).toBeNull();
+    expect(result.trace.stageOutput).toMatchObject({
       publisherCandidates: result.data.publisherCandidates,
       personaCandidates: result.data.personaCandidates
     });
@@ -96,8 +96,9 @@ function stageTrace(
     name,
     source,
     model: source === "openai" ? "gpt-5.1" : "code",
-    input: { stage: name },
-    output: { stage: name },
+    promptInput: { stage: name },
+    modelOutput: source === "openai" ? { stage: name } : null,
+    stageOutput: { stage: name },
     durationMs: 1,
     apiCalls,
     attempts: apiCalls,

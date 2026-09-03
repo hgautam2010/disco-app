@@ -30,8 +30,13 @@ export async function generateExecutionStage(
       name: "execute",
       source: "openai",
       model: result.model,
-      input: payload,
-      output: execution,
+      promptInput: payload,
+      modelOutput: result.data,
+      stageOutput: {
+        creativeVariants: execution.creativeVariants,
+        campaignConfig: execution.campaignConfig,
+        warnings: traceWarnings
+      },
       durationMs: Date.now() - startedAt,
       apiCalls: result.apiCalls,
       attempts: result.attempts,

@@ -29,18 +29,21 @@ export function assembleFinalCampaign({
     warnings: uniqueWarnings([...strategy.warnings, ...execution.warnings, ...stageWarnings])
   };
   const validationErrors = validateCampaignResult(campaignWithoutPipeline);
+  const finalWarnings = uniqueWarnings([...campaignWithoutPipeline.warnings, ...validationErrors]);
   const assembleTrace: CampaignStageTrace = {
     name: "assemble",
     source: "deterministic",
     model: "code",
-    input: {
+    promptInput: {
       strategy,
       execution,
       stageNames: stageTraces.map((trace) => trace.name)
     },
-    output: {
-      ...campaignWithoutPipeline,
-      warnings: uniqueWarnings([...campaignWithoutPipeline.warnings, ...validationErrors])
+    modelOutput: null,
+    stageOutput: {
+      validationErrors,
+      finalWarningCount: finalWarnings.length,
+      finalStageCount: stageTraces.length + 1
     },
     durationMs: Date.now() - startedAt,
     apiCalls: 0,
@@ -53,7 +56,7 @@ export function assembleFinalCampaign({
 
   return {
     ...campaignWithoutPipeline,
-    warnings: uniqueWarnings([...campaignWithoutPipeline.warnings, ...validationErrors]),
+    warnings: finalWarnings,
     pipeline: summarizePipeline(allStageTraces)
   };
 }

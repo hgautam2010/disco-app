@@ -50,13 +50,19 @@ export function retrieveCampaignCandidates(
       name: "retrieve",
       source: "deterministic",
       model: "code",
-      input: {
+      promptInput: {
         advertiserProfile,
         publisherCandidateLimit,
         personaCandidateLimit,
         exclusionCandidateLimit
       },
-      output: data,
+      modelOutput: null,
+      stageOutput: {
+        publisherCandidates,
+        personaCandidates,
+        exclusionCandidates,
+        warnings
+      },
       durationMs: Date.now() - startedAt,
       apiCalls: 0,
       attempts: 0,
