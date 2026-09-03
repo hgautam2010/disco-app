@@ -1,6 +1,7 @@
 import { getOpenAIModelForStage } from "../../shared/openaiClient";
 import { readStagePrompt } from "../../shared/prompts";
 import { generateAndValidateWithRepairResult, type RepairableStructuredRequest } from "../../shared/structuredGeneration";
+import { stageLocalWarnings } from "../../shared/warnings";
 import { normalizePersonaStrategy } from "./normalize";
 import { personaSelectionResponseJsonSchema, personaSelectionResponseSchema } from "./schema";
 import type {
@@ -43,6 +44,7 @@ export async function selectPersonaStrategy(
     repairContext: payload
   });
   const strategy = normalizePersonaStrategy(candidates, publisherStrategy, result.data);
+  const traceWarnings = stageLocalWarnings(strategy.warnings, [...publisherStrategy.warnings, ...candidates.warnings]);
 
   return {
     data: strategy,
@@ -55,7 +57,7 @@ export async function selectPersonaStrategy(
       attempts: result.attempts,
       tokenUsage: result.tokenUsage,
       repaired: result.repaired,
-      warnings: strategy.warnings
+      warnings: traceWarnings
     }
   };
 }

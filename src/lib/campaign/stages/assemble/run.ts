@@ -1,6 +1,7 @@
 import { validateCampaignResult } from "../../../schemas";
 import type { CampaignPipelineTrace, CampaignResult, CampaignStageTrace } from "../../../types";
 import { addTokenUsage, emptyTokenUsage } from "../../shared/tokenUsage";
+import { uniqueWarnings } from "../../shared/warnings";
 import type { CampaignExecution, LockedCampaignStrategy } from "../../types";
 
 export function assembleFinalCampaign({
@@ -25,7 +26,7 @@ export function assembleFinalCampaign({
     selectedPersonas: strategy.selectedPersonas,
     creativeVariants: execution.creativeVariants,
     campaignConfig: execution.campaignConfig,
-    warnings: unique([...strategy.warnings, ...execution.warnings, ...stageWarnings])
+    warnings: uniqueWarnings([...strategy.warnings, ...execution.warnings, ...stageWarnings])
   };
   const validationErrors = validateCampaignResult(campaignWithoutPipeline);
   const assembleTrace: CampaignStageTrace = {
@@ -43,7 +44,7 @@ export function assembleFinalCampaign({
 
   return {
     ...campaignWithoutPipeline,
-    warnings: unique([...campaignWithoutPipeline.warnings, ...validationErrors]),
+    warnings: uniqueWarnings([...campaignWithoutPipeline.warnings, ...validationErrors]),
     pipeline: summarizePipeline(allStageTraces)
   };
 }
@@ -56,8 +57,4 @@ function summarizePipeline(stages: CampaignStageTrace[]): CampaignPipelineTrace 
     totalTokenUsage: addTokenUsage(...stages.map((stage) => stage.tokenUsage)),
     stages
   };
-}
-
-function unique(values: string[]) {
-  return Array.from(new Set(values.filter(Boolean)));
 }

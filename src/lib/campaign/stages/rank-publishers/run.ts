@@ -1,6 +1,7 @@
 import { getOpenAIModelForStage } from "../../shared/openaiClient";
 import { readStagePrompt } from "../../shared/prompts";
 import { generateAndValidateWithRepairResult, type RepairableStructuredRequest } from "../../shared/structuredGeneration";
+import { stageLocalWarnings } from "../../shared/warnings";
 import { normalizePublisherStrategy } from "./normalize";
 import { publisherRankingResponseJsonSchema, publisherRankingResponseSchema } from "./schema";
 import type { CampaignCandidates, LockedPublisherStrategy, PipelineStageResult } from "../../types";
@@ -37,6 +38,7 @@ export async function rankPublisherStrategy(
     repairContext: payload
   });
   const strategy = normalizePublisherStrategy(candidates, result.data);
+  const traceWarnings = stageLocalWarnings(strategy.warnings, candidates.warnings);
 
   return {
     data: strategy,
@@ -49,7 +51,7 @@ export async function rankPublisherStrategy(
       attempts: result.attempts,
       tokenUsage: result.tokenUsage,
       repaired: result.repaired,
-      warnings: strategy.warnings
+      warnings: traceWarnings
     }
   };
 }

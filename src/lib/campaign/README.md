@@ -24,7 +24,9 @@ The campaign path is intentionally linear:
 5. `generate-execution` asks OpenAI for persona-specific creative and campaign config.
 6. `assemble` validates the final result and attaches pipeline trace metadata.
 
-Every stage returns `PipelineStageResult<T>`, which means the data and trace move together. The final `pipeline` object includes API calls, attempts, repair count, model name, latency, warnings, and token usage per stage.
+Every stage returns `PipelineStageResult<T>`, which means the data and trace move together. The final `pipeline` object includes API calls, attempts, repair count, model name, latency, stage-local warnings, and token usage per stage.
+
+Final campaign warnings are cumulative and user-facing. Pipeline trace warnings are stage-local, so a warning created during retrieval does not appear again under ranking, persona selection, or execution unless that stage adds a new warning.
 
 ## Model Selection
 

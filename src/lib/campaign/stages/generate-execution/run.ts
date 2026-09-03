@@ -6,6 +6,7 @@ import {
   type RepairableStructuredRequest,
   type StructuredGenerationResult
 } from "../../shared/structuredGeneration";
+import { stageLocalWarnings } from "../../shared/warnings";
 import type { CampaignExecution, LockedCampaignStrategy, PipelineStageResult } from "../../types";
 import { normalizeExecution } from "./normalize";
 import { executionResponseJsonSchema, executionResponseSchema, type ExecutionResponse } from "./schema";
@@ -20,6 +21,7 @@ export async function generateExecutionStage(
     strategy,
     execution: result.data
   });
+  const traceWarnings = stageLocalWarnings(execution.warnings, strategy.warnings);
 
   return {
     data: execution,
@@ -32,7 +34,7 @@ export async function generateExecutionStage(
       attempts: result.attempts,
       tokenUsage: result.tokenUsage,
       repaired: result.repaired,
-      warnings: execution.warnings
+      warnings: traceWarnings
     }
   };
 }
