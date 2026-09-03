@@ -1,4 +1,7 @@
-type ResponsesApiBody = {
+import type { TokenUsage } from "../../types";
+import { emptyTokenUsage } from "./tokenUsage";
+
+export type ResponsesApiBody = {
   model: string;
   input: {
     role: "system" | "user";
@@ -10,6 +13,7 @@ type ResponsesApiBody = {
 };
 
 type ResponsesApiResult = {
+  model?: string;
   output_text?: string;
   output?: {
     content?: {
@@ -17,6 +21,25 @@ type ResponsesApiResult = {
       text?: string;
     }[];
   }[];
+  usage?: ResponsesApiUsage | null;
+};
+
+type ResponsesApiUsage = {
+  input_tokens?: number;
+  output_tokens?: number;
+  total_tokens?: number;
+  input_tokens_details?: {
+    cached_tokens?: number;
+  };
+  output_tokens_details?: {
+    reasoning_tokens?: number;
+  };
+};
+
+export type StructuredResponse<T> = {
+  data: T;
+  model: string;
+  usage: TokenUsage;
 };
 
 const responsesEndpoint = "https://api.openai.com/v1/responses";
@@ -29,7 +52,7 @@ export function getOpenAIModel() {
   return process.env.OPENAI_MODEL || "gpt-5.1";
 }
 
-export async function createStructuredResponse<T>(body: ResponsesApiBody): Promise<T> {
+export async function createStructuredResponse<T>(body: ResponsesApiBody): Promise<StructuredResponse<T>> {
   const apiKey = process.env.OPENAI_API_KEY;
 
   if (!apiKey) {
@@ -57,7 +80,11 @@ export async function createStructuredResponse<T>(body: ResponsesApiBody): Promi
     throw new Error("OpenAI response did not include output text.");
   }
 
-  return JSON.parse(outputText) as T;
+  return {
+    data: JSON.parse(outputText) as T,
+    model: json.model ?? body.model,
+    usage: normalizeUsage(json.usage)
+  };
 }
 
 function extractOutputText(result: ResponsesApiResult) {
@@ -70,4 +97,18 @@ function extractOutputText(result: ResponsesApiResult) {
       ?.flatMap((item) => item.content ?? [])
       .find((content) => content.type === "output_text" && typeof content.text === "string")?.text ?? ""
   );
+}
+
+function normalizeUsage(usage: ResponsesApiUsage | null | undefined): TokenUsage {
+  if (!usage) {
+    return emptyTokenUsage();
+  }
+
+  return {
+    inputTokens: usage.input_tokens ?? 0,
+    outputTokens: usage.output_tokens ?? 0,
+    totalTokens: usage.total_tokens ?? 0,
+    cachedInputTokens: usage.input_tokens_details?.cached_tokens ?? 0,
+    reasoningOutputTokens: usage.output_tokens_details?.reasoning_tokens ?? 0
+  };
 }

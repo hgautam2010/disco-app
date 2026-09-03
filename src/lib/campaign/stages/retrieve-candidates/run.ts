@@ -2,6 +2,7 @@ import { getPersonas, getPublishers } from "../../../data";
 import { selectPersonas, scorePersonas } from "../../../personaScoring";
 import { scorePublishers } from "../../../publisherScoring";
 import type { ExcludedPublisher, Persona, Publisher, ScoredPersona, ScoredPublisher } from "../../../types";
+import { emptyTokenUsage } from "../../shared/tokenUsage";
 import type { AdvertiserProfile, CampaignCandidates, PipelineStageResult } from "../../types";
 
 const defaultPublisherCandidateLimit = 10;
@@ -47,8 +48,11 @@ export function retrieveCampaignCandidates(
     trace: {
       name: "retrieve",
       source: "deterministic",
+      model: "code",
       durationMs: Date.now() - startedAt,
       apiCalls: 0,
+      attempts: 0,
+      tokenUsage: emptyTokenUsage(),
       repaired: false,
       warnings
     }

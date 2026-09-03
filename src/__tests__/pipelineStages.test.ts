@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { emptyTokenUsage } from "@/lib/campaign/shared/tokenUsage";
 import { assembleFinalCampaign } from "@/lib/campaign/stages/assemble/run";
 import { retrieveCampaignCandidates } from "@/lib/campaign/stages/retrieve-candidates/run";
 import type { CampaignCandidates, CampaignExecution, LockedCampaignStrategy } from "@/lib/campaign/types";
@@ -21,6 +22,9 @@ describe("production pipeline stages", () => {
 
     expect(result.trace.name).toBe("retrieve");
     expect(result.trace.apiCalls).toBe(0);
+    expect(result.trace.attempts).toBe(0);
+    expect(result.trace.model).toBe("code");
+    expect(result.trace.tokenUsage.totalTokens).toBe(0);
     expect(result.data.publisherCandidates.length).toBeLessThanOrEqual(10);
     expect(result.data.personaCandidates.length).toBeLessThanOrEqual(8);
     expect(publisherNames).toContain("Stride & Stem");
@@ -57,7 +61,9 @@ describe("production pipeline stages", () => {
     });
 
     expect(result.pipeline?.apiCallCount).toBe(5);
+    expect(result.pipeline?.attemptCount).toBe(5);
     expect(result.pipeline?.repairCount).toBe(1);
+    expect(result.pipeline?.totalTokenUsage.totalTokens).toBe(500);
     expect(result.pipeline?.stages.map((stage) => stage.name)).toEqual([
       "extract",
       "retrieve",
@@ -78,8 +84,16 @@ function stageTrace(
   return {
     name,
     source,
+    model: source === "openai" ? "gpt-5.1" : "code",
     durationMs: 1,
     apiCalls,
+    attempts: apiCalls,
+    tokenUsage: {
+      ...emptyTokenUsage(),
+      inputTokens: apiCalls * 70,
+      outputTokens: apiCalls * 30,
+      totalTokens: apiCalls * 100
+    },
     repaired,
     warnings: []
   };

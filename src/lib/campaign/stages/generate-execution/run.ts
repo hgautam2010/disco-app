@@ -26,8 +26,11 @@ export async function generateExecutionStage(
     trace: {
       name: "execute",
       source: "openai",
+      model: result.model,
       durationMs: Date.now() - startedAt,
       apiCalls: result.apiCalls,
+      attempts: result.attempts,
+      tokenUsage: result.tokenUsage,
       repaired: result.repaired,
       warnings: execution.warnings
     }

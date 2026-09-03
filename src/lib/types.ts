@@ -12,18 +12,31 @@ export type CampaignStageName =
 
 export type CampaignStageSource = "deterministic" | "openai";
 
+export type TokenUsage = {
+  inputTokens: number;
+  outputTokens: number;
+  totalTokens: number;
+  cachedInputTokens: number;
+  reasoningOutputTokens: number;
+};
+
 export type CampaignStageTrace = {
   name: CampaignStageName;
   source: CampaignStageSource;
+  model: string;
   durationMs: number;
   apiCalls: number;
+  attempts: number;
+  tokenUsage: TokenUsage;
   repaired: boolean;
   warnings: string[];
 };
 
 export type CampaignPipelineTrace = {
   apiCallCount: number;
+  attemptCount: number;
   repairCount: number;
+  totalTokenUsage: TokenUsage;
   stages: CampaignStageTrace[];
 };
 

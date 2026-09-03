@@ -43,8 +43,11 @@ export async function rankPublisherStrategy(
     trace: {
       name: "rank_publishers",
       source: "openai",
+      model: result.model,
       durationMs: Date.now() - startedAt,
       apiCalls: result.apiCalls,
+      attempts: result.attempts,
+      tokenUsage: result.tokenUsage,
       repaired: result.repaired,
       warnings: strategy.warnings
     }

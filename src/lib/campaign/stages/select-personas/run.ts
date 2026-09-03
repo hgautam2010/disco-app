@@ -49,8 +49,11 @@ export async function selectPersonaStrategy(
     trace: {
       name: "select_personas",
       source: "openai",
+      model: result.model,
       durationMs: Date.now() - startedAt,
       apiCalls: result.apiCalls,
+      attempts: result.attempts,
+      tokenUsage: result.tokenUsage,
       repaired: result.repaired,
       warnings: strategy.warnings
     }

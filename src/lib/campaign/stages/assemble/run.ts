@@ -1,5 +1,6 @@
 import { validateCampaignResult } from "../../../schemas";
 import type { CampaignPipelineTrace, CampaignResult, CampaignStageTrace } from "../../../types";
+import { addTokenUsage, emptyTokenUsage } from "../../shared/tokenUsage";
 import type { CampaignExecution, LockedCampaignStrategy } from "../../types";
 
 export function assembleFinalCampaign({
@@ -30,8 +31,11 @@ export function assembleFinalCampaign({
   const assembleTrace: CampaignStageTrace = {
     name: "assemble",
     source: "deterministic",
+    model: "code",
     durationMs: Date.now() - startedAt,
     apiCalls: 0,
+    attempts: 0,
+    tokenUsage: emptyTokenUsage(),
     repaired: false,
     warnings: validationErrors
   };
@@ -47,7 +51,9 @@ export function assembleFinalCampaign({
 function summarizePipeline(stages: CampaignStageTrace[]): CampaignPipelineTrace {
   return {
     apiCallCount: stages.reduce((total, stage) => total + stage.apiCalls, 0),
+    attemptCount: stages.reduce((total, stage) => total + stage.attempts, 0),
     repairCount: stages.filter((stage) => stage.repaired).length,
+    totalTokenUsage: addTokenUsage(...stages.map((stage) => stage.tokenUsage)),
     stages
   };
 }
