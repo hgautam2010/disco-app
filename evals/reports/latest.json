@@ -1,6 +1,6 @@
 {
-  "passed": 11,
-  "total": 11,
+  "passed": 14,
+  "total": 14,
   "averageScore": 100,
   "results": [
     {
@@ -563,6 +563,172 @@
           "name": "forbidden-top-publisher",
           "passed": true,
           "detail": "Top 3: Northbed, Hearthstone Goods, Heartfoot"
+        }
+      ]
+    },
+    {
+      "id": "value-pet-subscription",
+      "score": 100,
+      "passed": true,
+      "checks": [
+        {
+          "name": "extraction-category-taxonomy",
+          "passed": true,
+          "detail": "Category: pet_food"
+        },
+        {
+          "name": "extraction-category",
+          "passed": true,
+          "detail": "Category: pet_food"
+        },
+        {
+          "name": "candidate-publisher-recall",
+          "passed": true,
+          "detail": "Candidates: Pawline, Tailcrate, Ruffco, Kitchenly, Movewell, Pantrygood, Daily Form, Swiftcart, Everbody, Heartfoot"
+        },
+        {
+          "name": "publisher-fit",
+          "passed": true,
+          "detail": "Top 3: Pawline, Tailcrate, Ruffco"
+        },
+        {
+          "name": "candidate-persona-recall",
+          "passed": true,
+          "detail": "Candidates: The Pet Parent, The Busy Parent, The Convenience-First Millennial, The Value-Conscious Shopper, The Sustainability Buyer, The Gen Z Aesthete, The Gifter, The Wellness Optimizer"
+        },
+        {
+          "name": "persona-fit",
+          "passed": true,
+          "detail": "Selected: The Pet Parent, The Busy Parent, The Convenience-First Millennial, The Value-Conscious Shopper"
+        },
+        {
+          "name": "exclusion-fit",
+          "passed": true,
+          "detail": "Excluded: Hearthstone Goods, Northbed, Stride & Stem, Marlowe & Co., Linden Park"
+        },
+        {
+          "name": "price-tier",
+          "passed": true,
+          "detail": "Price tier: value"
+        },
+        {
+          "name": "ambiguity-level",
+          "passed": true,
+          "detail": "Ambiguity: low"
+        },
+        {
+          "name": "product-signal-recall",
+          "passed": true,
+          "detail": "Signals: subscription, value, convenience"
+        },
+        {
+          "name": "product-signal-taxonomy",
+          "passed": true,
+          "detail": "Signals: subscription, value, convenience"
+        },
+        {
+          "name": "forbidden-top-publisher",
+          "passed": true,
+          "detail": "Top 3: Pawline, Tailcrate, Ruffco"
+        }
+      ]
+    },
+    {
+      "id": "giftable-premium-cookware",
+      "score": 100,
+      "passed": true,
+      "checks": [
+        {
+          "name": "extraction-category-taxonomy",
+          "passed": true,
+          "detail": "Category: home_goods"
+        },
+        {
+          "name": "extraction-category",
+          "passed": true,
+          "detail": "Category: home_goods"
+        },
+        {
+          "name": "candidate-publisher-recall",
+          "passed": true,
+          "detail": "Candidates: Northbed, Hearthstone Goods, Heartfoot, Pawline, Stride & Stem, Cloudfoot, Pop & Sip, Movewell, Pantrygood, Studiogrid"
+        },
+        {
+          "name": "publisher-fit",
+          "passed": true,
+          "detail": "Top 3: Northbed, Hearthstone Goods, Heartfoot"
+        },
+        {
+          "name": "candidate-persona-recall",
+          "passed": true,
+          "detail": "Candidates: The Gifter, The Sustainability Buyer, The Affluent Classic, The Gen Z Aesthete, The Pet Parent, The Convenience-First Millennial, The Wellness Optimizer, The Busy Parent"
+        },
+        {
+          "name": "persona-fit",
+          "passed": true,
+          "detail": "Selected: The Gifter, The Sustainability Buyer, The Affluent Classic"
+        },
+        {
+          "name": "exclusion-fit",
+          "passed": true,
+          "detail": "Excluded: Strandlab, Tailcrate, Velvetline, Swiftcart, Everbody"
+        },
+        {
+          "name": "price-tier",
+          "passed": true,
+          "detail": "Price tier: premium"
+        },
+        {
+          "name": "ambiguity-level",
+          "passed": true,
+          "detail": "Ambiguity: low"
+        },
+        {
+          "name": "product-signal-recall",
+          "passed": true,
+          "detail": "Signals: premium, gifting, sustainability"
+        },
+        {
+          "name": "product-signal-taxonomy",
+          "passed": true,
+          "detail": "Signals: premium, gifting, sustainability"
+        },
+        {
+          "name": "forbidden-top-publisher",
+          "passed": true,
+          "detail": "Top 3: Northbed, Hearthstone Goods, Heartfoot"
+        }
+      ]
+    },
+    {
+      "id": "vague-consumer-brand",
+      "score": 100,
+      "passed": true,
+      "checks": [
+        {
+          "name": "extraction-category-taxonomy",
+          "passed": true,
+          "detail": "Category: unknown"
+        },
+        {
+          "name": "extraction-category",
+          "passed": true,
+          "detail": "Category: unknown"
+        },
+        {
+          "name": "price-tier",
+          "passed": true,
+          "detail": "Price tier: unknown"
+        },
+        {
+          "name": "ambiguity-level",
+          "passed": true,
+          "detail": "Ambiguity: high"
+        },
+        {
+          "name": "result-warning",
+          "passed": true,
+          "detail": "Result warnings: Advertiser input is low-signal; recommendations should be treated as directional."
         }
       ]
     },

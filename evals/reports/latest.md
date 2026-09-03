@@ -13,6 +13,9 @@ Average score: 100
 | performance-supplements | 100 | pass |
 | clean-skincare | 100 | pass |
 | premium-bedding | 100 | pass |
+| value-pet-subscription | 100 | pass |
+| giftable-premium-cookware | 100 | pass |
+| vague-consumer-brand | 100 | pass |
 | b2b-saas-bad-fit | 100 | pass |
 | conflicting-luxury-value | 100 | pass |
 
@@ -144,6 +147,44 @@ Average score: 100
 - pass product-signal-recall: Signals: premium, gifting
 - pass product-signal-taxonomy: Signals: premium, gifting
 - pass forbidden-top-publisher: Top 3: Northbed, Hearthstone Goods, Heartfoot
+
+### value-pet-subscription
+
+- pass extraction-category-taxonomy: Category: pet_food
+- pass extraction-category: Category: pet_food
+- pass candidate-publisher-recall: Candidates: Pawline, Tailcrate, Ruffco, Kitchenly, Movewell, Pantrygood, Daily Form, Swiftcart, Everbody, Heartfoot
+- pass publisher-fit: Top 3: Pawline, Tailcrate, Ruffco
+- pass candidate-persona-recall: Candidates: The Pet Parent, The Busy Parent, The Convenience-First Millennial, The Value-Conscious Shopper, The Sustainability Buyer, The Gen Z Aesthete, The Gifter, The Wellness Optimizer
+- pass persona-fit: Selected: The Pet Parent, The Busy Parent, The Convenience-First Millennial, The Value-Conscious Shopper
+- pass exclusion-fit: Excluded: Hearthstone Goods, Northbed, Stride & Stem, Marlowe & Co., Linden Park
+- pass price-tier: Price tier: value
+- pass ambiguity-level: Ambiguity: low
+- pass product-signal-recall: Signals: subscription, value, convenience
+- pass product-signal-taxonomy: Signals: subscription, value, convenience
+- pass forbidden-top-publisher: Top 3: Pawline, Tailcrate, Ruffco
+
+### giftable-premium-cookware
+
+- pass extraction-category-taxonomy: Category: home_goods
+- pass extraction-category: Category: home_goods
+- pass candidate-publisher-recall: Candidates: Northbed, Hearthstone Goods, Heartfoot, Pawline, Stride & Stem, Cloudfoot, Pop & Sip, Movewell, Pantrygood, Studiogrid
+- pass publisher-fit: Top 3: Northbed, Hearthstone Goods, Heartfoot
+- pass candidate-persona-recall: Candidates: The Gifter, The Sustainability Buyer, The Affluent Classic, The Gen Z Aesthete, The Pet Parent, The Convenience-First Millennial, The Wellness Optimizer, The Busy Parent
+- pass persona-fit: Selected: The Gifter, The Sustainability Buyer, The Affluent Classic
+- pass exclusion-fit: Excluded: Strandlab, Tailcrate, Velvetline, Swiftcart, Everbody
+- pass price-tier: Price tier: premium
+- pass ambiguity-level: Ambiguity: low
+- pass product-signal-recall: Signals: premium, gifting, sustainability
+- pass product-signal-taxonomy: Signals: premium, gifting, sustainability
+- pass forbidden-top-publisher: Top 3: Northbed, Hearthstone Goods, Heartfoot
+
+### vague-consumer-brand
+
+- pass extraction-category-taxonomy: Category: unknown
+- pass extraction-category: Category: unknown
+- pass price-tier: Price tier: unknown
+- pass ambiguity-level: Ambiguity: high
+- pass result-warning: Result warnings: Advertiser input is low-signal; recommendations should be treated as directional.
 
 ### b2b-saas-bad-fit
 

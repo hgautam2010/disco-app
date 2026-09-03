@@ -102,6 +102,41 @@
     "forbiddenTopPublishers": ["Swiftcart", "Tailcrate"]
   },
   {
+    "id": "value-pet-subscription",
+    "input": "Affordable puppy treat and toy bundles for first-time dog owners, shipped monthly under $25.",
+    "expectedCategory": "pet_food",
+    "expectedTopPublishers": ["Tailcrate", "Pawline", "Ruffco"],
+    "expectedPersonas": ["The Pet Parent", "The Busy Parent", "The Value-Conscious Shopper"],
+    "shouldExclude": ["Linden Park", "Velvetline"],
+    "expectedPriceTier": "value",
+    "expectedAmbiguityLevel": "low",
+    "expectedProductSignals": ["subscription", "value", "convenience"],
+    "forbiddenTopPublishers": ["Linden Park", "Marlowe & Co."]
+  },
+  {
+    "id": "giftable-premium-cookware",
+    "input": "Premium non-toxic cookware sets for new homeowners and wedding gifts, built around durable materials and polished packaging.",
+    "expectedCategory": "home_goods",
+    "expectedTopPublishers": ["Hearthstone Goods", "Northbed", "Heartfoot"],
+    "expectedPersonas": ["The Gifter", "The Affluent Classic", "The Sustainability Buyer"],
+    "shouldExclude": ["Tailcrate", "Velvetline"],
+    "expectedPriceTier": "premium",
+    "expectedAmbiguityLevel": "low",
+    "expectedProductSignals": ["premium", "gifting", "sustainability"],
+    "forbiddenTopPublishers": ["Swiftcart", "Pawline"]
+  },
+  {
+    "id": "vague-consumer-brand",
+    "input": "A new consumer brand for everyday life, launching soon.",
+    "expectedCategory": "unknown",
+    "expectedTopPublishers": [],
+    "expectedPersonas": [],
+    "shouldExclude": [],
+    "expectedPriceTier": "unknown",
+    "expectedAmbiguityLevel": "high",
+    "expectedResultWarnings": ["low-signal"]
+  },
+  {
     "id": "b2b-saas-bad-fit",
     "input": "B2B SaaS platform that automates dental patient workflow, billing reminders, and front desk scheduling.",
     "expectedCategory": "b2b_saas",
