@@ -1,12 +1,7 @@
-import type { CampaignStageTrace } from "../../../types";
-import { getOpenAIModel, hasOpenAIKey } from "../../shared/openaiClient";
+import { getOpenAIModel } from "../../shared/openaiClient";
 import { readStagePrompt } from "../../shared/prompts";
-import {
-  generateAndValidateWithRepairResult,
-  StructuredGenerationError,
-  type RepairableStructuredRequest
-} from "../../shared/structuredGeneration";
-import { deterministicPublisherStrategyFromCandidates, normalizePublisherStrategy } from "./normalize";
+import { generateAndValidateWithRepairResult, type RepairableStructuredRequest } from "../../shared/structuredGeneration";
+import { normalizePublisherStrategy } from "./normalize";
 import { publisherRankingResponseJsonSchema, publisherRankingResponseSchema } from "./schema";
 import type { CampaignCandidates, LockedPublisherStrategy, PipelineStageResult } from "../../types";
 
@@ -14,11 +9,6 @@ export async function rankPublisherStrategy(
   candidates: CampaignCandidates
 ): Promise<PipelineStageResult<LockedPublisherStrategy>> {
   const startedAt = Date.now();
-
-  if (!hasOpenAIKey()) {
-    return deterministicPublisherRankingResult(candidates, startedAt, "OPENAI_API_KEY is not configured.");
-  }
-
   const payload = toPublisherRankingPayload(candidates);
   const request: RepairableStructuredRequest = {
     model: getOpenAIModel(),
@@ -40,64 +30,24 @@ export async function rankPublisherStrategy(
     }
   };
 
-  try {
-    const result = await generateAndValidateWithRepairResult({
-      label: "publisher_ranking",
-      schema: publisherRankingResponseSchema,
-      request,
-      fallbackCandidates: payload
-    });
-    const strategy = normalizePublisherStrategy(candidates, result.data);
-
-    return {
-      data: strategy,
-      trace: {
-        name: "rank_publishers",
-        source: "openai",
-        durationMs: Date.now() - startedAt,
-        apiCalls: result.apiCalls,
-        repaired: result.repaired,
-        warnings: strategy.warnings
-      }
-    };
-  } catch (error) {
-    const structuredError = error instanceof StructuredGenerationError ? error : null;
-    const reason = error instanceof Error ? error.message : "OpenAI publisher ranking failed.";
-    return deterministicPublisherRankingResult(
-      candidates,
-      startedAt,
-      reason,
-      structuredError?.apiCalls,
-      structuredError?.repaired
-    );
-  }
-}
-
-function deterministicPublisherRankingResult(
-  candidates: CampaignCandidates,
-  startedAt: number,
-  reason: string,
-  apiCalls = 0,
-  repaired = false
-): PipelineStageResult<LockedPublisherStrategy> {
-  const warning = `OpenAI publisher ranking unavailable; using deterministic publisher candidate order. ${reason}`;
-  const strategy = {
-    ...deterministicPublisherStrategyFromCandidates(candidates),
-    warnings: Array.from(new Set([...candidates.warnings, warning]))
-  };
-  const trace: CampaignStageTrace = {
-    name: "rank_publishers",
-    source: hasOpenAIKey() ? "fallback" : "deterministic",
-    durationMs: Date.now() - startedAt,
-    apiCalls,
-    repaired,
-    warnings: strategy.warnings,
-    fallbackReason: warning
-  };
+  const result = await generateAndValidateWithRepairResult({
+    label: "publisher_ranking",
+    schema: publisherRankingResponseSchema,
+    request,
+    fallbackCandidates: payload
+  });
+  const strategy = normalizePublisherStrategy(candidates, result.data);
 
   return {
     data: strategy,
-    trace
+    trace: {
+      name: "rank_publishers",
+      source: "openai",
+      durationMs: Date.now() - startedAt,
+      apiCalls: result.apiCalls,
+      repaired: result.repaired,
+      warnings: strategy.warnings
+    }
   };
 }
 

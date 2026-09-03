@@ -1,29 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { analyzeAdvertiserDescription } from "@/lib/advertiserParser";
 import { assembleFinalCampaign } from "@/lib/campaign/stages/assemble/run";
-import { extractAdvertiserProfile } from "@/lib/campaign/stages/extract-advertiser/run";
-import { buildExecutionFallback } from "@/lib/campaign/stages/generate-execution/fallback";
-import { deterministicPublisherStrategyFromCandidates } from "@/lib/campaign/stages/rank-publishers/normalize";
-import { rankPublisherStrategy } from "@/lib/campaign/stages/rank-publishers/run";
 import { retrieveCampaignCandidates } from "@/lib/campaign/stages/retrieve-candidates/run";
-import { deterministicPersonaStrategyFromCandidates } from "@/lib/campaign/stages/select-personas/normalize";
-import { selectPersonaStrategy } from "@/lib/campaign/stages/select-personas/run";
+import type { CampaignCandidates, CampaignExecution, LockedCampaignStrategy } from "@/lib/campaign/types";
 import type { CampaignStageTrace } from "@/lib/types";
 
 describe("production pipeline stages", () => {
-  it("extracts with deterministic fallback when OpenAI is unavailable", async () => {
-    await withoutOpenAIKey(async () => {
-      const result = await extractAdvertiserProfile(
-        "Premium dog food for senior dogs with vet-formulated joint support."
-      );
-
-      expect(result.data.category).toBe("pet_food");
-      expect(result.trace.name).toBe("extract");
-      expect(result.trace.source).toBe("deterministic");
-      expect(result.trace.apiCalls).toBe(0);
-    });
-  });
-
   it("retrieves bounded candidates before model ranking", () => {
     const profile = analyzeAdvertiserDescription(
       "A sustainable activewear brand for women made from recycled ocean plastic."
@@ -40,45 +22,17 @@ describe("production pipeline stages", () => {
     expect(personaNames).toContain("The Sustainability Buyer");
   });
 
-  it("falls back to deterministic candidate order for publisher ranking without an OpenAI key", async () => {
-    await withoutOpenAIKey(async () => {
-      const profile = analyzeAdvertiserDescription("Custom Italian leather handbags at a $1,200 price point.");
-      const candidates = retrieveCampaignCandidates(profile).data;
-      const result = await rankPublisherStrategy(candidates);
-
-      expect(result.trace.name).toBe("rank_publishers");
-      expect(result.trace.source).toBe("deterministic");
-      expect(result.trace.apiCalls).toBe(0);
-      expect(result.data.recommendedPublishers[0].publisher.id).toBe(candidates.publisherCandidates[0].publisher.id);
-    });
-  });
-
-  it("falls back to deterministic candidate order for persona selection without an OpenAI key", async () => {
-    await withoutOpenAIKey(async () => {
-      const profile = analyzeAdvertiserDescription("Custom Italian leather handbags at a $1,200 price point.");
-      const candidates = retrieveCampaignCandidates(profile).data;
-      const publisherStrategy = deterministicPublisherStrategyFromCandidates(candidates);
-      const result = await selectPersonaStrategy(candidates, publisherStrategy);
-
-      expect(result.trace.name).toBe("select_personas");
-      expect(result.trace.source).toBe("deterministic");
-      expect(result.trace.apiCalls).toBe(0);
-      expect(result.data.selectedPersonas[0].persona.id).toBe(candidates.personaCandidates[0].persona.id);
-    });
-  });
-
-  it("summarizes pipeline calls, repairs, and fallback stages during final assembly", () => {
+  it("summarizes pipeline calls and repairs during final assembly", () => {
     const profile = analyzeAdvertiserDescription("Non-alcoholic sparkling drink with adaptogens.");
     const candidates = retrieveCampaignCandidates(profile).data;
-    const publisherStrategy = deterministicPublisherStrategyFromCandidates(candidates);
-    const strategy = deterministicPersonaStrategyFromCandidates(candidates, publisherStrategy);
-    const execution = buildExecutionFallback(strategy);
+    const strategy = campaignStrategyFromCandidates(candidates);
+    const execution = executionFromStrategy(strategy);
     const traces: CampaignStageTrace[] = [
       stageTrace("extract", "openai", 1, false),
       stageTrace("retrieve", "deterministic", 0, false),
       stageTrace("rank_publishers", "openai", 2, true),
       stageTrace("select_personas", "openai", 1, false),
-      stageTrace("execute", "fallback", 1, false)
+      stageTrace("execute", "openai", 1, false)
     ];
 
     const result = assembleFinalCampaign({
@@ -90,7 +44,7 @@ describe("production pipeline stages", () => {
 
     expect(result.pipeline?.apiCallCount).toBe(5);
     expect(result.pipeline?.repairCount).toBe(1);
-    expect(result.pipeline?.fallbackStages).toEqual(["execute"]);
+    expect(result.pipeline?.fallbackStages).toEqual([]);
     expect(result.pipeline?.stages.map((stage) => stage.name)).toEqual([
       "extract",
       "retrieve",
@@ -101,19 +55,6 @@ describe("production pipeline stages", () => {
     ]);
   });
 });
-
-async function withoutOpenAIKey<T>(callback: () => Promise<T>) {
-  const originalKey = process.env.OPENAI_API_KEY;
-  delete process.env.OPENAI_API_KEY;
-
-  try {
-    return await callback();
-  } finally {
-    if (originalKey) {
-      process.env.OPENAI_API_KEY = originalKey;
-    }
-  }
-}
 
 function stageTrace(
   name: CampaignStageTrace["name"],
@@ -127,6 +68,65 @@ function stageTrace(
     durationMs: 1,
     apiCalls,
     repaired,
+    warnings: []
+  };
+}
+
+function campaignStrategyFromCandidates(candidates: CampaignCandidates): LockedCampaignStrategy {
+  return {
+    advertiserAnalysis: candidates.advertiserProfile,
+    recommendedPublishers: candidates.publisherCandidates.slice(0, 3),
+    excludedPublishers: candidates.exclusionCandidates.slice(0, 3),
+    selectedPersonas: candidates.personaCandidates.slice(0, 3),
+    warnings: candidates.warnings
+  };
+}
+
+function executionFromStrategy(strategy: LockedCampaignStrategy): CampaignExecution {
+  return {
+    creativeVariants: strategy.selectedPersonas.map((item, index) => ({
+      id: `creative_${index + 1}`,
+      personaId: item.persona.id,
+      personaName: item.persona.name,
+      headline: `Campaign idea for ${item.persona.name}`.slice(0, 80),
+      body: "Persona-specific copy aligned to the advertiser profile and selected publisher context.",
+      rationale: "Matches the selected persona to the campaign objective.",
+      tone: "clear"
+    })),
+    campaignConfig: {
+      objective: "new customer acquisition",
+      budget: {
+        totalUsd: 15000,
+        dailyUsd: 500,
+        allocation: strategy.recommendedPublishers.map((item, index) => ({
+          publisherId: item.publisher.id,
+          publisherName: item.publisher.name,
+          budgetPercent: index === 0 ? 40 : 30,
+          bidCpmUsd: 12,
+          rationale: "Budget follows selected publisher priority."
+        }))
+      },
+      targeting: {
+        categories: [strategy.advertiserAnalysis.category],
+        audienceAttributes: strategy.advertiserAnalysis.audienceHints,
+        geos: ["United States"],
+        excludedAttributes: []
+      },
+      placements: strategy.recommendedPublishers.map((item, index) => ({
+        publisherId: item.publisher.id,
+        publisherName: item.publisher.name,
+        placementType: "native checkout recommendation",
+        priority: index === 0 ? "primary" : "test"
+      })),
+      bidStrategy: {
+        type: "balanced_cpm",
+        rationale: "Balance quality and reach across selected publishers."
+      },
+      measurement: {
+        primaryKpi: "new customer conversion rate",
+        secondaryKpis: ["click-through rate"]
+      }
+    },
     warnings: []
   };
 }

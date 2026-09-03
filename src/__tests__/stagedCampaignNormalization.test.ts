@@ -1,18 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { analyzeAdvertiserDescription } from "@/lib/advertiserParser";
 import { assembleFinalCampaign } from "@/lib/campaign/stages/assemble/run";
-import { buildExecutionFallback } from "@/lib/campaign/stages/generate-execution/fallback";
 import { normalizeExecution } from "@/lib/campaign/stages/generate-execution/normalize";
-import {
-  deterministicPersonaStrategyFromCandidates,
-  normalizePersonaStrategy
-} from "@/lib/campaign/stages/select-personas/normalize";
-import {
-  deterministicPublisherStrategyFromCandidates,
-  normalizePublisherStrategy
-} from "@/lib/campaign/stages/rank-publishers/normalize";
+import { normalizePersonaStrategy } from "@/lib/campaign/stages/select-personas/normalize";
+import { normalizePublisherStrategy } from "@/lib/campaign/stages/rank-publishers/normalize";
 import { retrieveCampaignCandidates } from "@/lib/campaign/stages/retrieve-candidates/run";
 import { validateCampaignResult } from "@/lib/schemas";
+import type { CampaignCandidates, LockedCampaignStrategy, LockedPublisherStrategy } from "@/lib/campaign/types";
 import type { ExecutionResponse } from "@/lib/campaign/stages/generate-execution/schema";
 import type { PublisherRankingResponse } from "@/lib/campaign/stages/rank-publishers/schema";
 import type { PersonaSelectionResponse } from "@/lib/campaign/stages/select-personas/schema";
@@ -63,7 +57,7 @@ describe("staged campaign normalization", () => {
       "Premium dog supplements for senior pets with mobility support, sold as a monthly subscription.";
     const profile = analyzeAdvertiserDescription(description);
     const candidates = retrieveCampaignCandidates(profile).data;
-    const publisherStrategy = deterministicPublisherStrategyFromCandidates(candidates);
+    const publisherStrategy = publisherStrategyFromCandidates(candidates);
     const knownPersonaIds = candidates.personaCandidates.map((item) => item.persona.id);
     const selection: PersonaSelectionResponse = {
       selectedPersonas: [
@@ -94,16 +88,16 @@ describe("staged campaign normalization", () => {
       "Premium dog supplements for senior pets with mobility support, sold as a monthly subscription.";
     const profile = analyzeAdvertiserDescription(description);
     const candidates = retrieveCampaignCandidates(profile).data;
-    const publisherStrategy = deterministicPublisherStrategyFromCandidates(candidates);
-    const strategy = deterministicPersonaStrategyFromCandidates(candidates, publisherStrategy);
-    const fallbackExecution = buildExecutionFallback(strategy);
+    const publisherStrategy = publisherStrategyFromCandidates(candidates);
+    const strategy = campaignStrategyFromCandidates(candidates, publisherStrategy);
     const selectedPersonaIds = strategy.selectedPersonas.map((item) => item.persona.id);
     const recommendedPublisherIds = strategy.recommendedPublishers.map((item) => item.publisher.id);
     const execution: ExecutionResponse = {
       creativeVariants: [
         creativeVariant(selectedPersonaIds[0], "Valid persona", "Senior pet care without the guesswork"),
-        creativeVariant("persona_missing", "Missing persona", "This creative should be dropped"),
-        creativeVariant("persona_also_missing", "Missing persona", "This creative should also be dropped")
+        creativeVariant(selectedPersonaIds[1], "Valid persona", "Mobility support made simple"),
+        creativeVariant(selectedPersonaIds[2], "Valid persona", "A better monthly routine"),
+        creativeVariant("persona_missing", "Missing persona", "This creative should be dropped")
       ],
       campaignConfig: {
         objective: "monthly subscription acquisition",
@@ -113,6 +107,7 @@ describe("staged campaign normalization", () => {
           allocation: [
             allocation(recommendedPublisherIds[0], 70),
             allocation(recommendedPublisherIds[1], 50),
+            allocation(recommendedPublisherIds[2], 30),
             allocation("pub_missing", 20)
           ]
         },
@@ -124,8 +119,9 @@ describe("staged campaign normalization", () => {
         },
         placements: [
           placement(recommendedPublisherIds[0]),
-          placement("pub_missing"),
-          placement(recommendedPublisherIds[1])
+          placement(recommendedPublisherIds[1]),
+          placement(recommendedPublisherIds[2]),
+          placement("pub_missing")
         ],
         bidStrategy: {
           type: "premium_focus",
@@ -139,7 +135,7 @@ describe("staged campaign normalization", () => {
       warnings: []
     };
 
-    const normalizedExecution = normalizeExecution({ fallbackExecution, strategy, execution });
+    const normalizedExecution = normalizeExecution({ strategy, execution });
     const result = assembleFinalCampaign({
       generatedAt: new Date().toISOString(),
       strategy,
@@ -161,7 +157,8 @@ describe("staged campaign normalization", () => {
     expect(allocationTotal).toBe(100);
     expect(result.warnings).toEqual(
       expect.arrayContaining([
-        "Added fallback creative to keep 3 to 5 usable variants.",
+        "Dropped budget allocation outside recommended publisher set: pub_missing.",
+        "Dropped placement outside recommended publisher set: pub_missing.",
         "Normalized budget allocation to sum to 100."
       ])
     );
@@ -227,5 +224,24 @@ function placement(publisherId: string) {
     publisherName: publisherId,
     placementType: "native checkout recommendation",
     priority: "primary" as const
+  };
+}
+
+function publisherStrategyFromCandidates(candidates: CampaignCandidates): LockedPublisherStrategy {
+  return {
+    advertiserAnalysis: candidates.advertiserProfile,
+    recommendedPublishers: candidates.publisherCandidates.slice(0, 3),
+    excludedPublishers: candidates.exclusionCandidates.slice(0, 3),
+    warnings: candidates.warnings
+  };
+}
+
+function campaignStrategyFromCandidates(
+  candidates: CampaignCandidates,
+  publisherStrategy: LockedPublisherStrategy
+): LockedCampaignStrategy {
+  return {
+    ...publisherStrategy,
+    selectedPersonas: candidates.personaCandidates.slice(0, 3)
   };
 }

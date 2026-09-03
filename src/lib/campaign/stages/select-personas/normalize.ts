@@ -9,17 +9,6 @@ import {
 import type { CampaignCandidates, LockedCampaignStrategy, LockedPublisherStrategy } from "../../types";
 import type { PersonaSelectionResponse } from "./schema";
 
-export function deterministicPersonaStrategyFromCandidates(
-  candidates: CampaignCandidates,
-  publisherStrategy: LockedPublisherStrategy
-): LockedCampaignStrategy {
-  return {
-    ...publisherStrategy,
-    selectedPersonas: candidates.personaCandidates.slice(0, 5),
-    warnings: Array.from(new Set([...publisherStrategy.warnings, ...candidates.warnings]))
-  };
-}
-
 export function normalizePersonaStrategy(
   candidates: CampaignCandidates,
   publisherStrategy: LockedPublisherStrategy,

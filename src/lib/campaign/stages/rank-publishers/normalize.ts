@@ -9,17 +9,6 @@ import {
 } from "../../shared/normalization";
 import type { CampaignCandidates, LockedPublisherStrategy } from "../../types";
 
-export function deterministicPublisherStrategyFromCandidates(
-  candidates: CampaignCandidates
-): LockedPublisherStrategy {
-  return {
-    advertiserAnalysis: candidates.advertiserProfile,
-    recommendedPublishers: candidates.publisherCandidates.slice(0, 5),
-    excludedPublishers: candidates.exclusionCandidates.slice(0, 8),
-    warnings: candidates.warnings
-  };
-}
-
 export function normalizePublisherStrategy(
   candidates: CampaignCandidates,
   ranking: PublisherRankingResponse

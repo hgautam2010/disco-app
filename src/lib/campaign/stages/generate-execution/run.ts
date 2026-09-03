@@ -1,6 +1,5 @@
 import { getPersonas, getPublishers } from "../../../data";
-import type { CampaignStageTrace } from "../../../types";
-import { getOpenAIModel, hasOpenAIKey } from "../../shared/openaiClient";
+import { getOpenAIModel } from "../../shared/openaiClient";
 import { readStagePrompt } from "../../shared/prompts";
 import {
   generateAndValidateWithRepairResult,
@@ -8,7 +7,6 @@ import {
   type StructuredGenerationResult
 } from "../../shared/structuredGeneration";
 import type { CampaignExecution, LockedCampaignStrategy, PipelineStageResult } from "../../types";
-import { buildExecutionFallback } from "./fallback";
 import { normalizeExecution } from "./normalize";
 import { executionResponseJsonSchema, executionResponseSchema, type ExecutionResponse } from "./schema";
 
@@ -17,37 +15,23 @@ export async function generateExecutionStage(
   strategy: LockedCampaignStrategy
 ): Promise<PipelineStageResult<CampaignExecution>> {
   const startedAt = Date.now();
-  const fallbackExecution = buildExecutionFallback(strategy);
+  const result = await generateExecutionWithMetadata(advertiserDescription, strategy);
+  const execution = normalizeExecution({
+    strategy,
+    execution: result.data
+  });
 
-  if (!hasOpenAIKey()) {
-    return fallbackExecutionStage(startedAt, fallbackExecution, "OPENAI_API_KEY is not configured.", 0, false);
-  }
-
-  try {
-    const result = await generateExecutionWithMetadata(advertiserDescription, strategy);
-    const execution = normalizeExecution({
-      fallbackExecution,
-      strategy,
-      execution: result.data
-    });
-
-    return {
-      data: execution,
-      trace: {
-        name: "execute",
-        source: "openai",
-        durationMs: Date.now() - startedAt,
-        apiCalls: result.apiCalls,
-        repaired: result.repaired,
-        warnings: execution.warnings
-      }
-    };
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "OpenAI execution failed.";
-    const apiCalls = hasApiCallMetadata(error) ? error.apiCalls : 1;
-    const repaired = hasApiCallMetadata(error) ? error.repaired : false;
-    return fallbackExecutionStage(startedAt, fallbackExecution, message, apiCalls, repaired);
-  }
+  return {
+    data: execution,
+    trace: {
+      name: "execute",
+      source: "openai",
+      durationMs: Date.now() - startedAt,
+      apiCalls: result.apiCalls,
+      repaired: result.repaired,
+      warnings: execution.warnings
+    }
+  };
 }
 
 export async function generateExecution(
@@ -131,42 +115,4 @@ export async function generateExecutionWithMetadata(
       selectedPersonas
     }
   });
-}
-
-function fallbackExecutionStage(
-  startedAt: number,
-  fallbackExecution: CampaignExecution,
-  reason: string,
-  apiCalls: number,
-  repaired: boolean
-): PipelineStageResult<CampaignExecution> {
-  const warning = `OpenAI execution unavailable; using deterministic creative and config. ${reason}`;
-  const trace: CampaignStageTrace = {
-    name: "execute",
-    source: hasOpenAIKey() ? "fallback" : "deterministic",
-    durationMs: Date.now() - startedAt,
-    apiCalls,
-    repaired,
-    warnings: [warning],
-    fallbackReason: warning
-  };
-
-  return {
-    data: {
-      ...fallbackExecution,
-      warnings: [warning]
-    },
-    trace
-  };
-}
-
-function hasApiCallMetadata(error: unknown): error is { apiCalls: number; repaired: boolean } {
-  return (
-    typeof error === "object" &&
-    error !== null &&
-    "apiCalls" in error &&
-    "repaired" in error &&
-    typeof error.apiCalls === "number" &&
-    typeof error.repaired === "boolean"
-  );
 }

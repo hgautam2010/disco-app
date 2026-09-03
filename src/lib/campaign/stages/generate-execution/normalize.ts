@@ -1,47 +1,28 @@
-import type {
-  CampaignConfig,
-  CreativeVariant,
-  PublisherBudgetAllocation,
-  ScoredPublisher
-} from "../../../types";
-import { fillUniqueFromFallback, nonEmptyArray, positiveNumber } from "../../shared/normalization";
+import type { CampaignConfig, CreativeVariant, PublisherBudgetAllocation, ScoredPublisher } from "../../../types";
+import { positiveNumber } from "../../shared/normalization";
 import type { CampaignExecution, LockedCampaignStrategy } from "../../types";
 import type { ExecutionResponse } from "./schema";
 
 export function normalizeExecution({
-  fallbackExecution,
   strategy,
   execution
 }: {
-  fallbackExecution: CampaignExecution;
   strategy: LockedCampaignStrategy;
   execution: ExecutionResponse;
 }): CampaignExecution {
   const warnings = new Set([...strategy.warnings, ...execution.warnings]);
   const selectedPersonaIds = new Set(strategy.selectedPersonas.map((item) => item.persona.id));
-  const creativeVariants = normalizeCreativeVariants(
-    execution.creativeVariants,
-    fallbackExecution,
-    strategy,
-    selectedPersonaIds,
-    warnings
-  );
+  const creativeVariants = normalizeCreativeVariants(execution.creativeVariants, strategy, selectedPersonaIds, warnings);
 
   return {
     creativeVariants,
-    campaignConfig: normalizeCampaignConfig(
-      execution.campaignConfig,
-      fallbackExecution,
-      strategy.recommendedPublishers,
-      warnings
-    ),
+    campaignConfig: normalizeCampaignConfig(execution.campaignConfig, strategy.recommendedPublishers, warnings),
     warnings: Array.from(warnings)
   };
 }
 
 function normalizeCreativeVariants(
   variants: CreativeVariant[],
-  fallbackExecution: CampaignExecution,
   strategy: LockedCampaignStrategy,
   selectedPersonaIds: Set<string>,
   warnings: Set<string>
@@ -59,111 +40,111 @@ function normalizeCreativeVariants(
     }));
 
   if (normalized.length < 3) {
-    fillUniqueFromFallback({
-      target: normalized,
-      fallback: fallbackExecution.creativeVariants,
-      getId: (item) => item.personaId,
-      min: 3,
-      max: 5,
-      warnings,
-      warning: "Added fallback creative to keep 3 to 5 usable variants."
-    });
+    throw new Error("Execution response must include at least 3 creative variants for selected personas.");
   }
-
-  fillUniqueFromFallback({
-    target: normalized,
-    fallback: fallbackExecution.creativeVariants,
-    getId: (item) => item.personaId,
-    min: 3,
-    max: 5,
-    warnings,
-    warning: "Added deterministic creative fallback to keep at least 3 variants."
-  });
 
   return normalized.slice(0, 5);
 }
 
 function normalizeCampaignConfig(
   config: CampaignConfig,
-  fallbackExecution: CampaignExecution,
   recommendedPublishers: ScoredPublisher[],
   warnings: Set<string>
 ): CampaignConfig {
-  const totalUsd = positiveNumber(config.budget.totalUsd) || fallbackExecution.campaignConfig.budget.totalUsd;
-  const allocation = normalizeAllocation(config.budget.allocation, fallbackExecution, recommendedPublishers, warnings);
+  const totalUsd = positiveNumber(config.budget.totalUsd);
+  const allocation = normalizeAllocation(config.budget.allocation, recommendedPublishers, warnings);
+  const recommendedPublisherIds = new Set(recommendedPublishers.map((item) => item.publisher.id));
   const placementByPublisher = new Map(config.placements.map((placement) => [placement.publisherId, placement]));
-  const placements = recommendedPublishers.map((item, index) => {
-    const placement = placementByPublisher.get(item.publisher.id);
+  const placements = config.placements.flatMap((placement, index) => {
+    const recommendedPublisher = recommendedPublishers.find((item) => item.publisher.id === placement.publisherId);
 
-    return {
-      publisherId: item.publisher.id,
-      publisherName: item.publisher.name,
-      placementType:
-        placement?.placementType ||
-        fallbackExecution.campaignConfig.placements.find((candidate) => candidate.publisherId === item.publisher.id)
-          ?.placementType ||
-        "native checkout recommendation",
-      priority: placement?.priority || (index < 3 ? "primary" : "test")
-    };
+    if (!recommendedPublisherIds.has(placement.publisherId) || !recommendedPublisher) {
+      warnings.add(`Dropped placement outside recommended publisher set: ${placement.publisherId}.`);
+      return [];
+    }
+
+    return [
+      {
+        publisherId: recommendedPublisher.publisher.id,
+        publisherName: recommendedPublisher.publisher.name,
+        placementType: placement.placementType,
+        priority: placement.priority || (index < 3 ? "primary" : "test")
+      }
+    ];
   });
 
+  if (!totalUsd) {
+    throw new Error("Execution response must include a positive total budget.");
+  }
+
+  if (placements.length < 3) {
+    throw new Error("Execution response must include at least 3 placements for recommended publishers.");
+  }
+
   return {
-    objective: config.objective || fallbackExecution.campaignConfig.objective,
+    objective: config.objective,
     budget: {
       totalUsd,
       dailyUsd: positiveNumber(config.budget.dailyUsd) || Math.round(totalUsd / 30),
       allocation
     },
     targeting: {
-      categories: nonEmptyArray(config.targeting.categories, fallbackExecution.campaignConfig.targeting.categories[0]),
-      audienceAttributes: nonEmptyArray(
-        config.targeting.audienceAttributes,
-        fallbackExecution.campaignConfig.targeting.audienceAttributes[0]
-      ),
-      geos: nonEmptyArray(config.targeting.geos, fallbackExecution.campaignConfig.targeting.geos[0] ?? "nationwide"),
+      categories: config.targeting.categories,
+      audienceAttributes: config.targeting.audienceAttributes,
+      geos: config.targeting.geos,
       excludedAttributes: config.targeting.excludedAttributes
     },
-    placements,
+    placements: placements.slice(0, 5),
     bidStrategy: {
-      type: config.bidStrategy.type || fallbackExecution.campaignConfig.bidStrategy.type,
-      rationale: config.bidStrategy.rationale || fallbackExecution.campaignConfig.bidStrategy.rationale
+      type: config.bidStrategy.type,
+      rationale: config.bidStrategy.rationale
     },
     measurement: {
-      primaryKpi: config.measurement.primaryKpi || fallbackExecution.campaignConfig.measurement.primaryKpi,
-      secondaryKpis: nonEmptyArray(
-        config.measurement.secondaryKpis,
-        fallbackExecution.campaignConfig.measurement.secondaryKpis[0] ?? "conversion rate"
-      )
+      primaryKpi: config.measurement.primaryKpi,
+      secondaryKpis: config.measurement.secondaryKpis
     }
   };
 }
 
 function normalizeAllocation(
   allocations: PublisherBudgetAllocation[],
-  fallbackExecution: CampaignExecution,
   recommendedPublishers: ScoredPublisher[],
   warnings: Set<string>
 ): PublisherBudgetAllocation[] {
-  const allocationByPublisher = new Map(allocations.map((item) => [item.publisherId, item]));
-  const baselineByPublisher = new Map(
-    fallbackExecution.campaignConfig.budget.allocation.map((item) => [item.publisherId, item])
-  );
-  const raw = recommendedPublishers.map((item) => {
-    const allocation = allocationByPublisher.get(item.publisher.id);
-    const baselineAllocation = baselineByPublisher.get(item.publisher.id);
+  const recommendedById = new Map(recommendedPublishers.map((item) => [item.publisher.id, item]));
+  const seen = new Set<string>();
+  const raw = allocations.flatMap((allocation) => {
+    const recommendedPublisher = recommendedById.get(allocation.publisherId);
 
-    return {
-      publisherId: item.publisher.id,
-      publisherName: item.publisher.name,
-      budgetPercent: positiveNumber(allocation?.budgetPercent) || baselineAllocation?.budgetPercent || item.score,
-      bidCpmUsd: positiveNumber(allocation?.bidCpmUsd) || baselineAllocation?.bidCpmUsd || defaultBidCpm(item),
-      rationale:
-        allocation?.rationale ||
-        baselineAllocation?.rationale ||
-        `${item.publisher.name} receives budget because it ranked in the staged strategy output.`
-    };
+    if (!recommendedPublisher || seen.has(allocation.publisherId)) {
+      if (!recommendedPublisher) {
+        warnings.add(`Dropped budget allocation outside recommended publisher set: ${allocation.publisherId}.`);
+      }
+      return [];
+    }
+
+    seen.add(allocation.publisherId);
+
+    return [
+      {
+        publisherId: recommendedPublisher.publisher.id,
+        publisherName: recommendedPublisher.publisher.name,
+        budgetPercent: allocation.budgetPercent,
+        bidCpmUsd: positiveNumber(allocation.bidCpmUsd) || defaultBidCpm(recommendedPublisher),
+        rationale: allocation.rationale
+      }
+    ];
   });
+
+  if (raw.length < 3) {
+    throw new Error("Execution response must include at least 3 budget allocations for recommended publishers.");
+  }
+
   const sourceTotal = raw.reduce((total, item) => total + item.budgetPercent, 0);
+  if (sourceTotal <= 0) {
+    throw new Error("Execution response budget allocation must be greater than zero.");
+  }
+
   const normalized = raw.map((item) => ({
     ...item,
     budgetPercent: Math.round((item.budgetPercent / Math.max(sourceTotal, 1)) * 100)

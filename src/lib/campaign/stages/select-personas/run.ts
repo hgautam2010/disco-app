@@ -1,12 +1,7 @@
-import type { CampaignStageTrace } from "../../../types";
-import { getOpenAIModel, hasOpenAIKey } from "../../shared/openaiClient";
+import { getOpenAIModel } from "../../shared/openaiClient";
 import { readStagePrompt } from "../../shared/prompts";
-import {
-  generateAndValidateWithRepairResult,
-  StructuredGenerationError,
-  type RepairableStructuredRequest
-} from "../../shared/structuredGeneration";
-import { deterministicPersonaStrategyFromCandidates, normalizePersonaStrategy } from "./normalize";
+import { generateAndValidateWithRepairResult, type RepairableStructuredRequest } from "../../shared/structuredGeneration";
+import { normalizePersonaStrategy } from "./normalize";
 import { personaSelectionResponseJsonSchema, personaSelectionResponseSchema } from "./schema";
 import type {
   CampaignCandidates,
@@ -20,16 +15,6 @@ export async function selectPersonaStrategy(
   publisherStrategy: LockedPublisherStrategy
 ): Promise<PipelineStageResult<LockedCampaignStrategy>> {
   const startedAt = Date.now();
-
-  if (!hasOpenAIKey()) {
-    return deterministicPersonaSelectionResult(
-      candidates,
-      publisherStrategy,
-      startedAt,
-      "OPENAI_API_KEY is not configured."
-    );
-  }
-
   const payload = toPersonaSelectionPayload(candidates, publisherStrategy);
   const request: RepairableStructuredRequest = {
     model: getOpenAIModel(),
@@ -51,67 +36,24 @@ export async function selectPersonaStrategy(
     }
   };
 
-  try {
-    const result = await generateAndValidateWithRepairResult({
-      label: "persona_selection",
-      schema: personaSelectionResponseSchema,
-      request,
-      fallbackCandidates: payload
-    });
-    const strategy = normalizePersonaStrategy(candidates, publisherStrategy, result.data);
-
-    return {
-      data: strategy,
-      trace: {
-        name: "select_personas",
-        source: "openai",
-        durationMs: Date.now() - startedAt,
-        apiCalls: result.apiCalls,
-        repaired: result.repaired,
-        warnings: strategy.warnings
-      }
-    };
-  } catch (error) {
-    const structuredError = error instanceof StructuredGenerationError ? error : null;
-    const reason = error instanceof Error ? error.message : "OpenAI persona selection failed.";
-    return deterministicPersonaSelectionResult(
-      candidates,
-      publisherStrategy,
-      startedAt,
-      reason,
-      structuredError?.apiCalls,
-      structuredError?.repaired
-    );
-  }
-}
-
-function deterministicPersonaSelectionResult(
-  candidates: CampaignCandidates,
-  publisherStrategy: LockedPublisherStrategy,
-  startedAt: number,
-  reason: string,
-  apiCalls = 0,
-  repaired = false
-): PipelineStageResult<LockedCampaignStrategy> {
-  const warning = `OpenAI persona selection unavailable; using deterministic persona candidate order. ${reason}`;
-  const baselineStrategy = deterministicPersonaStrategyFromCandidates(candidates, publisherStrategy);
-  const strategy = {
-    ...baselineStrategy,
-    warnings: Array.from(new Set([...baselineStrategy.warnings, warning]))
-  };
-  const trace: CampaignStageTrace = {
-    name: "select_personas",
-    source: hasOpenAIKey() ? "fallback" : "deterministic",
-    durationMs: Date.now() - startedAt,
-    apiCalls,
-    repaired,
-    warnings: strategy.warnings,
-    fallbackReason: warning
-  };
+  const result = await generateAndValidateWithRepairResult({
+    label: "persona_selection",
+    schema: personaSelectionResponseSchema,
+    request,
+    fallbackCandidates: payload
+  });
+  const strategy = normalizePersonaStrategy(candidates, publisherStrategy, result.data);
 
   return {
     data: strategy,
-    trace
+    trace: {
+      name: "select_personas",
+      source: "openai",
+      durationMs: Date.now() - startedAt,
+      apiCalls: result.apiCalls,
+      repaired: result.repaired,
+      warnings: strategy.warnings
+    }
   };
 }
 
