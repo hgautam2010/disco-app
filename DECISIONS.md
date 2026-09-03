@@ -81,14 +81,21 @@ The final response includes a `pipeline` trace with:
 - stage name,
 - source,
 - model,
+- prompt input for OpenAI-backed stages,
+- parsed model output for OpenAI-backed stages,
+- normalized stage output,
 - duration,
 - API calls,
 - attempts,
 - token usage,
 - repair status,
-- warnings.
+- stage-local warnings.
 
-The UI shows a compact summary and an expandable per-stage trace. This makes the app easier to demo and gives a clear answer to cost, latency, and reliability questions.
+The UI shows a compact summary and an expandable per-stage trace. Each trace data panel has a `View JSON` button that opens a highlighted JSON modal with copy support.
+
+This makes the app easier to demo and gives a clear answer to cost, latency, reliability, prompt payload, model response, and normalization questions.
+
+Tradeoff: trace snapshots can be verbose, so they are collapsed by default and intentionally exclude raw system prompts, JSON schemas, request headers, and secrets.
 
 ## 8. Use Offline Evals for Regression Coverage
 
@@ -129,8 +136,8 @@ This makes it easy to modify one stage without mentally loading the entire syste
 Given more time, the next production improvements would be:
 
 - persisted campaign drafts,
-- persisted run logs,
+- persisted run logs for traces and warnings,
 - embeddings-backed retrieval for larger catalogs,
 - per-stage eval fixtures,
 - human feedback labels,
-- monitoring for repair rate, schema failures, token usage, and latency.
+- monitoring for repair rate, schema failures, token usage, latency, and per-stage model performance.

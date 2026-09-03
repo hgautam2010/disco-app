@@ -30,6 +30,8 @@ extract -> retrieve -> rank_publishers -> select_personas -> generate_execution 
 
 Each step returns data plus trace metadata.
 
+The trace is designed for demos: each stage can show the payload it received, the parsed model response when OpenAI was involved, and the normalized output that moved to the next step.
+
 ## 3. Extract Advertiser Profile
 
 Folder:
@@ -145,8 +147,10 @@ The final response includes:
 - selected personas,
 - creative variants,
 - campaign config,
-- warnings,
+- cumulative API warnings,
 - pipeline trace.
+
+The UI does not render a separate global warnings banner. Warnings are easier to explain from the stage that created them, so the visible warnings live inside each stage's trace.
 
 ## 9. OpenAI Call Count
 
@@ -196,18 +200,23 @@ Each stage trace records:
 - stage name,
 - source,
 - model,
+- prompt input for OpenAI stages or stage input for deterministic stages,
+- parsed model output for OpenAI stages,
+- normalized stage output,
 - duration,
 - API calls,
 - attempts,
 - token usage,
 - repair status,
-- warnings.
+- stage-local warnings.
 
 The UI renders this in:
 
 `src/components/CampaignPlanner.tsx`
 
-This makes the pipeline easy to inspect during demos.
+The trace UI starts compact. Expanding `Trace data` shows inline JSON previews, and each preview has a `View JSON` button that opens a highlighted modal with copy support.
+
+This makes the pipeline easy to inspect during demos without flooding the page. The trace shows business payloads and parsed outputs, not request headers, raw schemas, secrets, or full system prompt text.
 
 ## 12. Evals and Tests
 
@@ -228,6 +237,8 @@ Important test files:
 - `src/__tests__/publisherScoring.test.ts`
 - `src/__tests__/personaScoring.test.ts`
 - `src/__tests__/campaignEngine.test.ts`
+- `src/__tests__/campaignWarnings.test.ts`
+- `src/__tests__/openaiClient.test.ts`
 
 Eval files:
 

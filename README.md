@@ -57,13 +57,12 @@ Core entry points:
 - `src/lib/schemas.ts`: final campaign result validation.
 - `src/app/api/campaign/route.ts`: server-only API route that keeps the API key out of the browser.
 
-## Remaining Roadmap
+## Future Improvements
 
-1. Keep the current split pipeline as the production path: narrow extraction, deterministic candidate retrieval, publisher ranking, persona selection, execution generation, and final normalization.
-2. Expand evals from end-to-end campaign cases into per-stage fixtures so publisher ranking, persona selection, and execution can fail independently without hiding regressions.
-3. Add persisted run logs for schema failures, repair rate, token usage, latency, and normalized/dropped IDs.
-4. Move catalog retrieval to embeddings or indexed search when publisher and persona data grows beyond what deterministic top-k scoring can scan cheaply.
-5. Add saved campaign drafts and human feedback labels so prompt and retrieval changes can be evaluated against real reviewer preferences.
+1. Expand evals from end-to-end campaign cases into per-stage fixtures so publisher ranking, persona selection, and execution can fail independently without hiding regressions.
+2. Add persisted run logs for schema failures, repair rate, token usage, latency, selected model, and normalized/dropped IDs.
+3. Move catalog retrieval to embeddings or indexed search when publisher and persona data grows beyond what deterministic top-k scoring can scan cheaply.
+4. Add saved campaign drafts and human feedback labels so prompt and retrieval changes can be evaluated against real reviewer preferences.
 
 ## Evals
 
@@ -74,7 +73,7 @@ npm run test
 npm run eval
 ```
 
-Unit tests cover scoring mechanics, Zod contracts, staged-output normalization, candidate retrieval, pipeline trace summaries, and the OpenAI API key requirement. The eval harness runs 14 representative advertiser cases from `evals/fixtures/advertiser-cases.json` and writes reports to `evals/reports/`. The cases cover happy paths, vague inputs, unknown-category handling, B2B bad-fit behavior, conflicting price signals, category diversity, expected exclusions, extraction taxonomy checks, and candidate recall. Current offline eval score: `100`.
+Unit tests cover scoring mechanics, Zod contracts, staged-output normalization, candidate retrieval, pipeline trace summaries, trace warning behavior, stage model selection, and the OpenAI API key requirement. The eval harness runs 14 representative advertiser cases from `evals/fixtures/advertiser-cases.json` and writes reports to `evals/reports/`. The cases cover happy paths, vague inputs, unknown-category handling, B2B bad-fit behavior, conflicting price signals, category diversity, expected exclusions, extraction taxonomy checks, and candidate recall. Current offline eval score: `100`.
 
 ## What I Cut
 
