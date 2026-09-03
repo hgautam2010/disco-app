@@ -1,0 +1,136 @@
+# Technical Decisions
+
+This document captures the main implementation decisions behind the campaign planner and the tradeoffs they create.
+
+## 1. Use Next.js With a Server API Route
+
+The app uses Next.js because the assignment needs both a polished UI and a secure server-side place to call OpenAI.
+
+- The browser renders the campaign planner interface.
+- `src/app/api/campaign/route.ts` owns request validation and server-only campaign generation.
+- `OPENAI_API_KEY` stays on the server and is never exposed to client components.
+
+Tradeoff: this is still a prototype, so campaign persistence and auth are intentionally out of scope.
+
+## 2. Use a Staged OpenAI Pipeline
+
+The primary flow is split into stages:
+
+1. Extract advertiser profile.
+2. Retrieve bounded publisher and persona candidates.
+3. Rank publishers.
+4. Select personas.
+5. Generate creative and campaign config.
+6. Assemble and validate the final result.
+
+This is easier to explain, debug, and evaluate than one large prompt because every stage has a narrow responsibility and its own schema.
+
+Tradeoff: the normal path uses 4 OpenAI calls instead of 1. The benefit is better inspectability and stricter validation.
+
+## 3. Keep Retrieval Deterministic
+
+The retrieval stage uses local scoring code to shortlist publishers and personas before OpenAI ranks the final choices.
+
+This keeps prompts smaller and prevents the model from choosing IDs outside the catalog. It also gives the app useful offline eval coverage without requiring an API call.
+
+Tradeoff: the current scoring rules are simple and tuned to the supplied catalog. If the catalog grows significantly, this should move to embeddings or indexed retrieval.
+
+## 4. Use Controlled Extraction Taxonomy
+
+Advertiser extraction uses controlled values for `category`, `secondaryCategories`, and `productSignals`.
+
+The taxonomy lives in `src/lib/advertiserTaxonomy.ts`, and the extraction schema/prompt both reference the same allowed vocabulary.
+
+This improves predictability because downstream scoring can depend on known values instead of free-form model language.
+
+Tradeoff: unknown or new business types may be mapped to `unknown` until the taxonomy is expanded.
+
+## 5. Validate Every Model Response With Zod
+
+Each OpenAI-backed stage requests structured JSON and validates the result with Zod.
+
+If validation fails, the app makes one repair call with:
+
+- the invalid response,
+- the validation errors,
+- the allowed publisher and persona IDs,
+- the same JSON schema contract,
+- the relevant stage context.
+
+Tradeoff: repair improves reliability but can double API calls in the worst case.
+
+## 6. Normalize Model Decisions Against Local Data
+
+Model output is treated as a proposal, not final truth.
+
+Normalization ensures:
+
+- recommended publishers exist in the retrieved candidate set,
+- excluded publishers do not overlap with recommendations,
+- selected personas exist in the retrieved candidate set,
+- creative variants only target locked personas,
+- budget allocations and placements only use recommended publishers,
+- budget percentages sum to 100.
+
+This keeps the final campaign internally consistent even when a model response is slightly messy.
+
+## 7. Make Pipeline Trace Visible
+
+The final response includes a `pipeline` trace with:
+
+- stage name,
+- source,
+- model,
+- duration,
+- API calls,
+- attempts,
+- token usage,
+- repair status,
+- warnings.
+
+The UI shows a compact summary and an expandable per-stage trace. This makes the app easier to demo and gives a clear answer to cost, latency, and reliability questions.
+
+## 8. Use Offline Evals for Regression Coverage
+
+The eval harness runs representative advertiser cases through deterministic retrieval and scoring.
+
+It checks:
+
+- expected category,
+- taxonomy validity,
+- candidate publisher recall,
+- top publisher fit,
+- candidate persona recall,
+- persona fit,
+- exclusions,
+- price tier,
+- ambiguity level,
+- product signals,
+- warning behavior,
+- forbidden top publishers.
+
+Tradeoff: offline evals do not fully grade OpenAI writing quality. They are strongest for retrieval, taxonomy, ranking expectations, and regression detection.
+
+## 9. Keep the Code Walkthrough-Oriented
+
+The code is organized around the pipeline rather than around generic abstractions.
+
+Each stage folder has predictable files:
+
+- `run.ts`
+- `prompt.md`
+- `schema.ts`
+- `normalize.ts` when needed
+
+This makes it easy to modify one stage without mentally loading the entire system.
+
+## 10. What I Would Improve Next
+
+Given more time, the next production improvements would be:
+
+- persisted campaign drafts,
+- persisted run logs,
+- embeddings-backed retrieval for larger catalogs,
+- per-stage eval fixtures,
+- human feedback labels,
+- monitoring for repair rate, schema failures, token usage, and latency.
