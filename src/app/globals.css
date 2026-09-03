@@ -309,7 +309,8 @@ button:disabled {
 }
 
 .pipeline-chips span,
-.pipeline-stage-metrics span {
+.pipeline-stage-metrics span,
+.pipeline-stage-warnings summary {
   border: 1px solid var(--line);
   border-radius: 999px;
   padding: 4px 8px;
@@ -371,7 +372,34 @@ button:disabled {
   gap: 6px;
 }
 
-.pipeline-stage p {
+.pipeline-stage-warnings summary {
+  border-color: #f2c9b5;
+  color: var(--warn);
+  background: var(--warn-soft);
+}
+
+.pipeline-stage-warnings {
+  width: fit-content;
+  max-width: 100%;
+  color: var(--warn);
+}
+
+.pipeline-stage-warnings summary {
+  cursor: pointer;
+  font-weight: 760;
+  list-style-position: inside;
+}
+
+.pipeline-stage-warnings ul {
+  display: grid;
+  min-width: 0;
+  max-width: 100%;
+  gap: 6px;
+  margin: 8px 0 0;
+  padding-left: 18px;
+}
+
+.pipeline-stage-warnings li {
   color: var(--warn);
   line-height: 1.45;
   overflow-wrap: anywhere;

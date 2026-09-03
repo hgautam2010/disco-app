@@ -192,22 +192,35 @@ function PipelineSummary({ result }: { result: CampaignResult }) {
       <details className="pipeline-details">
         <summary>Pipeline trace</summary>
         <div className="pipeline-stage-list">
-          {pipeline.stages.map((stage) => (
-            <div className="pipeline-stage" key={stage.name}>
-              <div>
-                <strong>{formatStageName(stage.name)}</strong>
-                <span>{stage.source === "openai" ? stage.model : "code"}</span>
+          {pipeline.stages.map((stage) => {
+            const warningCount = stage.warnings.length;
+
+            return (
+              <div className="pipeline-stage" key={stage.name}>
+                <div>
+                  <strong>{formatStageName(stage.name)}</strong>
+                  <span>{stage.source === "openai" ? stage.model : "code"}</span>
+                </div>
+                <div className="pipeline-stage-metrics">
+                  <span>{stage.apiCalls} calls</span>
+                  <span>{stage.attempts} attempts</span>
+                  <span>{formatNumber(stage.tokenUsage.totalTokens)} tokens</span>
+                  <span>{formatDuration(stage.durationMs)}</span>
+                  <span>{stage.repaired ? "repaired" : "valid"}</span>
+                </div>
+                {warningCount > 0 ? (
+                  <details className="pipeline-stage-warnings">
+                    <summary>{formatWarningCount(warningCount)}</summary>
+                    <ul>
+                      {stage.warnings.map((warning) => (
+                        <li key={warning}>{warning}</li>
+                      ))}
+                    </ul>
+                  </details>
+                ) : null}
               </div>
-              <div className="pipeline-stage-metrics">
-                <span>{stage.apiCalls} calls</span>
-                <span>{stage.attempts} attempts</span>
-                <span>{formatNumber(stage.tokenUsage.totalTokens)} tokens</span>
-                <span>{formatDuration(stage.durationMs)}</span>
-                <span>{stage.repaired ? "repaired" : "valid"}</span>
-              </div>
-              {stage.warnings.length > 0 ? <p>{stage.warnings.join(" ")}</p> : null}
-            </div>
-          ))}
+            );
+          })}
         </div>
       </details>
     </div>
@@ -228,6 +241,10 @@ function formatDuration(durationMs: number) {
   }
 
   return `${(durationMs / 1000).toFixed(1)} s`;
+}
+
+function formatWarningCount(count: number) {
+  return `${count} ${count === 1 ? "warning" : "warnings"}`;
 }
 
 function Metric({ label, value }: { label: string; value: string }) {
