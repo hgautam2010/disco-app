@@ -35,7 +35,7 @@ export async function extractAdvertiserProfile(
     label: "advertiser_profile",
     schema: advertiserProfileResponseSchema,
     request,
-    fallbackCandidates: {
+    repairContext: {
       advertiserDescription
     }
   });

@@ -34,7 +34,7 @@ export async function rankPublisherStrategy(
     label: "publisher_ranking",
     schema: publisherRankingResponseSchema,
     request,
-    fallbackCandidates: payload
+    repairContext: payload
   });
   const strategy = normalizePublisherStrategy(candidates, result.data);
 

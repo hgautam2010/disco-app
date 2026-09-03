@@ -2,7 +2,7 @@ import type { ExcludedPublisher, ScoredPublisher } from "../../../types";
 import type { PublisherRankingResponse } from "./schema";
 import {
   clampScore,
-  fillUniqueFromFallback,
+  fillUniqueFromCandidates,
   nonEmptyArray,
   nonEmptySignals,
   normalizedScore
@@ -64,9 +64,9 @@ function normalizeRecommendedPublishers(
     ];
   });
 
-  fillUniqueFromFallback({
+  fillUniqueFromCandidates({
     target: recommended,
-    fallback: Array.from(publisherCandidateById.values()),
+    candidates: Array.from(publisherCandidateById.values()),
     getId: (item) => item.publisher.id,
     min: 3,
     max: 5,
@@ -111,7 +111,7 @@ function normalizeExcludedPublishers(
       }
     ];
   });
-  const fallbackExclusions = [
+  const exclusionFillCandidates = [
     ...candidates.exclusionCandidates,
     ...candidates.publisherCandidates
       .filter((item) => !recommendedIds.has(item.publisher.id))
@@ -123,9 +123,9 @@ function normalizeExcludedPublishers(
       }))
   ];
 
-  fillUniqueFromFallback({
+  fillUniqueFromCandidates({
     target: excluded,
-    fallback: fallbackExclusions.filter((item) => !recommendedIds.has(item.publisher.id)),
+    candidates: exclusionFillCandidates.filter((item) => !recommendedIds.has(item.publisher.id)),
     getId: (item) => item.publisher.id,
     min: 3,
     max: 8,

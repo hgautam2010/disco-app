@@ -99,15 +99,13 @@ function CampaignResultView({
   result: CampaignResult;
   catalogSummary: CampaignPlannerProps["catalogSummary"];
 }) {
-  const openAIStatusCopy = statusCopy(result.mode, catalogSummary);
-
   return (
     <>
       <section className="status-band">
         <div>
           <p className="eyebrow">Mode</p>
-          <h2>{modeLabel(result.mode)}</h2>
-          {openAIStatusCopy ? <p className="status-copy">{openAIStatusCopy}</p> : null}
+          <h2>Staged OpenAI pipeline</h2>
+          <p className="status-copy">{statusCopy(catalogSummary)}</p>
           {result.pipeline ? <PipelineSummary result={result} /> : null}
         </div>
         <CheckCircle2 aria-hidden="true" size={28} />
@@ -172,20 +170,8 @@ function CampaignResultView({
   );
 }
 
-function modeLabel(mode: CampaignResult["mode"]) {
-  if (mode === "openai_staged") {
-    return "Staged OpenAI pipeline";
-  }
-
-  return "Deterministic fallback";
-}
-
-function statusCopy(mode: CampaignResult["mode"], catalogSummary: CampaignPlannerProps["catalogSummary"]) {
-  if (mode === "openai_staged") {
-    return `Extraction, deterministic retrieval, publisher ranking, persona selection, and execution run across ${catalogSummary.publisherCount} publishers and ${catalogSummary.personaCount} personas.`;
-  }
-
-  return "";
+function statusCopy(catalogSummary: CampaignPlannerProps["catalogSummary"]) {
+  return `Extraction, shortlist retrieval, publisher ranking, persona selection, and execution run across ${catalogSummary.publisherCount} publishers and ${catalogSummary.personaCount} personas.`;
 }
 
 function PipelineSummary({ result }: { result: CampaignResult }) {
@@ -199,7 +185,6 @@ function PipelineSummary({ result }: { result: CampaignResult }) {
     <div className="pipeline-summary" aria-label="Pipeline summary">
       <span>{pipeline.apiCallCount} API calls</span>
       <span>{pipeline.repairCount} repairs</span>
-      <span>{pipeline.fallbackStages.length} fallbacks</span>
     </div>
   );
 }

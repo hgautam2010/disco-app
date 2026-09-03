@@ -40,7 +40,7 @@ export async function selectPersonaStrategy(
     label: "persona_selection",
     schema: personaSelectionResponseSchema,
     request,
-    fallbackCandidates: payload
+    repairContext: payload
   });
   const strategy = normalizePersonaStrategy(candidates, publisherStrategy, result.data);
 

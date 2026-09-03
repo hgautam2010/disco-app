@@ -34,9 +34,9 @@ export function extractionWarnings(profile: AdvertiserAnalysis) {
   return warnings;
 }
 
-function cleanText(value: string, fallback: string) {
+function cleanText(value: string, defaultValue: string) {
   const cleanValue = value.trim();
-  return cleanValue || fallback;
+  return cleanValue || defaultValue;
 }
 
 function cleanArray(values: string[]) {

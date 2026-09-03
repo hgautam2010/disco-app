@@ -58,7 +58,6 @@ describe("production pipeline stages", () => {
 
     expect(result.pipeline?.apiCallCount).toBe(5);
     expect(result.pipeline?.repairCount).toBe(1);
-    expect(result.pipeline?.fallbackStages).toEqual([]);
     expect(result.pipeline?.stages.map((stage) => stage.name)).toEqual([
       "extract",
       "retrieve",

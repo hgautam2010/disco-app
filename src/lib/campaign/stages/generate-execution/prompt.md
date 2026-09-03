@@ -40,7 +40,7 @@ Use the validated strategy to produce campaign execution assets.
 - placements: publisher placements using only recommended publisher IDs, with `primary` for core placements and `test` for smaller experiments.
 - bidStrategy: one of `balanced_cpm`, `efficient_reach`, or `premium_focus`, with a clear rationale.
 - measurement: primary and secondary KPIs that match the campaign objective.
-- warnings: user-visible caveats about execution tradeoffs, assumptions, or any constrained fallback decisions.
+- warnings: user-visible caveats about execution tradeoffs, assumptions, or constraints.
 
 ## Creative Quality
 

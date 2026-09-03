@@ -8,13 +8,13 @@ export async function repairStructuredResponse({
   schema,
   original,
   validationError,
-  fallbackCandidates
+  repairContext
 }: {
   label: string;
   schema: Record<string, unknown>;
   original: unknown;
   validationError: ZodError;
-  fallbackCandidates: unknown;
+  repairContext: unknown;
 }) {
   return createStructuredResponse<unknown>({
     model: getOpenAIModel(),
@@ -34,7 +34,7 @@ export async function repairStructuredResponse({
           invalidResponse: original,
           allowedPublisherIds: getPublishers().map((publisher) => publisher.id),
           allowedPersonaIds: getPersonas().map((persona) => persona.id),
-          fallbackCandidates,
+          repairContext,
           schema
         })
       }

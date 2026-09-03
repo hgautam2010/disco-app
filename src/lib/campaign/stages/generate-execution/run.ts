@@ -108,7 +108,7 @@ export async function generateExecutionWithMetadata(
     label: "execution",
     schema: executionResponseSchema,
     request,
-    fallbackCandidates: {
+    repairContext: {
       strategy: strategyPayload,
       recommendedPublishers,
       excludedPublishers,

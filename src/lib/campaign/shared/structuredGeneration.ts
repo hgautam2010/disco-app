@@ -17,7 +17,7 @@ type GenerateAndValidateOptions<T> = {
   label: string;
   schema: ZodType<T>;
   request: RepairableStructuredRequest;
-  fallbackCandidates: unknown;
+  repairContext: unknown;
 };
 
 export type StructuredGenerationResult<T> = {
@@ -42,14 +42,14 @@ export async function generateAndValidateWithRepair<T>({
   label,
   schema,
   request,
-  fallbackCandidates
+  repairContext
 }: GenerateAndValidateOptions<T>) {
   return (
     await generateAndValidateWithRepairResult({
       label,
       schema,
       request,
-      fallbackCandidates
+      repairContext
     })
   ).data;
 }
@@ -58,7 +58,7 @@ export async function generateAndValidateWithRepairResult<T>({
   label,
   schema,
   request,
-  fallbackCandidates
+  repairContext
 }: GenerateAndValidateOptions<T>): Promise<StructuredGenerationResult<T>> {
   let original: unknown;
 
@@ -84,7 +84,7 @@ export async function generateAndValidateWithRepairResult<T>({
       schema: request.text.format,
       original,
       validationError: parsed.error,
-      fallbackCandidates
+      repairContext
     });
 
     return {

@@ -2,8 +2,6 @@ export type PriceTier = "budget" | "value" | "mid_market" | "premium" | "luxury"
 
 export type AmbiguityLevel = "low" | "medium" | "high";
 
-export type CampaignMode = "openai_staged" | "fallback";
-
 export type CampaignStageName =
   | "extract"
   | "retrieve"
@@ -12,7 +10,7 @@ export type CampaignStageName =
   | "execute"
   | "assemble";
 
-export type CampaignStageSource = "deterministic" | "openai" | "hybrid" | "fallback";
+export type CampaignStageSource = "deterministic" | "openai";
 
 export type CampaignStageTrace = {
   name: CampaignStageName;
@@ -21,13 +19,11 @@ export type CampaignStageTrace = {
   apiCalls: number;
   repaired: boolean;
   warnings: string[];
-  fallbackReason?: string;
 };
 
 export type CampaignPipelineTrace = {
   apiCallCount: number;
   repairCount: number;
-  fallbackStages: CampaignStageName[];
   stages: CampaignStageTrace[];
 };
 
@@ -160,7 +156,7 @@ export type CampaignConfig = {
 };
 
 export type CampaignResult = {
-  mode: CampaignMode;
+  mode: "openai_staged";
   generatedAt: string;
   advertiserAnalysis: AdvertiserAnalysis;
   recommendedPublishers: ScoredPublisher[];

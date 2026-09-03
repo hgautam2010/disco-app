@@ -1,7 +1,7 @@
 import type { ScoredPersona } from "../../../types";
 import {
   clampScore,
-  fillUniqueFromFallback,
+  fillUniqueFromCandidates,
   nonEmptyArray,
   nonEmptySignals,
   normalizedScore
@@ -58,9 +58,9 @@ function normalizeSelectedPersonas(
     ];
   });
 
-  fillUniqueFromFallback({
+  fillUniqueFromCandidates({
     target: selected,
-    fallback: Array.from(personaCandidateById.values()),
+    candidates: Array.from(personaCandidateById.values()),
     getId: (item) => item.persona.id,
     min: 3,
     max: 5,

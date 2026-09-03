@@ -14,10 +14,7 @@ export function assembleFinalCampaign({
   stageTraces: CampaignStageTrace[];
 }): CampaignResult {
   const startedAt = Date.now();
-  const stageWarnings = stageTraces.flatMap((trace) => [
-    ...trace.warnings,
-    ...(trace.fallbackReason ? [trace.fallbackReason] : [])
-  ]);
+  const stageWarnings = stageTraces.flatMap((trace) => trace.warnings);
   const campaignWithoutPipeline: CampaignResult = {
     mode: "openai_staged",
     generatedAt,
@@ -51,7 +48,6 @@ function summarizePipeline(stages: CampaignStageTrace[]): CampaignPipelineTrace 
   return {
     apiCallCount: stages.reduce((total, stage) => total + stage.apiCalls, 0),
     repairCount: stages.filter((stage) => stage.repaired).length,
-    fallbackStages: stages.filter((stage) => stage.source === "fallback").map((stage) => stage.name),
     stages
   };
 }
