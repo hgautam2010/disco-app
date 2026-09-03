@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { generateDeterministicCampaign } from "@/lib/campaignEngine";
+import { analyzeAdvertiserDescription } from "@/lib/advertiserParser";
 import { assembleFinalCampaign } from "@/lib/campaign/stages/assemble/run";
 import { buildExecutionFallback } from "@/lib/campaign/stages/generate-execution/fallback";
 import { normalizeExecution } from "@/lib/campaign/stages/generate-execution/normalize";
@@ -21,7 +21,7 @@ describe("staged campaign normalization", () => {
   it("cleans publisher ranking IDs and fills required recommendations from retrieved candidates", () => {
     const description =
       "Premium dog supplements for senior pets with mobility support, sold as a monthly subscription.";
-    const profile = generateDeterministicCampaign(description).advertiserAnalysis;
+    const profile = analyzeAdvertiserDescription(description);
     const candidates = retrieveCampaignCandidates(profile).data;
     const knownRecommendedIds = candidates.publisherCandidates.map((item) => item.publisher.id);
     const knownExcludedIds = candidates.exclusionCandidates.map((item) => item.publisher.id);
@@ -61,7 +61,7 @@ describe("staged campaign normalization", () => {
   it("cleans persona selection IDs and fills required personas from retrieved candidates", () => {
     const description =
       "Premium dog supplements for senior pets with mobility support, sold as a monthly subscription.";
-    const profile = generateDeterministicCampaign(description).advertiserAnalysis;
+    const profile = analyzeAdvertiserDescription(description);
     const candidates = retrieveCampaignCandidates(profile).data;
     const publisherStrategy = deterministicPublisherStrategyFromCandidates(candidates);
     const knownPersonaIds = candidates.personaCandidates.map((item) => item.persona.id);
@@ -92,7 +92,7 @@ describe("staged campaign normalization", () => {
   it("normalizes execution output against locked personas and recommended publishers", () => {
     const description =
       "Premium dog supplements for senior pets with mobility support, sold as a monthly subscription.";
-    const profile = generateDeterministicCampaign(description).advertiserAnalysis;
+    const profile = analyzeAdvertiserDescription(description);
     const candidates = retrieveCampaignCandidates(profile).data;
     const publisherStrategy = deterministicPublisherStrategyFromCandidates(candidates);
     const strategy = deterministicPersonaStrategyFromCandidates(candidates, publisherStrategy);

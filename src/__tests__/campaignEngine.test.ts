@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { generateCampaign, generateDeterministicCampaign } from "@/lib/campaignEngine";
-import { validateCampaignResult } from "@/lib/schemas";
+import { generateCampaign } from "@/lib/campaignEngine";
 
 describe("campaign engine", () => {
   it("requires an OpenAI API key for generated campaigns", async () => {
@@ -9,29 +8,6 @@ describe("campaign engine", () => {
         "OPENAI_API_KEY is required"
       );
     });
-  });
-
-  it("returns a complete valid campaign result", () => {
-    const result = generateDeterministicCampaign(
-      "Refillable, concentrated cleaning products. Skip the single-use plastic bottles."
-    );
-    const allocationTotal = result.campaignConfig.budget.allocation.reduce(
-      (total, item) => total + item.budgetPercent,
-      0
-    );
-
-    expect(result.recommendedPublishers.length).toBeGreaterThanOrEqual(3);
-    expect(result.selectedPersonas.length).toBeGreaterThanOrEqual(3);
-    expect(result.creativeVariants.length).toBeGreaterThanOrEqual(3);
-    expect(allocationTotal).toBe(100);
-    expect(validateCampaignResult(result)).toEqual([]);
-  });
-
-  it("flags low-signal advertiser descriptions", () => {
-    const result = generateDeterministicCampaign("idk just try it");
-
-    expect(result.advertiserAnalysis.ambiguityLevel).toBe("high");
-    expect(result.warnings.length).toBeGreaterThan(0);
   });
 });
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { generateDeterministicCampaign } from "@/lib/campaignEngine";
+import { analyzeAdvertiserDescription } from "@/lib/advertiserParser";
 import { assembleFinalCampaign } from "@/lib/campaign/stages/assemble/run";
 import { extractAdvertiserProfile } from "@/lib/campaign/stages/extract-advertiser/run";
 import { buildExecutionFallback } from "@/lib/campaign/stages/generate-execution/fallback";
@@ -25,9 +25,9 @@ describe("production pipeline stages", () => {
   });
 
   it("retrieves bounded candidates before model ranking", () => {
-    const profile = generateDeterministicCampaign(
+    const profile = analyzeAdvertiserDescription(
       "A sustainable activewear brand for women made from recycled ocean plastic."
-    ).advertiserAnalysis;
+    );
     const result = retrieveCampaignCandidates(profile);
     const publisherNames = result.data.publisherCandidates.map((item) => item.publisher.name);
     const personaNames = result.data.personaCandidates.map((item) => item.persona.name);
@@ -42,8 +42,7 @@ describe("production pipeline stages", () => {
 
   it("falls back to deterministic candidate order for publisher ranking without an OpenAI key", async () => {
     await withoutOpenAIKey(async () => {
-      const profile = generateDeterministicCampaign("Custom Italian leather handbags at a $1,200 price point.")
-        .advertiserAnalysis;
+      const profile = analyzeAdvertiserDescription("Custom Italian leather handbags at a $1,200 price point.");
       const candidates = retrieveCampaignCandidates(profile).data;
       const result = await rankPublisherStrategy(candidates);
 
@@ -56,8 +55,7 @@ describe("production pipeline stages", () => {
 
   it("falls back to deterministic candidate order for persona selection without an OpenAI key", async () => {
     await withoutOpenAIKey(async () => {
-      const profile = generateDeterministicCampaign("Custom Italian leather handbags at a $1,200 price point.")
-        .advertiserAnalysis;
+      const profile = analyzeAdvertiserDescription("Custom Italian leather handbags at a $1,200 price point.");
       const candidates = retrieveCampaignCandidates(profile).data;
       const publisherStrategy = deterministicPublisherStrategyFromCandidates(candidates);
       const result = await selectPersonaStrategy(candidates, publisherStrategy);
@@ -70,7 +68,7 @@ describe("production pipeline stages", () => {
   });
 
   it("summarizes pipeline calls, repairs, and fallback stages during final assembly", () => {
-    const profile = generateDeterministicCampaign("Non-alcoholic sparkling drink with adaptogens.").advertiserAnalysis;
+    const profile = analyzeAdvertiserDescription("Non-alcoholic sparkling drink with adaptogens.");
     const candidates = retrieveCampaignCandidates(profile).data;
     const publisherStrategy = deterministicPublisherStrategyFromCandidates(candidates);
     const strategy = deterministicPersonaStrategyFromCandidates(candidates, publisherStrategy);
