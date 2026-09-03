@@ -1,15 +1,20 @@
 import { describe, expect, it } from "vitest";
-import { analyzeAdvertiserDescription } from "@/lib/advertiserParser";
 import { assembleFinalCampaign } from "@/lib/campaign/stages/assemble/run";
 import { retrieveCampaignCandidates } from "@/lib/campaign/stages/retrieve-candidates/run";
 import type { CampaignCandidates, CampaignExecution, LockedCampaignStrategy } from "@/lib/campaign/types";
 import type { CampaignStageTrace } from "@/lib/types";
+import { advertiserAnalysisFixture } from "./helpers/advertiserAnalysis";
 
 describe("production pipeline stages", () => {
   it("retrieves bounded candidates before model ranking", () => {
-    const profile = analyzeAdvertiserDescription(
-      "A sustainable activewear brand for women made from recycled ocean plastic."
-    );
+    const profile = advertiserAnalysisFixture({
+      originalDescription: "A sustainable activewear brand for women made from recycled ocean plastic.",
+      category: "sustainable_apparel",
+      priceTier: "premium",
+      audienceHints: ["women", "sustainability-minded shoppers"],
+      productSignals: ["sustainability", "value"],
+      valuePropositions: ["specific sustainability benefit"]
+    });
     const result = retrieveCampaignCandidates(profile);
     const publisherNames = result.data.publisherCandidates.map((item) => item.publisher.name);
     const personaNames = result.data.personaCandidates.map((item) => item.persona.name);
@@ -23,7 +28,16 @@ describe("production pipeline stages", () => {
   });
 
   it("summarizes pipeline calls and repairs during final assembly", () => {
-    const profile = analyzeAdvertiserDescription("Non-alcoholic sparkling drink with adaptogens.");
+    const profile = advertiserAnalysisFixture({
+      originalDescription: "Non-alcoholic sparkling drink with adaptogens.",
+      category: "functional_beverages",
+      priceTier: "mid_market",
+      audienceHints: ["health-conscious shoppers"],
+      productSignals: ["science-backed"],
+      valuePropositions: ["evidence-oriented product promise"],
+      purchaseModel: "one-time purchase",
+      likelyObjective: "new customer acquisition"
+    });
     const candidates = retrieveCampaignCandidates(profile).data;
     const strategy = campaignStrategyFromCandidates(candidates);
     const execution = executionFromStrategy(strategy);

@@ -1,14 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { analyzeAdvertiserDescription } from "@/lib/advertiserParser";
 import { getPersonas, getPublishers } from "@/lib/data";
 import { scorePersonas, selectPersonas } from "@/lib/personaScoring";
 import { scorePublishers } from "@/lib/publisherScoring";
+import { advertiserAnalysisFixture } from "./helpers/advertiserAnalysis";
 
 describe("publisher scoring", () => {
   it("ranks pet publishers highest for premium senior dog food", () => {
-    const analysis = analyzeAdvertiserDescription(
-      "We sell premium dog food for senior dogs, targeting owners who care about joint health and longevity. Grain-free, vet-formulated, subscription-based."
-    );
+    const analysis = advertiserAnalysisFixture();
     const selectedPersonas = selectPersonas(scorePersonas(analysis, getPersonas()));
     const { recommendedPublishers, excludedPublishers } = scorePublishers(
       analysis,
@@ -23,9 +21,16 @@ describe("publisher scoring", () => {
   });
 
   it("surfaces the strongest activewear and sustainability publishers", () => {
-    const analysis = analyzeAdvertiserDescription(
-      "A sustainable activewear brand for women. Made from recycled ocean plastic."
-    );
+    const analysis = advertiserAnalysisFixture({
+      originalDescription: "A sustainable activewear brand for women. Made from recycled ocean plastic.",
+      category: "sustainable_apparel",
+      priceTier: "premium",
+      audienceHints: ["women", "sustainability-minded shoppers"],
+      productSignals: ["sustainability", "value"],
+      valuePropositions: ["specific sustainability benefit"],
+      purchaseModel: "one-time purchase",
+      likelyObjective: "new customer acquisition"
+    });
     const selectedPersonas = selectPersonas(scorePersonas(analysis, getPersonas()));
     const { recommendedPublishers } = scorePublishers(analysis, selectedPersonas, getPublishers());
     const topNames = recommendedPublishers.map((item) => item.publisher.name);

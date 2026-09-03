@@ -1,4 +1,4 @@
-import { countKeywordMatches, tokenize } from "./advertiserParser";
+import { countKeywordMatches, tokenize } from "./text";
 import type { AdvertiserAnalysis, Persona, ScoredPersona, ScoreSignal } from "./types";
 
 const categoryAffinityMap: Record<string, string[]> = {

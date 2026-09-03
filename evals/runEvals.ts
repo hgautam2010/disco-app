@@ -1,10 +1,10 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import { analyzeAdvertiserDescription } from "../src/lib/advertiserParser";
 import { getPersonas, getPublishers } from "../src/lib/data";
 import { scorePersonas, selectPersonas } from "../src/lib/personaScoring";
 import { scorePublishers } from "../src/lib/publisherScoring";
 import { retrieveCampaignCandidates } from "../src/lib/campaign/stages/retrieve-candidates/run";
+import type { AdvertiserAnalysis, AmbiguityLevel, PriceTier } from "../src/lib/types";
 
 type EvalCase = {
   id: string;
@@ -56,7 +56,7 @@ if (passed !== results.length) {
 }
 
 function runEvalCase(evalCase: EvalCase): EvalResult {
-  const analysis = analyzeAdvertiserDescription(evalCase.input);
+  const analysis = analysisFromEvalCase(evalCase);
   const scoredPersonas = scorePersonas(analysis, getPersonas());
   const selectedPersonaCandidates = selectPersonas(scoredPersonas);
   const { recommendedPublishers, excludedPublishers } = scorePublishers(
@@ -178,6 +178,41 @@ function runEvalCase(evalCase: EvalCase): EvalResult {
     passed: checks.every((check) => check.passed),
     checks
   };
+}
+
+function analysisFromEvalCase(evalCase: EvalCase): AdvertiserAnalysis {
+  const ambiguityLevel = (evalCase.expectedAmbiguityLevel ?? "low") as AmbiguityLevel;
+
+  return {
+    originalDescription: evalCase.input,
+    category: evalCase.expectedCategory,
+    secondaryCategories: [],
+    priceTier: (evalCase.expectedPriceTier ?? "mid_market") as PriceTier,
+    audienceHints: audienceHintsForCategory(evalCase.expectedCategory),
+    productSignals: evalCase.expectedProductSignals ?? [],
+    valuePropositions: evalCase.expectedProductSignals ?? [],
+    purchaseModel: evalCase.expectedProductSignals?.includes("subscription") ? "subscription" : "one-time purchase",
+    likelyObjective: evalCase.expectedCategory === "b2b_saas" ? "qualified lead generation" : "new customer acquisition",
+    ambiguityLevel,
+    confidence: ambiguityLevel === "high" ? 0.35 : 0.86
+  };
+}
+
+function audienceHintsForCategory(category: string) {
+  const hintsByCategory: Record<string, string[]> = {
+    pet_food: ["pet owners"],
+    sustainable_apparel: ["women", "sustainability-minded shoppers"],
+    functional_beverages: ["health-conscious shoppers"],
+    luxury_accessories: ["gift buyers", "high-income shoppers"],
+    wellness: ["health-conscious shoppers"],
+    refillable_products: ["families", "sustainability-minded shoppers"],
+    supplements: ["performance-oriented shoppers", "health-conscious shoppers"],
+    beauty: ["Gen Z shoppers", "beauty shoppers"],
+    home_goods: ["design-conscious homeowners", "gift buyers"],
+    b2b_saas: ["business buyers"]
+  };
+
+  return hintsByCategory[category] ?? ["broad consumer audience"];
 }
 
 function includesText(values: string[], expected: string) {

@@ -1,13 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { analyzeAdvertiserDescription } from "@/lib/advertiserParser";
 import { getPersonas } from "@/lib/data";
 import { scorePersonas, selectPersonas } from "@/lib/personaScoring";
+import { advertiserAnalysisFixture } from "./helpers/advertiserAnalysis";
 
 describe("persona scoring", () => {
   it("selects pet-oriented personas for senior dog food", () => {
-    const analysis = analyzeAdvertiserDescription(
-      "We sell premium dog food for senior dogs, targeting owners who care about joint health and longevity."
-    );
+    const analysis = advertiserAnalysisFixture();
     const selected = selectPersonas(scorePersonas(analysis, getPersonas()));
     const names = selected.map((item) => item.persona.name);
 
@@ -16,9 +14,14 @@ describe("persona scoring", () => {
   });
 
   it("selects sustainability and fitness personas for recycled activewear", () => {
-    const analysis = analyzeAdvertiserDescription(
-      "A sustainable activewear brand for women. Made from recycled ocean plastic."
-    );
+    const analysis = advertiserAnalysisFixture({
+      originalDescription: "A sustainable activewear brand for women. Made from recycled ocean plastic.",
+      category: "sustainable_apparel",
+      priceTier: "premium",
+      audienceHints: ["women", "sustainability-minded shoppers"],
+      productSignals: ["sustainability", "value"],
+      valuePropositions: ["specific sustainability benefit"]
+    });
     const selected = selectPersonas(scorePersonas(analysis, getPersonas()));
     const names = selected.map((item) => item.persona.name);
 

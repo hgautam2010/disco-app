@@ -1,4 +1,4 @@
-import { countKeywordMatches, tokenize } from "./advertiserParser";
+import { countKeywordMatches, tokenize } from "./text";
 import type {
   AdvertiserAnalysis,
   ExcludedPublisher,

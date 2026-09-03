@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-import { analyzeAdvertiserDescription } from "@/lib/advertiserParser";
 import { assembleFinalCampaign } from "@/lib/campaign/stages/assemble/run";
 import { normalizeExecution } from "@/lib/campaign/stages/generate-execution/normalize";
 import { normalizePersonaStrategy } from "@/lib/campaign/stages/select-personas/normalize";
@@ -10,12 +9,13 @@ import type { CampaignCandidates, LockedCampaignStrategy, LockedPublisherStrateg
 import type { ExecutionResponse } from "@/lib/campaign/stages/generate-execution/schema";
 import type { PublisherRankingResponse } from "@/lib/campaign/stages/rank-publishers/schema";
 import type { PersonaSelectionResponse } from "@/lib/campaign/stages/select-personas/schema";
+import { advertiserAnalysisFixture } from "./helpers/advertiserAnalysis";
 
 describe("staged campaign normalization", () => {
   it("cleans publisher ranking IDs and fills required recommendations from retrieved candidates", () => {
     const description =
       "Premium dog supplements for senior pets with mobility support, sold as a monthly subscription.";
-    const profile = analyzeAdvertiserDescription(description);
+    const profile = advertiserAnalysisFixture({ originalDescription: description });
     const candidates = retrieveCampaignCandidates(profile).data;
     const knownRecommendedIds = candidates.publisherCandidates.map((item) => item.publisher.id);
     const knownExcludedIds = candidates.exclusionCandidates.map((item) => item.publisher.id);
@@ -55,7 +55,7 @@ describe("staged campaign normalization", () => {
   it("cleans persona selection IDs and fills required personas from retrieved candidates", () => {
     const description =
       "Premium dog supplements for senior pets with mobility support, sold as a monthly subscription.";
-    const profile = analyzeAdvertiserDescription(description);
+    const profile = advertiserAnalysisFixture({ originalDescription: description });
     const candidates = retrieveCampaignCandidates(profile).data;
     const publisherStrategy = publisherStrategyFromCandidates(candidates);
     const knownPersonaIds = candidates.personaCandidates.map((item) => item.persona.id);
@@ -86,7 +86,7 @@ describe("staged campaign normalization", () => {
   it("normalizes execution output against locked personas and recommended publishers", () => {
     const description =
       "Premium dog supplements for senior pets with mobility support, sold as a monthly subscription.";
-    const profile = analyzeAdvertiserDescription(description);
+    const profile = advertiserAnalysisFixture({ originalDescription: description });
     const candidates = retrieveCampaignCandidates(profile).data;
     const publisherStrategy = publisherStrategyFromCandidates(candidates);
     const strategy = campaignStrategyFromCandidates(candidates, publisherStrategy);

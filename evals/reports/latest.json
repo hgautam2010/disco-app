@@ -16,27 +16,27 @@
         {
           "name": "candidate-publisher-recall",
           "passed": true,
-          "detail": "Candidates: Pawline, Ruffco, Tailcrate, Kitchenly, Movewell, Pantrygood, Daily Form, Pop & Sip, Studiogrid, Swiftcart"
+          "detail": "Candidates: Pawline, Tailcrate, Ruffco, Movewell, Kitchenly, Daily Form, Pantrygood, Pop & Sip, Studiogrid, Linden Park"
         },
         {
           "name": "publisher-fit",
           "passed": true,
-          "detail": "Top 3: Pawline, Ruffco, Tailcrate"
+          "detail": "Top 3: Pawline, Tailcrate, Ruffco"
         },
         {
           "name": "candidate-persona-recall",
           "passed": true,
-          "detail": "Candidates: The Pet Parent, The Busy Parent, The Convenience-First Millennial, The Gifter, The Wellness Optimizer, The Affluent Classic, The Sustainability Buyer, The Fitness Enthusiast"
+          "detail": "Candidates: The Pet Parent, The Busy Parent, The Convenience-First Millennial, The Wellness Optimizer, The Gifter, The Sustainability Buyer, The Fitness Enthusiast, The Affluent Classic"
         },
         {
           "name": "persona-fit",
           "passed": true,
-          "detail": "Selected: The Pet Parent, The Busy Parent, The Convenience-First Millennial, The Gifter"
+          "detail": "Selected: The Pet Parent, The Busy Parent, The Convenience-First Millennial, The Wellness Optimizer"
         },
         {
           "name": "exclusion-fit",
           "passed": true,
-          "detail": "Excluded: Strandlab, Velvetline, Everbody, Cloudfoot, Stride & Stem"
+          "detail": "Excluded: Everbody, Strandlab, Velvetline, Cloudfoot, Stride & Stem"
         },
         {
           "name": "price-tier",
@@ -51,22 +51,7 @@
         {
           "name": "product-signal-recall",
           "passed": true,
-          "detail": "Signals: subscription, premium, science-backed, convenience"
-        },
-        {
-          "name": "creative-count",
-          "passed": true,
-          "detail": "4 variants"
-        },
-        {
-          "name": "budget-total",
-          "passed": true,
-          "detail": "100%"
-        },
-        {
-          "name": "schema-validation",
-          "passed": true,
-          "detail": "valid"
+          "detail": "Signals: subscription, premium, science-backed"
         }
       ]
     },
@@ -83,7 +68,7 @@
         {
           "name": "candidate-publisher-recall",
           "passed": true,
-          "detail": "Candidates: Stride & Stem, Movewell, Cloudfoot, Marlowe & Co., Linden Park, Everbody, Heartfoot, Daily Form, Pantrygood, Studiogrid"
+          "detail": "Candidates: Stride & Stem, Movewell, Cloudfoot, Marlowe & Co., Linden Park, Everbody, Heartfoot, Pantrygood, Daily Form, Studiogrid"
         },
         {
           "name": "publisher-fit",
@@ -93,7 +78,7 @@
         {
           "name": "candidate-persona-recall",
           "passed": true,
-          "detail": "Candidates: The Sustainability Buyer, The Fitness Enthusiast, The Wellness Optimizer, The Gen Z Aesthete, The Gifter, The Pet Parent, The Value-Conscious Shopper, The Convenience-First Millennial"
+          "detail": "Candidates: The Sustainability Buyer, The Fitness Enthusiast, The Wellness Optimizer, The Gen Z Aesthete, The Gifter, The Pet Parent, The Value-Conscious Shopper, The Busy Parent"
         },
         {
           "name": "persona-fit",
@@ -119,21 +104,6 @@
           "name": "product-signal-recall",
           "passed": true,
           "detail": "Signals: sustainability, value"
-        },
-        {
-          "name": "creative-count",
-          "passed": true,
-          "detail": "4 variants"
-        },
-        {
-          "name": "budget-total",
-          "passed": true,
-          "detail": "100%"
-        },
-        {
-          "name": "schema-validation",
-          "passed": true,
-          "detail": "valid"
         }
       ]
     },
@@ -186,21 +156,6 @@
           "name": "product-signal-recall",
           "passed": true,
           "detail": "Signals: science-backed"
-        },
-        {
-          "name": "creative-count",
-          "passed": true,
-          "detail": "4 variants"
-        },
-        {
-          "name": "budget-total",
-          "passed": true,
-          "detail": "100%"
-        },
-        {
-          "name": "schema-validation",
-          "passed": true,
-          "detail": "valid"
         }
       ]
     },
@@ -217,7 +172,7 @@
         {
           "name": "candidate-publisher-recall",
           "passed": true,
-          "detail": "Candidates: Linden Park, Marlowe & Co., Stride & Stem, Everbody, Heartfoot, Movewell, Cloudfoot, Hearthstone Goods, Northbed, Studiogrid"
+          "detail": "Candidates: Linden Park, Marlowe & Co., Stride & Stem, Everbody, Movewell, Heartfoot, Cloudfoot, Pantrygood, Hearthstone Goods, Northbed"
         },
         {
           "name": "publisher-fit",
@@ -227,7 +182,7 @@
         {
           "name": "candidate-persona-recall",
           "passed": true,
-          "detail": "Candidates: The Gifter, The Affluent Classic, The Value-Conscious Shopper, The Gen Z Aesthete, The Wellness Optimizer, The Pet Parent, The Convenience-First Millennial, The Sustainability Buyer"
+          "detail": "Candidates: The Gifter, The Affluent Classic, The Value-Conscious Shopper, The Gen Z Aesthete, The Wellness Optimizer, The Pet Parent, The Convenience-First Millennial, The Busy Parent"
         },
         {
           "name": "persona-fit",
@@ -253,21 +208,6 @@
           "name": "product-signal-recall",
           "passed": true,
           "detail": "Signals: premium, value"
-        },
-        {
-          "name": "creative-count",
-          "passed": true,
-          "detail": "3 variants"
-        },
-        {
-          "name": "budget-total",
-          "passed": true,
-          "detail": "100%"
-        },
-        {
-          "name": "schema-validation",
-          "passed": true,
-          "detail": "valid"
         }
       ]
     },
@@ -284,7 +224,7 @@
         {
           "name": "candidate-publisher-recall",
           "passed": true,
-          "detail": "Candidates: Studiogrid, Daily Form, Pantrygood, Ruffco, Movewell, Kitchenly, Tailcrate, Pop & Sip, Strandlab, Everbody"
+          "detail": "Candidates: Studiogrid, Daily Form, Pantrygood, Movewell, Ruffco, Pawline, Kitchenly, Pop & Sip, Tailcrate, Swiftcart"
         },
         {
           "name": "publisher-fit",
@@ -294,17 +234,17 @@
         {
           "name": "candidate-persona-recall",
           "passed": true,
-          "detail": "Candidates: The Sustainability Buyer, The Wellness Optimizer, The Gen Z Aesthete, The Pet Parent, The Convenience-First Millennial, The Fitness Enthusiast, The Busy Parent, The Value-Conscious Shopper"
+          "detail": "Candidates: The Sustainability Buyer, The Wellness Optimizer, The Pet Parent, The Convenience-First Millennial, The Fitness Enthusiast, The Busy Parent, The Gen Z Aesthete, The Affluent Classic"
         },
         {
           "name": "persona-fit",
           "passed": true,
-          "detail": "Selected: The Sustainability Buyer, The Wellness Optimizer, The Gen Z Aesthete, The Pet Parent"
+          "detail": "Selected: The Sustainability Buyer, The Wellness Optimizer, The Pet Parent, The Convenience-First Millennial"
         },
         {
           "name": "exclusion-fit",
           "passed": true,
-          "detail": "Excluded: Cloudfoot, Stride & Stem, Linden Park, Marlowe & Co., Hearthstone Goods"
+          "detail": "Excluded: Cloudfoot, Stride & Stem, Hearthstone Goods, Heartfoot, Everbody"
         },
         {
           "name": "price-tier",
@@ -320,21 +260,6 @@
           "name": "result-warning",
           "passed": true,
           "detail": "Result warnings: Advertiser input is low-signal; recommendations should be treated as directional."
-        },
-        {
-          "name": "creative-count",
-          "passed": true,
-          "detail": "4 variants"
-        },
-        {
-          "name": "budget-total",
-          "passed": true,
-          "detail": "100%"
-        },
-        {
-          "name": "schema-validation",
-          "passed": true,
-          "detail": "valid"
         }
       ]
     },
@@ -392,21 +317,6 @@
           "name": "forbidden-top-publisher",
           "passed": true,
           "detail": "Top 3: Pantrygood, Hearthstone Goods, Northbed"
-        },
-        {
-          "name": "creative-count",
-          "passed": true,
-          "detail": "3 variants"
-        },
-        {
-          "name": "budget-total",
-          "passed": true,
-          "detail": "100%"
-        },
-        {
-          "name": "schema-validation",
-          "passed": true,
-          "detail": "valid"
         }
       ]
     },
@@ -423,7 +333,7 @@
         {
           "name": "candidate-publisher-recall",
           "passed": true,
-          "detail": "Candidates: Daily Form, Movewell, Studiogrid, Kitchenly, Ruffco, Pantrygood, Swiftcart, Cloudfoot, Pawline, Tailcrate"
+          "detail": "Candidates: Daily Form, Movewell, Studiogrid, Pantrygood, Pawline, Kitchenly, Cloudfoot, Tailcrate, Ruffco, Pop & Sip"
         },
         {
           "name": "publisher-fit",
@@ -433,7 +343,7 @@
         {
           "name": "candidate-persona-recall",
           "passed": true,
-          "detail": "Candidates: The Fitness Enthusiast, The Wellness Optimizer, The Convenience-First Millennial, The Pet Parent, The Sustainability Buyer, The Gen Z Aesthete, The Gifter, The Busy Parent"
+          "detail": "Candidates: The Fitness Enthusiast, The Wellness Optimizer, The Convenience-First Millennial, The Pet Parent, The Sustainability Buyer, The Gen Z Aesthete, The Busy Parent, The Gifter"
         },
         {
           "name": "persona-fit",
@@ -443,7 +353,7 @@
         {
           "name": "exclusion-fit",
           "passed": true,
-          "detail": "Excluded: Stride & Stem, Heartfoot, Everbody, Marlowe & Co., Strandlab"
+          "detail": "Excluded: Stride & Stem, Hearthstone Goods, Heartfoot, Everbody, Marlowe & Co."
         },
         {
           "name": "price-tier",
@@ -458,27 +368,12 @@
         {
           "name": "product-signal-recall",
           "passed": true,
-          "detail": "Signals: subscription, science-backed, convenience, performance"
+          "detail": "Signals: subscription, science-backed, performance"
         },
         {
           "name": "forbidden-top-publisher",
           "passed": true,
           "detail": "Top 3: Daily Form, Movewell, Studiogrid"
-        },
-        {
-          "name": "creative-count",
-          "passed": true,
-          "detail": "4 variants"
-        },
-        {
-          "name": "budget-total",
-          "passed": true,
-          "detail": "100%"
-        },
-        {
-          "name": "schema-validation",
-          "passed": true,
-          "detail": "valid"
         }
       ]
     },
@@ -495,12 +390,12 @@
         {
           "name": "candidate-publisher-recall",
           "passed": true,
-          "detail": "Candidates: Strandlab, Velvetline, Ruffco, Movewell, Studiogrid, Pop & Sip, Pantrygood, Daily Form, Everbody, Pawline"
+          "detail": "Candidates: Velvetline, Strandlab, Movewell, Pop & Sip, Studiogrid, Pantrygood, Ruffco, Everbody, Pawline, Heartfoot"
         },
         {
           "name": "publisher-fit",
           "passed": true,
-          "detail": "Top 3: Strandlab, Velvetline, Movewell"
+          "detail": "Top 3: Velvetline, Strandlab, Movewell"
         },
         {
           "name": "candidate-persona-recall",
@@ -510,12 +405,12 @@
         {
           "name": "persona-fit",
           "passed": true,
-          "detail": "Selected: The Gen Z Aesthete, The Sustainability Buyer, The Gifter, The Wellness Optimizer"
+          "detail": "Selected: The Gen Z Aesthete, The Sustainability Buyer, The Gifter"
         },
         {
           "name": "exclusion-fit",
           "passed": true,
-          "detail": "Excluded: Cloudfoot, Stride & Stem, Kitchenly, Linden Park, Marlowe & Co."
+          "detail": "Excluded: Daily Form, Cloudfoot, Stride & Stem, Kitchenly, Linden Park"
         },
         {
           "name": "price-tier",
@@ -530,22 +425,7 @@
         {
           "name": "forbidden-top-publisher",
           "passed": true,
-          "detail": "Top 3: Strandlab, Velvetline, Movewell"
-        },
-        {
-          "name": "creative-count",
-          "passed": true,
-          "detail": "4 variants"
-        },
-        {
-          "name": "budget-total",
-          "passed": true,
-          "detail": "100%"
-        },
-        {
-          "name": "schema-validation",
-          "passed": true,
-          "detail": "valid"
+          "detail": "Top 3: Velvetline, Strandlab, Movewell"
         }
       ]
     },
@@ -572,17 +452,17 @@
         {
           "name": "candidate-persona-recall",
           "passed": true,
-          "detail": "Candidates: The Gifter, The Affluent Classic, The Gen Z Aesthete, The Sustainability Buyer, The Pet Parent, The Value-Conscious Shopper, The Convenience-First Millennial, The Wellness Optimizer"
+          "detail": "Candidates: The Gifter, The Sustainability Buyer, The Affluent Classic, The Gen Z Aesthete, The Pet Parent, The Convenience-First Millennial, The Busy Parent, The Wellness Optimizer"
         },
         {
           "name": "persona-fit",
           "passed": true,
-          "detail": "Selected: The Gifter, The Affluent Classic, The Gen Z Aesthete, The Sustainability Buyer"
+          "detail": "Selected: The Gifter, The Sustainability Buyer, The Affluent Classic"
         },
         {
           "name": "exclusion-fit",
           "passed": true,
-          "detail": "Excluded: Swiftcart, Strandlab, Velvetline, Tailcrate, Daily Form"
+          "detail": "Excluded: Strandlab, Tailcrate, Velvetline, Swiftcart, Everbody"
         },
         {
           "name": "price-tier",
@@ -597,27 +477,12 @@
         {
           "name": "product-signal-recall",
           "passed": true,
-          "detail": "Signals: premium, gifting, value"
+          "detail": "Signals: premium, gifting"
         },
         {
           "name": "forbidden-top-publisher",
           "passed": true,
           "detail": "Top 3: Northbed, Hearthstone Goods, Heartfoot"
-        },
-        {
-          "name": "creative-count",
-          "passed": true,
-          "detail": "4 variants"
-        },
-        {
-          "name": "budget-total",
-          "passed": true,
-          "detail": "100%"
-        },
-        {
-          "name": "schema-validation",
-          "passed": true,
-          "detail": "valid"
         }
       ]
     },
@@ -655,21 +520,6 @@
           "name": "candidate-warning",
           "passed": true,
           "detail": "Candidate warnings: Publisher catalog is consumer-commerce oriented; B2B recommendations are directional."
-        },
-        {
-          "name": "creative-count",
-          "passed": true,
-          "detail": "4 variants"
-        },
-        {
-          "name": "budget-total",
-          "passed": true,
-          "detail": "100%"
-        },
-        {
-          "name": "schema-validation",
-          "passed": true,
-          "detail": "valid"
         }
       ]
     },
@@ -686,7 +536,7 @@
         {
           "name": "candidate-publisher-recall",
           "passed": true,
-          "detail": "Candidates: Linden Park, Marlowe & Co., Stride & Stem, Everbody, Movewell, Heartfoot, Cloudfoot, Hearthstone Goods, Northbed, Studiogrid"
+          "detail": "Candidates: Linden Park, Marlowe & Co., Stride & Stem, Everbody, Movewell, Heartfoot, Cloudfoot, Pantrygood, Hearthstone Goods, Northbed"
         },
         {
           "name": "publisher-fit",
@@ -696,7 +546,7 @@
         {
           "name": "candidate-persona-recall",
           "passed": true,
-          "detail": "Candidates: The Gifter, The Affluent Classic, The Value-Conscious Shopper, The Gen Z Aesthete, The Wellness Optimizer, The Pet Parent, The Convenience-First Millennial, The Sustainability Buyer"
+          "detail": "Candidates: The Gifter, The Affluent Classic, The Value-Conscious Shopper, The Gen Z Aesthete, The Wellness Optimizer, The Pet Parent, The Convenience-First Millennial, The Busy Parent"
         },
         {
           "name": "persona-fit",
@@ -727,21 +577,6 @@
           "name": "forbidden-top-publisher",
           "passed": true,
           "detail": "Top 3: Linden Park, Marlowe & Co., Stride & Stem"
-        },
-        {
-          "name": "creative-count",
-          "passed": true,
-          "detail": "3 variants"
-        },
-        {
-          "name": "budget-total",
-          "passed": true,
-          "detail": "100%"
-        },
-        {
-          "name": "schema-validation",
-          "passed": true,
-          "detail": "valid"
         }
       ]
     }

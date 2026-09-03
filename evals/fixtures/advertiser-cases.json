@@ -49,7 +49,7 @@
     "expectedCategory": "wellness",
     "expectedTopPublishers": ["Daily Form", "Studiogrid"],
     "expectedPersonas": ["The Wellness Optimizer"],
-    "shouldExclude": ["Linden Park", "Marlowe & Co."],
+    "shouldExclude": ["Cloudfoot", "Stride & Stem"],
     "expectedPriceTier": "mid_market",
     "expectedAmbiguityLevel": "high",
     "expectedResultWarnings": ["low-signal"]
