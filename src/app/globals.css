@@ -283,6 +283,10 @@ button:disabled {
   background: linear-gradient(90deg, #ffffff, var(--accent-soft));
 }
 
+.status-band > div {
+  min-width: 0;
+}
+
 .status-copy {
   margin-top: 6px;
   color: var(--muted);
@@ -291,13 +295,21 @@ button:disabled {
 }
 
 .pipeline-summary {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  display: grid;
+  min-width: 0;
+  gap: 10px;
   margin-top: 10px;
 }
 
-.pipeline-summary span {
+.pipeline-chips {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pipeline-chips span,
+.pipeline-stage-metrics span {
   border: 1px solid var(--line);
   border-radius: 999px;
   padding: 4px 8px;
@@ -305,6 +317,64 @@ button:disabled {
   background: #ffffff;
   font-size: 0.78rem;
   font-weight: 760;
+}
+
+.pipeline-details {
+  min-width: 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.pipeline-details summary {
+  cursor: pointer;
+  font-weight: 760;
+}
+
+.pipeline-stage-list {
+  display: grid;
+  min-width: 0;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.pipeline-stage {
+  display: grid;
+  min-width: 0;
+  gap: 8px;
+  border-top: 1px solid var(--line);
+  padding-top: 8px;
+}
+
+.pipeline-stage > div:first-child {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.pipeline-stage strong {
+  color: var(--text);
+  text-transform: capitalize;
+}
+
+.pipeline-stage > div:first-child span {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.pipeline-stage-metrics {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pipeline-stage p {
+  color: var(--warn);
+  line-height: 1.45;
+  overflow-wrap: anywhere;
 }
 
 .warning-band {

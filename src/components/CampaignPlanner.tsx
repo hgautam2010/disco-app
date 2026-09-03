@@ -183,10 +183,51 @@ function PipelineSummary({ result }: { result: CampaignResult }) {
 
   return (
     <div className="pipeline-summary" aria-label="Pipeline summary">
-      <span>{pipeline.apiCallCount} API calls</span>
-      <span>{pipeline.repairCount} repairs</span>
+      <div className="pipeline-chips">
+        <span>{pipeline.apiCallCount} API calls</span>
+        <span>{pipeline.attemptCount} attempts</span>
+        <span>{pipeline.repairCount} repairs</span>
+        <span>{formatNumber(pipeline.totalTokenUsage.totalTokens)} tokens</span>
+      </div>
+      <details className="pipeline-details">
+        <summary>Pipeline trace</summary>
+        <div className="pipeline-stage-list">
+          {pipeline.stages.map((stage) => (
+            <div className="pipeline-stage" key={stage.name}>
+              <div>
+                <strong>{formatStageName(stage.name)}</strong>
+                <span>{stage.source === "openai" ? stage.model : "code"}</span>
+              </div>
+              <div className="pipeline-stage-metrics">
+                <span>{stage.apiCalls} calls</span>
+                <span>{stage.attempts} attempts</span>
+                <span>{formatNumber(stage.tokenUsage.totalTokens)} tokens</span>
+                <span>{formatDuration(stage.durationMs)}</span>
+                <span>{stage.repaired ? "repaired" : "valid"}</span>
+              </div>
+              {stage.warnings.length > 0 ? <p>{stage.warnings.join(" ")}</p> : null}
+            </div>
+          ))}
+        </div>
+      </details>
     </div>
   );
+}
+
+function formatStageName(name: string) {
+  return name.replaceAll("_", " ");
+}
+
+function formatNumber(value: number) {
+  return new Intl.NumberFormat("en-US").format(value);
+}
+
+function formatDuration(durationMs: number) {
+  if (durationMs < 1000) {
+    return `${durationMs} ms`;
+  }
+
+  return `${(durationMs / 1000).toFixed(1)} s`;
 }
 
 function Metric({ label, value }: { label: string; value: string }) {
