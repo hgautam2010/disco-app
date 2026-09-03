@@ -36,19 +36,27 @@ export function retrieveCampaignCandidates(
     exclusionCandidateLimit
   );
   const warnings = candidateWarnings(advertiserProfile, publisherCandidates, personaCandidates);
+  const data = {
+    advertiserProfile,
+    publisherCandidates,
+    personaCandidates,
+    exclusionCandidates,
+    warnings
+  };
 
   return {
-    data: {
-      advertiserProfile,
-      publisherCandidates,
-      personaCandidates,
-      exclusionCandidates,
-      warnings
-    },
+    data,
     trace: {
       name: "retrieve",
       source: "deterministic",
       model: "code",
+      input: {
+        advertiserProfile,
+        publisherCandidateLimit,
+        personaCandidateLimit,
+        exclusionCandidateLimit
+      },
+      output: data,
       durationMs: Date.now() - startedAt,
       apiCalls: 0,
       attempts: 0,

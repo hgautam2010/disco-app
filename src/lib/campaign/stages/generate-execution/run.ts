@@ -16,7 +16,8 @@ export async function generateExecutionStage(
   strategy: LockedCampaignStrategy
 ): Promise<PipelineStageResult<CampaignExecution>> {
   const startedAt = Date.now();
-  const result = await generateExecutionWithMetadata(advertiserDescription, strategy);
+  const payload = toExecutionPayload(advertiserDescription, strategy);
+  const result = await generateExecutionForPayload(payload);
   const execution = normalizeExecution({
     strategy,
     execution: result.data
@@ -29,6 +30,8 @@ export async function generateExecutionStage(
       name: "execute",
       source: "openai",
       model: result.model,
+      input: payload,
+      output: execution,
       durationMs: Date.now() - startedAt,
       apiCalls: result.apiCalls,
       attempts: result.attempts,
@@ -50,6 +53,10 @@ export async function generateExecutionWithMetadata(
   advertiserDescription: string,
   strategy: LockedCampaignStrategy
 ): Promise<StructuredGenerationResult<ExecutionResponse>> {
+  return generateExecutionForPayload(toExecutionPayload(advertiserDescription, strategy));
+}
+
+function toExecutionPayload(advertiserDescription: string, strategy: LockedCampaignStrategy) {
   const publishers = getPublishers();
   const personas = getPersonas();
   const strategyPayload = {
@@ -83,6 +90,17 @@ export async function generateExecutionWithMetadata(
   const recommendedPublishers = publishers.filter((publisher) => recommendedPublisherIds.has(publisher.id));
   const excludedPublishers = publishers.filter((publisher) => excludedPublisherIds.has(publisher.id));
   const selectedPersonas = personas.filter((persona) => selectedPersonaIds.has(persona.id));
+
+  return {
+    advertiserDescription,
+    strategy: strategyPayload,
+    recommendedPublishers,
+    excludedPublishers,
+    selectedPersonas
+  };
+}
+
+function generateExecutionForPayload(payload: ReturnType<typeof toExecutionPayload>) {
   const request: RepairableStructuredRequest = {
     model: getOpenAIModelForStage("execute"),
     input: [
@@ -92,13 +110,7 @@ export async function generateExecutionWithMetadata(
       },
       {
         role: "user",
-        content: JSON.stringify({
-          advertiserDescription,
-          strategy: strategyPayload,
-          recommendedPublishers,
-          excludedPublishers,
-          selectedPersonas
-        })
+        content: JSON.stringify(payload)
       }
     ],
     text: {
@@ -113,11 +125,6 @@ export async function generateExecutionWithMetadata(
     label: "execution",
     schema: executionResponseSchema,
     request,
-    repairContext: {
-      strategy: strategyPayload,
-      recommendedPublishers,
-      excludedPublishers,
-      selectedPersonas
-    }
+    repairContext: payload
   });
 }

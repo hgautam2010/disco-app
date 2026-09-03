@@ -208,6 +208,13 @@ function PipelineSummary({ result }: { result: CampaignResult }) {
                   <span>{formatDuration(stage.durationMs)}</span>
                   <span>{stage.repaired ? "repaired" : "valid"}</span>
                 </div>
+                <details className="pipeline-stage-io">
+                  <summary>Input/output</summary>
+                  <div className="pipeline-io-grid">
+                    <TraceJsonPanel title="Input" value={stage.input} />
+                    <TraceJsonPanel title="Output" value={stage.output} />
+                  </div>
+                </details>
                 {warningCount > 0 ? (
                   <details className="pipeline-stage-warnings">
                     <summary>{formatWarningCount(warningCount)}</summary>
@@ -223,6 +230,15 @@ function PipelineSummary({ result }: { result: CampaignResult }) {
           })}
         </div>
       </details>
+    </div>
+  );
+}
+
+function TraceJsonPanel({ title, value }: { title: string; value: unknown }) {
+  return (
+    <div className="pipeline-io-panel">
+      <h4>{title}</h4>
+      <pre>{formatTraceJson(value)}</pre>
     </div>
   );
 }
@@ -245,6 +261,10 @@ function formatDuration(durationMs: number) {
 
 function formatWarningCount(count: number) {
   return `${count} ${count === 1 ? "warning" : "warnings"}`;
+}
+
+function formatTraceJson(value: unknown) {
+  return JSON.stringify(value, null, 2) ?? "null";
 }
 
 function Metric({ label, value }: { label: string; value: string }) {

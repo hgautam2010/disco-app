@@ -26,6 +26,8 @@ export type CampaignStageTrace = {
   name: CampaignStageName;
   source: CampaignStageSource;
   model: string;
+  input: unknown;
+  output: unknown;
   durationMs: number;
   apiCalls: number;
   attempts: number;

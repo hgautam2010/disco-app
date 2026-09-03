@@ -52,6 +52,8 @@ export async function selectPersonaStrategy(
       name: "select_personas",
       source: "openai",
       model: result.model,
+      input: payload,
+      output: strategy,
       durationMs: Date.now() - startedAt,
       apiCalls: result.apiCalls,
       attempts: result.attempts,

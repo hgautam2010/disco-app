@@ -46,6 +46,8 @@ export async function rankPublisherStrategy(
       name: "rank_publishers",
       source: "openai",
       model: result.model,
+      input: payload,
+      output: strategy,
       durationMs: Date.now() - startedAt,
       apiCalls: result.apiCalls,
       attempts: result.attempts,

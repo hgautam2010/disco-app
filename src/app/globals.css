@@ -88,6 +88,7 @@ h1 {
 
 h2,
 h3,
+h4,
 p {
   margin: 0;
 }
@@ -309,6 +310,7 @@ button:disabled {
 }
 
 .pipeline-chips span,
+.pipeline-stage-io summary,
 .pipeline-stage-metrics span,
 .pipeline-stage-warnings summary {
   border: 1px solid var(--line);
@@ -370,6 +372,57 @@ button:disabled {
   min-width: 0;
   flex-wrap: wrap;
   gap: 6px;
+}
+
+.pipeline-stage-io {
+  display: grid;
+  min-width: 0;
+  max-width: 100%;
+  gap: 8px;
+}
+
+.pipeline-stage-io summary {
+  width: fit-content;
+  max-width: 100%;
+  cursor: pointer;
+  font-weight: 760;
+  list-style-position: inside;
+}
+
+.pipeline-io-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  min-width: 0;
+  max-width: 100%;
+  gap: 8px;
+}
+
+.pipeline-io-panel {
+  display: grid;
+  min-width: 0;
+  gap: 6px;
+}
+
+.pipeline-io-panel h4 {
+  color: var(--text);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+}
+
+.pipeline-io-panel pre {
+  max-width: 100%;
+  max-height: 280px;
+  margin: 0;
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px;
+  color: #27312e;
+  background: #f9fbfa;
+  font-size: 0.76rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
 .pipeline-stage-warnings summary {
@@ -708,6 +761,7 @@ button:disabled {
 
   .planner-layout,
   .analysis-grid,
+  .pipeline-io-grid,
   .persona-grid,
   .creative-grid,
   .excluded-grid,

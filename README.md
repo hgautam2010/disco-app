@@ -36,7 +36,7 @@ The app is optimized for predictable, inspectable campaign generation:
 - Advertiser extraction uses a small controlled taxonomy for `category`, `secondaryCategories`, and `productSignals`, which keeps matching predictable.
 - A normalization layer maps every returned ID back to local catalog data, removes invalid or overlapping choices, and repairs budget allocation.
 - Deterministic TypeScript code is only used for catalog shortlisting, normalization, and offline evals.
-- The UI shows recommended publishers, exclusions, personas, creative variants, config, score signals, API calls, repair count, and an expandable per-stage trace with model, attempts, latency, token usage, and stage-local warnings.
+- The UI shows recommended publishers, exclusions, personas, creative variants, config, score signals, API calls, repair count, and an expandable per-stage trace with model, attempts, latency, token usage, stage-local warnings, and input/output payload snapshots.
 - Normal OpenAI usage is 4 calls per campaign: extraction, publisher ranking, persona selection, and execution. Worst case is 8 calls if all four stages need one repair retry.
 
 Core entry points:

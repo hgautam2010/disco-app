@@ -33,6 +33,15 @@ export function assembleFinalCampaign({
     name: "assemble",
     source: "deterministic",
     model: "code",
+    input: {
+      strategy,
+      execution,
+      stageNames: stageTraces.map((trace) => trace.name)
+    },
+    output: {
+      ...campaignWithoutPipeline,
+      warnings: uniqueWarnings([...campaignWithoutPipeline.warnings, ...validationErrors])
+    },
     durationMs: Date.now() - startedAt,
     apiCalls: 0,
     attempts: 0,

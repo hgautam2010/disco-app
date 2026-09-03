@@ -9,6 +9,9 @@ export async function extractAdvertiserProfile(
   advertiserDescription: string
 ): Promise<PipelineStageResult<AdvertiserProfile>> {
   const startedAt = Date.now();
+  const input = {
+    advertiserDescription
+  };
   const request: RepairableStructuredRequest = {
     model: getOpenAIModelForStage("extract"),
     input: [
@@ -18,9 +21,7 @@ export async function extractAdvertiserProfile(
       },
       {
         role: "user",
-        content: JSON.stringify({
-          advertiserDescription
-        })
+        content: JSON.stringify(input)
       }
     ],
     text: {
@@ -47,6 +48,8 @@ export async function extractAdvertiserProfile(
       name: "extract",
       source: "openai",
       model: result.model,
+      input,
+      output: profile,
       durationMs: Date.now() - startedAt,
       apiCalls: result.apiCalls,
       attempts: result.attempts,
