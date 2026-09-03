@@ -9,6 +9,14 @@ describe("campaign Zod schemas", () => {
     expect(advertiserProfileResponseSchema.safeParse(validAdvertiserProfileResponse()).success).toBe(true);
   });
 
+  it("rejects advertiser profile output outside the extraction taxonomy", () => {
+    const response = validAdvertiserProfileResponse();
+    response.category = "pet_health";
+    response.productSignals = ["mobility support"];
+
+    expect(advertiserProfileResponseSchema.safeParse(response).success).toBe(false);
+  });
+
   it("rejects out-of-contract publisher ranking scores", () => {
     const response = validPublisherRankingResponse();
     response.recommendedPublishers[0].score = 140;
@@ -33,11 +41,11 @@ describe("campaign Zod schemas", () => {
 
 function validAdvertiserProfileResponse() {
   return {
-    category: "pet_health",
-    secondaryCategories: ["subscription"],
+    category: "pet_food",
+    secondaryCategories: ["supplements"],
     priceTier: "premium",
     audienceHints: ["senior dog owners"],
-    productSignals: ["mobility support"],
+    productSignals: ["subscription", "science-backed"],
     valuePropositions: ["clear ingredients"],
     purchaseModel: "subscription",
     likelyObjective: "subscription acquisition",

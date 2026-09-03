@@ -9,6 +9,11 @@
       "passed": true,
       "checks": [
         {
+          "name": "extraction-category-taxonomy",
+          "passed": true,
+          "detail": "Category: pet_food"
+        },
+        {
           "name": "extraction-category",
           "passed": true,
           "detail": "Category: pet_food"
@@ -52,6 +57,11 @@
           "name": "product-signal-recall",
           "passed": true,
           "detail": "Signals: subscription, premium, science-backed"
+        },
+        {
+          "name": "product-signal-taxonomy",
+          "passed": true,
+          "detail": "Signals: subscription, premium, science-backed"
         }
       ]
     },
@@ -60,6 +70,11 @@
       "score": 100,
       "passed": true,
       "checks": [
+        {
+          "name": "extraction-category-taxonomy",
+          "passed": true,
+          "detail": "Category: sustainable_apparel"
+        },
         {
           "name": "extraction-category",
           "passed": true,
@@ -104,6 +119,11 @@
           "name": "product-signal-recall",
           "passed": true,
           "detail": "Signals: sustainability, value"
+        },
+        {
+          "name": "product-signal-taxonomy",
+          "passed": true,
+          "detail": "Signals: sustainability, value"
         }
       ]
     },
@@ -112,6 +132,11 @@
       "score": 100,
       "passed": true,
       "checks": [
+        {
+          "name": "extraction-category-taxonomy",
+          "passed": true,
+          "detail": "Category: functional_beverages"
+        },
         {
           "name": "extraction-category",
           "passed": true,
@@ -156,6 +181,11 @@
           "name": "product-signal-recall",
           "passed": true,
           "detail": "Signals: science-backed"
+        },
+        {
+          "name": "product-signal-taxonomy",
+          "passed": true,
+          "detail": "Signals: science-backed"
         }
       ]
     },
@@ -164,6 +194,11 @@
       "score": 100,
       "passed": true,
       "checks": [
+        {
+          "name": "extraction-category-taxonomy",
+          "passed": true,
+          "detail": "Category: luxury_accessories"
+        },
         {
           "name": "extraction-category",
           "passed": true,
@@ -208,6 +243,11 @@
           "name": "product-signal-recall",
           "passed": true,
           "detail": "Signals: premium, value"
+        },
+        {
+          "name": "product-signal-taxonomy",
+          "passed": true,
+          "detail": "Signals: premium, value"
         }
       ]
     },
@@ -216,6 +256,11 @@
       "score": 100,
       "passed": true,
       "checks": [
+        {
+          "name": "extraction-category-taxonomy",
+          "passed": true,
+          "detail": "Category: wellness"
+        },
         {
           "name": "extraction-category",
           "passed": true,
@@ -269,6 +314,11 @@
       "passed": true,
       "checks": [
         {
+          "name": "extraction-category-taxonomy",
+          "passed": true,
+          "detail": "Category: refillable_products"
+        },
+        {
           "name": "extraction-category",
           "passed": true,
           "detail": "Category: refillable_products"
@@ -314,6 +364,11 @@
           "detail": "Signals: sustainability, convenience"
         },
         {
+          "name": "product-signal-taxonomy",
+          "passed": true,
+          "detail": "Signals: sustainability, convenience"
+        },
+        {
           "name": "forbidden-top-publisher",
           "passed": true,
           "detail": "Top 3: Pantrygood, Hearthstone Goods, Northbed"
@@ -325,6 +380,11 @@
       "score": 100,
       "passed": true,
       "checks": [
+        {
+          "name": "extraction-category-taxonomy",
+          "passed": true,
+          "detail": "Category: supplements"
+        },
         {
           "name": "extraction-category",
           "passed": true,
@@ -371,6 +431,11 @@
           "detail": "Signals: subscription, science-backed, performance"
         },
         {
+          "name": "product-signal-taxonomy",
+          "passed": true,
+          "detail": "Signals: subscription, science-backed, performance"
+        },
+        {
           "name": "forbidden-top-publisher",
           "passed": true,
           "detail": "Top 3: Daily Form, Movewell, Studiogrid"
@@ -382,6 +447,11 @@
       "score": 100,
       "passed": true,
       "checks": [
+        {
+          "name": "extraction-category-taxonomy",
+          "passed": true,
+          "detail": "Category: beauty"
+        },
         {
           "name": "extraction-category",
           "passed": true,
@@ -435,6 +505,11 @@
       "passed": true,
       "checks": [
         {
+          "name": "extraction-category-taxonomy",
+          "passed": true,
+          "detail": "Category: home_goods"
+        },
+        {
           "name": "extraction-category",
           "passed": true,
           "detail": "Category: home_goods"
@@ -480,6 +555,11 @@
           "detail": "Signals: premium, gifting"
         },
         {
+          "name": "product-signal-taxonomy",
+          "passed": true,
+          "detail": "Signals: premium, gifting"
+        },
+        {
           "name": "forbidden-top-publisher",
           "passed": true,
           "detail": "Top 3: Northbed, Hearthstone Goods, Heartfoot"
@@ -491,6 +571,11 @@
       "score": 100,
       "passed": true,
       "checks": [
+        {
+          "name": "extraction-category-taxonomy",
+          "passed": true,
+          "detail": "Category: b2b_saas"
+        },
         {
           "name": "extraction-category",
           "passed": true,
@@ -517,6 +602,11 @@
           "detail": "Signals: convenience"
         },
         {
+          "name": "product-signal-taxonomy",
+          "passed": true,
+          "detail": "Signals: convenience"
+        },
+        {
           "name": "candidate-warning",
           "passed": true,
           "detail": "Candidate warnings: Publisher catalog is consumer-commerce oriented; B2B recommendations are directional."
@@ -528,6 +618,11 @@
       "score": 100,
       "passed": true,
       "checks": [
+        {
+          "name": "extraction-category-taxonomy",
+          "passed": true,
+          "detail": "Category: luxury_accessories"
+        },
         {
           "name": "extraction-category",
           "passed": true,
@@ -570,6 +665,11 @@
         },
         {
           "name": "product-signal-recall",
+          "passed": true,
+          "detail": "Signals: premium, value"
+        },
+        {
+          "name": "product-signal-taxonomy",
           "passed": true,
           "detail": "Signals: premium, value"
         },

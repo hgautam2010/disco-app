@@ -4,18 +4,24 @@ import { getPersonas, getPublishers } from "../src/lib/data";
 import { scorePersonas, selectPersonas } from "../src/lib/personaScoring";
 import { scorePublishers } from "../src/lib/publisherScoring";
 import { retrieveCampaignCandidates } from "../src/lib/campaign/stages/retrieve-candidates/run";
+import {
+  advertiserCategoryValues,
+  productSignalValues,
+  type AdvertiserCategory,
+  type ProductSignal
+} from "../src/lib/advertiserTaxonomy";
 import type { AdvertiserAnalysis, AmbiguityLevel, PriceTier } from "../src/lib/types";
 
 type EvalCase = {
   id: string;
   input: string;
-  expectedCategory: string;
+  expectedCategory: AdvertiserCategory;
   expectedTopPublishers: string[];
   expectedPersonas: string[];
   shouldExclude: string[];
-  expectedPriceTier?: string;
-  expectedAmbiguityLevel?: string;
-  expectedProductSignals?: string[];
+  expectedPriceTier?: PriceTier;
+  expectedAmbiguityLevel?: AmbiguityLevel;
+  expectedProductSignals?: ProductSignal[];
   expectedCandidateWarnings?: string[];
   expectedResultWarnings?: string[];
   forbiddenTopPublishers?: string[];
@@ -37,6 +43,8 @@ type EvalResult = {
 const fixturesPath = path.join(process.cwd(), "evals", "fixtures", "advertiser-cases.json");
 const reportsPath = path.join(process.cwd(), "evals", "reports");
 const cases = JSON.parse(readFileSync(fixturesPath, "utf8")) as EvalCase[];
+const advertiserCategorySet = new Set<string>(advertiserCategoryValues);
+const productSignalSet = new Set<string>(productSignalValues);
 
 const results = cases.map(runEvalCase);
 const passed = results.filter((result) => result.passed).length;
@@ -73,6 +81,11 @@ function runEvalCase(evalCase: EvalCase): EvalResult {
   const candidateWarnings = candidates.warnings;
 
   const checks: EvalCheck[] = [
+    {
+      name: "extraction-category-taxonomy",
+      passed: advertiserCategorySet.has(analysis.category),
+      detail: `Category: ${analysis.category}`
+    },
     {
       name: "extraction-category",
       passed: analysis.category === evalCase.expectedCategory,
@@ -140,6 +153,11 @@ function runEvalCase(evalCase: EvalCase): EvalResult {
       passed: evalCase.expectedProductSignals.every((signal) => analysis.productSignals.includes(signal)),
       detail: `Signals: ${analysis.productSignals.join(", ")}`
     });
+    checks.push({
+      name: "product-signal-taxonomy",
+      passed: analysis.productSignals.every((signal) => productSignalSet.has(signal)),
+      detail: `Signals: ${analysis.productSignals.join(", ")}`
+    });
   }
 
   if (evalCase.expectedCandidateWarnings) {
@@ -181,13 +199,13 @@ function runEvalCase(evalCase: EvalCase): EvalResult {
 }
 
 function analysisFromEvalCase(evalCase: EvalCase): AdvertiserAnalysis {
-  const ambiguityLevel = (evalCase.expectedAmbiguityLevel ?? "low") as AmbiguityLevel;
+  const ambiguityLevel = evalCase.expectedAmbiguityLevel ?? "low";
 
   return {
     originalDescription: evalCase.input,
     category: evalCase.expectedCategory,
     secondaryCategories: [],
-    priceTier: (evalCase.expectedPriceTier ?? "mid_market") as PriceTier,
+    priceTier: evalCase.expectedPriceTier ?? "mid_market",
     audienceHints: audienceHintsForCategory(evalCase.expectedCategory),
     productSignals: evalCase.expectedProductSignals ?? [],
     valuePropositions: evalCase.expectedProductSignals ?? [],

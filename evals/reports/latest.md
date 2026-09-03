@@ -20,6 +20,7 @@ Average score: 100
 
 ### senior-dog-food
 
+- pass extraction-category-taxonomy: Category: pet_food
 - pass extraction-category: Category: pet_food
 - pass candidate-publisher-recall: Candidates: Pawline, Tailcrate, Ruffco, Movewell, Kitchenly, Daily Form, Pantrygood, Pop & Sip, Studiogrid, Linden Park
 - pass publisher-fit: Top 3: Pawline, Tailcrate, Ruffco
@@ -29,9 +30,11 @@ Average score: 100
 - pass price-tier: Price tier: premium
 - pass ambiguity-level: Ambiguity: low
 - pass product-signal-recall: Signals: subscription, premium, science-backed
+- pass product-signal-taxonomy: Signals: subscription, premium, science-backed
 
 ### sustainable-activewear
 
+- pass extraction-category-taxonomy: Category: sustainable_apparel
 - pass extraction-category: Category: sustainable_apparel
 - pass candidate-publisher-recall: Candidates: Stride & Stem, Movewell, Cloudfoot, Marlowe & Co., Linden Park, Everbody, Heartfoot, Pantrygood, Daily Form, Studiogrid
 - pass publisher-fit: Top 3: Stride & Stem, Movewell, Cloudfoot
@@ -41,9 +44,11 @@ Average score: 100
 - pass price-tier: Price tier: premium
 - pass ambiguity-level: Ambiguity: low
 - pass product-signal-recall: Signals: sustainability, value
+- pass product-signal-taxonomy: Signals: sustainability, value
 
 ### functional-beverage
 
+- pass extraction-category-taxonomy: Category: functional_beverages
 - pass extraction-category: Category: functional_beverages
 - pass candidate-publisher-recall: Candidates: Pop & Sip, Pantrygood, Daily Form, Movewell, Swiftcart, Studiogrid, Kitchenly, Ruffco, Northbed, Velvetline
 - pass publisher-fit: Top 3: Pop & Sip, Pantrygood, Daily Form
@@ -53,9 +58,11 @@ Average score: 100
 - pass price-tier: Price tier: mid_market
 - pass ambiguity-level: Ambiguity: low
 - pass product-signal-recall: Signals: science-backed
+- pass product-signal-taxonomy: Signals: science-backed
 
 ### luxury-handbags
 
+- pass extraction-category-taxonomy: Category: luxury_accessories
 - pass extraction-category: Category: luxury_accessories
 - pass candidate-publisher-recall: Candidates: Linden Park, Marlowe & Co., Stride & Stem, Everbody, Movewell, Heartfoot, Cloudfoot, Pantrygood, Hearthstone Goods, Northbed
 - pass publisher-fit: Top 3: Linden Park, Marlowe & Co., Stride & Stem
@@ -65,9 +72,11 @@ Average score: 100
 - pass price-tier: Price tier: luxury
 - pass ambiguity-level: Ambiguity: low
 - pass product-signal-recall: Signals: premium, value
+- pass product-signal-taxonomy: Signals: premium, value
 
 ### vague-wellness
 
+- pass extraction-category-taxonomy: Category: wellness
 - pass extraction-category: Category: wellness
 - pass candidate-publisher-recall: Candidates: Studiogrid, Daily Form, Pantrygood, Movewell, Ruffco, Pawline, Kitchenly, Pop & Sip, Tailcrate, Swiftcart
 - pass publisher-fit: Top 3: Studiogrid, Daily Form, Pantrygood
@@ -80,6 +89,7 @@ Average score: 100
 
 ### refillable-cleaning
 
+- pass extraction-category-taxonomy: Category: refillable_products
 - pass extraction-category: Category: refillable_products
 - pass candidate-publisher-recall: Candidates: Pantrygood, Hearthstone Goods, Northbed, Swiftcart, Kitchenly, Movewell, Ruffco, Stride & Stem, Cloudfoot, Pawline
 - pass publisher-fit: Top 3: Pantrygood, Hearthstone Goods, Northbed
@@ -89,10 +99,12 @@ Average score: 100
 - pass price-tier: Price tier: mid_market
 - pass ambiguity-level: Ambiguity: low
 - pass product-signal-recall: Signals: sustainability, convenience
+- pass product-signal-taxonomy: Signals: sustainability, convenience
 - pass forbidden-top-publisher: Top 3: Pantrygood, Hearthstone Goods, Northbed
 
 ### performance-supplements
 
+- pass extraction-category-taxonomy: Category: supplements
 - pass extraction-category: Category: supplements
 - pass candidate-publisher-recall: Candidates: Daily Form, Movewell, Studiogrid, Pantrygood, Pawline, Kitchenly, Cloudfoot, Tailcrate, Ruffco, Pop & Sip
 - pass publisher-fit: Top 3: Daily Form, Movewell, Studiogrid
@@ -102,10 +114,12 @@ Average score: 100
 - pass price-tier: Price tier: mid_market
 - pass ambiguity-level: Ambiguity: low
 - pass product-signal-recall: Signals: subscription, science-backed, performance
+- pass product-signal-taxonomy: Signals: subscription, science-backed, performance
 - pass forbidden-top-publisher: Top 3: Daily Form, Movewell, Studiogrid
 
 ### clean-skincare
 
+- pass extraction-category-taxonomy: Category: beauty
 - pass extraction-category: Category: beauty
 - pass candidate-publisher-recall: Candidates: Velvetline, Strandlab, Movewell, Pop & Sip, Studiogrid, Pantrygood, Ruffco, Everbody, Pawline, Heartfoot
 - pass publisher-fit: Top 3: Velvetline, Strandlab, Movewell
@@ -118,6 +132,7 @@ Average score: 100
 
 ### premium-bedding
 
+- pass extraction-category-taxonomy: Category: home_goods
 - pass extraction-category: Category: home_goods
 - pass candidate-publisher-recall: Candidates: Northbed, Hearthstone Goods, Heartfoot, Pawline, Pop & Sip, Movewell, Studiogrid, Marlowe & Co., Linden Park, Stride & Stem
 - pass publisher-fit: Top 3: Northbed, Hearthstone Goods, Heartfoot
@@ -127,19 +142,23 @@ Average score: 100
 - pass price-tier: Price tier: premium
 - pass ambiguity-level: Ambiguity: low
 - pass product-signal-recall: Signals: premium, gifting
+- pass product-signal-taxonomy: Signals: premium, gifting
 - pass forbidden-top-publisher: Top 3: Northbed, Hearthstone Goods, Heartfoot
 
 ### b2b-saas-bad-fit
 
+- pass extraction-category-taxonomy: Category: b2b_saas
 - pass extraction-category: Category: b2b_saas
 - pass exclusion-fit: Excluded: Pop & Sip, Strandlab, Tailcrate, Cloudfoot, Stride & Stem
 - pass price-tier: Price tier: mid_market
 - pass ambiguity-level: Ambiguity: low
 - pass product-signal-recall: Signals: convenience
+- pass product-signal-taxonomy: Signals: convenience
 - pass candidate-warning: Candidate warnings: Publisher catalog is consumer-commerce oriented; B2B recommendations are directional.
 
 ### conflicting-luxury-value
 
+- pass extraction-category-taxonomy: Category: luxury_accessories
 - pass extraction-category: Category: luxury_accessories
 - pass candidate-publisher-recall: Candidates: Linden Park, Marlowe & Co., Stride & Stem, Everbody, Movewell, Heartfoot, Cloudfoot, Pantrygood, Hearthstone Goods, Northbed
 - pass publisher-fit: Top 3: Linden Park, Marlowe & Co., Stride & Stem
@@ -149,5 +168,6 @@ Average score: 100
 - pass price-tier: Price tier: luxury
 - pass ambiguity-level: Ambiguity: low
 - pass product-signal-recall: Signals: premium, value
+- pass product-signal-taxonomy: Signals: premium, value
 - pass forbidden-top-publisher: Top 3: Linden Park, Marlowe & Co., Stride & Stem
 

@@ -7,12 +7,12 @@ export function normalizeAdvertiserProfile(
 ): AdvertiserAnalysis {
   return {
     originalDescription: advertiserDescription.trim(),
-    category: cleanText(profile.category, "unknown"),
-    secondaryCategories: cleanArray(profile.secondaryCategories),
+    category: profile.category,
+    secondaryCategories: uniqueValues(profile.secondaryCategories).filter((category) => category !== profile.category),
     priceTier: profile.priceTier,
-    audienceHints: cleanArray(profile.audienceHints),
-    productSignals: cleanArray(profile.productSignals),
-    valuePropositions: cleanArray(profile.valuePropositions),
+    audienceHints: cleanStringArray(profile.audienceHints),
+    productSignals: uniqueValues(profile.productSignals),
+    valuePropositions: cleanStringArray(profile.valuePropositions),
     purchaseModel: cleanText(profile.purchaseModel, "unknown"),
     likelyObjective: cleanText(profile.likelyObjective, "new customer acquisition"),
     ambiguityLevel: profile.ambiguityLevel,
@@ -39,7 +39,11 @@ function cleanText(value: string, defaultValue: string) {
   return cleanValue || defaultValue;
 }
 
-function cleanArray(values: string[]) {
+function cleanStringArray(values: string[]) {
   const cleanValues = values.map((value) => value.trim()).filter(Boolean);
   return Array.from(new Set(cleanValues));
+}
+
+function uniqueValues<T extends string>(values: T[]) {
+  return Array.from(new Set(values));
 }

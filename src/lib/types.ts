@@ -1,3 +1,5 @@
+import type { AdvertiserCategory, ProductSignal } from "./advertiserTaxonomy";
+
 export type PriceTier = "budget" | "value" | "mid_market" | "premium" | "luxury" | "unknown";
 
 export type AmbiguityLevel = "low" | "medium" | "high";
@@ -77,11 +79,11 @@ export type Persona = {
 
 export type AdvertiserAnalysis = {
   originalDescription: string;
-  category: string;
-  secondaryCategories: string[];
+  category: AdvertiserCategory;
+  secondaryCategories: AdvertiserCategory[];
   priceTier: PriceTier;
   audienceHints: string[];
-  productSignals: string[];
+  productSignals: ProductSignal[];
   valuePropositions: string[];
   purchaseModel: string;
   likelyObjective: string;

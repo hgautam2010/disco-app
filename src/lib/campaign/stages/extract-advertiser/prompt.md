@@ -21,16 +21,43 @@ Return:
 
 ## Field Semantics
 
-- category: one concise, machine-friendly primary category inferred from the pitch. Prefer a specific commerce category over a broad market when the pitch supports it.
-- secondaryCategories: adjacent categories, use cases, or buying contexts that may affect matching. Do not repeat the primary category.
+- category: one primary category from the allowed category list. Prefer a specific commerce category over a broad market when the pitch supports it.
+- secondaryCategories: zero or more adjacent categories from the allowed category list. Do not repeat the primary category.
 - priceTier: calibrated position of the offer: `budget`, `value`, `mid_market`, `premium`, `luxury`, or `unknown`.
 - audienceHints: explicit or strongly implied shopper segments from the pitch.
-- productSignals: concrete product attributes that can influence publisher, persona, or creative decisions.
+- productSignals: zero or more concrete product attributes from the allowed signal list that can influence publisher, persona, or creative decisions.
 - valuePropositions: supportable benefits or reasons to buy. Keep them grounded in the pitch.
 - purchaseModel: how the product is sold, such as one-time purchase, subscription, replenishment, gift, or `unknown`.
 - likelyObjective: the most likely campaign goal, such as acquisition, subscription growth, trial, gifting, or awareness.
 - ambiguityLevel: `low` when the pitch is specific, `medium` when some key facts are missing, and `high` when most matching decisions would be assumptions.
 - confidence: 0 to 1 confidence in the extracted profile. Use lower values when category, price, or audience is unclear.
+
+## Allowed Values
+
+Use only these category values for `category` and `secondaryCategories`:
+
+- `pet_food`
+- `sustainable_apparel`
+- `functional_beverages`
+- `home_goods`
+- `refillable_products`
+- `supplements`
+- `luxury_accessories`
+- `beauty`
+- `b2b_saas`
+- `wellness`
+- `unknown`
+
+Use only these product signal values for `productSignals`:
+
+- `subscription`
+- `premium`
+- `sustainability`
+- `science-backed`
+- `gifting`
+- `convenience`
+- `value`
+- `performance`
 
 ## Extraction Priorities
 
