@@ -12,12 +12,25 @@ npm run dev
 
 Set `OPENAI_API_KEY` in `.env.local`; campaign generation requires OpenAI. `OPENAI_MODEL` defaults to `gpt-5.1`.
 
+Optional stage-specific model overrides:
+
+```bash
+OPENAI_EXTRACT_MODEL=
+OPENAI_RANK_PUBLISHERS_MODEL=
+OPENAI_SELECT_PERSONAS_MODEL=
+OPENAI_EXECUTION_MODEL=
+OPENAI_REPAIR_MODEL=
+```
+
+Any blank stage override falls back to `OPENAI_MODEL`, so local setup only needs one model unless you want to tune cost or quality per stage.
+
 ## What I Built
 
 The app is optimized for predictable, inspectable campaign generation:
 
 - The primary path lives in `src/lib/campaign` and runs `extract -> retrieve -> rank_publishers -> select_personas -> generate_execution -> assemble`.
 - Extraction, publisher ranking, persona selection, and execution are separate OpenAI stages. Deterministic retrieval sits between extraction and ranking so the model only works from bounded candidate sets.
+- Each OpenAI stage can use its own model through an env override, while blank overrides fall back to `OPENAI_MODEL`.
 - Each stage has its own folder with the local prompt, schema, runner, and any normalizer needed for that responsibility.
 - Each OpenAI stage requests strict structured JSON, validates it with Zod, and gets one repair retry if the response misses the contract.
 - Advertiser extraction uses a small controlled taxonomy for `category`, `secondaryCategories`, and `productSignals`, which keeps matching predictable.

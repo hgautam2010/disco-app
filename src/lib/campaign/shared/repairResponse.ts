@@ -1,6 +1,6 @@
 import type { ZodError } from "zod";
 import { getPersonas, getPublishers } from "../../data";
-import { createStructuredResponse, getOpenAIModel } from "./openaiClient";
+import { createStructuredResponse, getOpenAIModelForStage } from "./openaiClient";
 import { readSharedPrompt } from "./prompts";
 
 export async function repairStructuredResponse({
@@ -17,7 +17,7 @@ export async function repairStructuredResponse({
   repairContext: unknown;
 }) {
   return createStructuredResponse<unknown>({
-    model: getOpenAIModel(),
+    model: getOpenAIModelForStage("repair"),
     input: [
       {
         role: "system",

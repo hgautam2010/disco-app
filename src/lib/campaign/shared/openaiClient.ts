@@ -42,14 +42,29 @@ export type StructuredResponse<T> = {
   usage: TokenUsage;
 };
 
+export type OpenAIModelStage = "extract" | "rank_publishers" | "select_personas" | "execute" | "repair";
+
 const responsesEndpoint = "https://api.openai.com/v1/responses";
+const defaultOpenAIModel = "gpt-5.1";
+
+const stageModelEnvVars: Record<OpenAIModelStage, string> = {
+  extract: "OPENAI_EXTRACT_MODEL",
+  rank_publishers: "OPENAI_RANK_PUBLISHERS_MODEL",
+  select_personas: "OPENAI_SELECT_PERSONAS_MODEL",
+  execute: "OPENAI_EXECUTION_MODEL",
+  repair: "OPENAI_REPAIR_MODEL"
+};
 
 export function hasOpenAIKey() {
   return Boolean(process.env.OPENAI_API_KEY);
 }
 
 export function getOpenAIModel() {
-  return process.env.OPENAI_MODEL || "gpt-5.1";
+  return readEnv("OPENAI_MODEL") ?? defaultOpenAIModel;
+}
+
+export function getOpenAIModelForStage(stage: OpenAIModelStage) {
+  return readEnv(stageModelEnvVars[stage]) ?? getOpenAIModel();
 }
 
 export async function createStructuredResponse<T>(body: ResponsesApiBody): Promise<StructuredResponse<T>> {
@@ -85,6 +100,11 @@ export async function createStructuredResponse<T>(body: ResponsesApiBody): Promi
     model: json.model ?? body.model,
     usage: normalizeUsage(json.usage)
   };
+}
+
+function readEnv(name: string) {
+  const value = process.env[name]?.trim();
+  return value ? value : undefined;
 }
 
 function extractOutputText(result: ResponsesApiResult) {

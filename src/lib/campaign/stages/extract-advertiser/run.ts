@@ -1,4 +1,4 @@
-import { getOpenAIModel } from "../../shared/openaiClient";
+import { getOpenAIModelForStage } from "../../shared/openaiClient";
 import { readStagePrompt } from "../../shared/prompts";
 import { generateAndValidateWithRepairResult, type RepairableStructuredRequest } from "../../shared/structuredGeneration";
 import type { AdvertiserProfile, PipelineStageResult } from "../../types";
@@ -10,7 +10,7 @@ export async function extractAdvertiserProfile(
 ): Promise<PipelineStageResult<AdvertiserProfile>> {
   const startedAt = Date.now();
   const request: RepairableStructuredRequest = {
-    model: getOpenAIModel(),
+    model: getOpenAIModelForStage("extract"),
     input: [
       {
         role: "system",

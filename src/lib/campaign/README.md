@@ -26,6 +26,18 @@ The campaign path is intentionally linear:
 
 Every stage returns `PipelineStageResult<T>`, which means the data and trace move together. The final `pipeline` object includes API calls, attempts, repair count, model name, latency, warnings, and token usage per stage.
 
+## Model Selection
+
+All OpenAI-backed stages use `OPENAI_MODEL` by default. Override a single stage only when you want a different cost, latency, or quality profile:
+
+- `OPENAI_EXTRACT_MODEL`: advertiser profile extraction
+- `OPENAI_RANK_PUBLISHERS_MODEL`: publisher ranking
+- `OPENAI_SELECT_PERSONAS_MODEL`: persona selection
+- `OPENAI_EXECUTION_MODEL`: creative and campaign config generation
+- `OPENAI_REPAIR_MODEL`: Zod repair retry
+
+Blank stage overrides are ignored and fall back to `OPENAI_MODEL`.
+
 ## Stage Anatomy
 
 - `run.ts`: the stage entry point. It should return a `PipelineStageResult`.

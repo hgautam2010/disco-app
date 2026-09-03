@@ -54,7 +54,6 @@ function normalizeCampaignConfig(
   const totalUsd = positiveNumber(config.budget.totalUsd);
   const allocation = normalizeAllocation(config.budget.allocation, recommendedPublishers, warnings);
   const recommendedPublisherIds = new Set(recommendedPublishers.map((item) => item.publisher.id));
-  const placementByPublisher = new Map(config.placements.map((placement) => [placement.publisherId, placement]));
   const placements = config.placements.flatMap((placement, index) => {
     const recommendedPublisher = recommendedPublishers.find((item) => item.publisher.id === placement.publisherId);
 

@@ -1,5 +1,5 @@
 import { getPersonas, getPublishers } from "../../../data";
-import { getOpenAIModel } from "../../shared/openaiClient";
+import { getOpenAIModelForStage } from "../../shared/openaiClient";
 import { readStagePrompt } from "../../shared/prompts";
 import {
   generateAndValidateWithRepairResult,
@@ -82,7 +82,7 @@ export async function generateExecutionWithMetadata(
   const excludedPublishers = publishers.filter((publisher) => excludedPublisherIds.has(publisher.id));
   const selectedPersonas = personas.filter((persona) => selectedPersonaIds.has(persona.id));
   const request: RepairableStructuredRequest = {
-    model: getOpenAIModel(),
+    model: getOpenAIModelForStage("execute"),
     input: [
       {
         role: "system",

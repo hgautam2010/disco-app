@@ -1,4 +1,4 @@
-import { getOpenAIModel } from "../../shared/openaiClient";
+import { getOpenAIModelForStage } from "../../shared/openaiClient";
 import { readStagePrompt } from "../../shared/prompts";
 import { generateAndValidateWithRepairResult, type RepairableStructuredRequest } from "../../shared/structuredGeneration";
 import { normalizePersonaStrategy } from "./normalize";
@@ -17,7 +17,7 @@ export async function selectPersonaStrategy(
   const startedAt = Date.now();
   const payload = toPersonaSelectionPayload(candidates, publisherStrategy);
   const request: RepairableStructuredRequest = {
-    model: getOpenAIModel(),
+    model: getOpenAIModelForStage("select_personas"),
     input: [
       {
         role: "system",

@@ -1,4 +1,4 @@
-import { getOpenAIModel } from "../../shared/openaiClient";
+import { getOpenAIModelForStage } from "../../shared/openaiClient";
 import { readStagePrompt } from "../../shared/prompts";
 import { generateAndValidateWithRepairResult, type RepairableStructuredRequest } from "../../shared/structuredGeneration";
 import { normalizePublisherStrategy } from "./normalize";
@@ -11,7 +11,7 @@ export async function rankPublisherStrategy(
   const startedAt = Date.now();
   const payload = toPublisherRankingPayload(candidates);
   const request: RepairableStructuredRequest = {
-    model: getOpenAIModel(),
+    model: getOpenAIModelForStage("rank_publishers"),
     input: [
       {
         role: "system",
