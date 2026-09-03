@@ -412,9 +412,16 @@ button:disabled {
   background: var(--warn-soft);
 }
 
-.warning-band div {
+.warning-list {
   display: grid;
   gap: 6px;
+  margin: 0;
+  padding-left: 18px;
+  line-height: 1.45;
+}
+
+.warning-list li {
+  overflow-wrap: anywhere;
 }
 
 .empty-state {

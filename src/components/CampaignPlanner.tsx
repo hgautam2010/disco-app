@@ -114,11 +114,11 @@ function CampaignResultView({
       {result.warnings.length > 0 ? (
         <section className="warning-band">
           <AlertTriangle aria-hidden="true" size={20} />
-          <div>
+          <ul className="warning-list">
             {result.warnings.map((warning) => (
-              <p key={warning}>{warning}</p>
+              <li key={warning}>{warning}</li>
             ))}
-          </div>
+          </ul>
         </section>
       ) : null}
 
