@@ -26,7 +26,7 @@ The campaign path is intentionally linear:
 
 Every stage returns `PipelineStageResult<T>`, which means the data and trace move together. The final `pipeline` object includes API calls, attempts, repair count, model name, latency, stage-local warnings, token usage, prompt input, model output, and normalized stage output per stage.
 
-Final campaign warnings are cumulative and user-facing. Pipeline trace warnings are stage-local, so a warning created during retrieval does not appear again under ranking, persona selection, or execution unless that stage adds a new warning.
+Final campaign warnings remain cumulative in the API result. Pipeline trace warnings are stage-local, so a warning created during retrieval does not appear again under ranking, persona selection, or execution unless that stage adds a new warning.
 
 Trace snapshots are business payloads and normalized results. OpenAI stages show the exact prompt input payload, parsed model output, and normalized stage output. Deterministic stages show stage input and stage output. The trace intentionally does not include raw system prompts, JSON schema payloads, request headers, or secrets.
 

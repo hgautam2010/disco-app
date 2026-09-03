@@ -111,17 +111,6 @@ function CampaignResultView({
         <CheckCircle2 aria-hidden="true" size={28} />
       </section>
 
-      {result.warnings.length > 0 ? (
-        <section className="warning-band">
-          <AlertTriangle aria-hidden="true" size={20} />
-          <ul className="warning-list">
-            {result.warnings.map((warning) => (
-              <li key={warning}>{warning}</li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
-
       <section className="result-section" aria-labelledby="analysis-heading">
         <div className="section-heading">
           <h2 id="analysis-heading">Advertiser analysis</h2>
