@@ -14,7 +14,7 @@ npm run dev
 
 Set `OPENAI_API_KEY` in `.env.local`. The shared model default is `gpt-5.6-terra`, with lower-latency `gpt-5.6-luna` defaults for extraction and repair. Optional per-stage model, reasoning effort, output-token, and service-tier overrides are documented in `.env.example`.
 
-Qdrant is required on this branch. The app retrieves publisher and persona candidates from Qdrant at runtime, so ingestion must be run before generating a campaign.
+Qdrant is required on this branch. The app retrieves publisher and persona candidates from Qdrant at runtime, so ingestion must be run before generating a campaign. The ingestion script creates missing publisher/persona collections automatically.
 
 ## What I Built
 

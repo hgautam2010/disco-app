@@ -1,10 +1,10 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { advertiserAnalysisFixture } from "./helpers/advertiserAnalysis";
 import { getPersonas, getPublishers } from "@/lib/data";
 import { retrieveCampaignCandidatesForRuntime } from "@/lib/campaign/stages/retrieve-candidates/run";
 import { getVectorConfig } from "@/lib/vector/config";
 import { advertiserToRetrievalQuery, personaToEmbeddingText, publisherToEmbeddingText } from "@/lib/vector/embeddingText";
-import { qdrantPointId } from "@/lib/vector/qdrantClient";
+import { ensureQdrantCollection, qdrantPointId } from "@/lib/vector/qdrantClient";
 
 const vectorEnvNames = [
   "QDRANT_URL",
@@ -17,6 +17,10 @@ const vectorEnvNames = [
 ] as const;
 
 describe("vector retrieval helpers", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it("builds labeled embedding text for publishers and personas", () => {
     const publisher = getPublishers().find((item) => item.id === "pub_007");
     const persona = getPersonas().find((item) => item.id === "persona_004");
@@ -85,6 +89,54 @@ describe("vector retrieval helpers", () => {
     expect(first).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
   });
 
+  it("creates a Qdrant collection when it does not exist", async () => {
+    const fetchSpy = vi
+      .spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(jsonResponse({ status: "not_found" }, 404))
+      .mockResolvedValueOnce(jsonResponse({ result: true, status: "ok" }));
+
+    const result = await ensureQdrantCollection("disco_publishers", {
+      qdrantUrl: "http://qdrant.test",
+      publishersCollection: "disco_publishers",
+      personasCollection: "disco_personas",
+      embeddingModel: "text-embedding-3-small",
+      embeddingDimensions: 1536
+    });
+
+    expect(result).toEqual({
+      collectionName: "disco_publishers",
+      created: true,
+      vectorSize: 1536,
+      distance: "Cosine"
+    });
+    expect(fetchSpy).toHaveBeenCalledTimes(2);
+    expect(fetchSpy.mock.calls[0]?.[0]).toBe("http://qdrant.test/collections/disco_publishers");
+    expect(fetchSpy.mock.calls[0]?.[1]).toMatchObject({ method: "GET" });
+    expect(fetchSpy.mock.calls[1]?.[0]).toBe("http://qdrant.test/collections/disco_publishers");
+    expect(fetchSpy.mock.calls[1]?.[1]).toMatchObject({ method: "PUT" });
+    expect(JSON.parse(String(fetchSpy.mock.calls[1]?.[1]?.body))).toEqual({
+      vectors: {
+        size: 1536,
+        distance: "Cosine"
+      }
+    });
+  });
+
+  it("reuses an existing Qdrant collection", async () => {
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(jsonResponse({ result: {}, status: "ok" }));
+
+    const result = await ensureQdrantCollection("disco_personas", {
+      qdrantUrl: "http://qdrant.test",
+      publishersCollection: "disco_publishers",
+      personasCollection: "disco_personas",
+      embeddingModel: "text-embedding-3-small",
+      embeddingDimensions: 1536
+    });
+
+    expect(result.created).toBe(false);
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+  });
+
   it("requires embeddings for runtime retrieval", async () => {
     await withVectorEnv(
       {
@@ -130,4 +182,13 @@ async function withVectorEnv<T>(
       }
     }
   }
+}
+
+function jsonResponse(body: unknown, status = 200) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: {
+      "Content-Type": "application/json"
+    }
+  });
 }

@@ -13,6 +13,13 @@ export type QdrantSearchHit = {
   payload: Record<string, unknown>;
 };
 
+export type QdrantCollectionEnsureResult = {
+  collectionName: string;
+  created: boolean;
+  vectorSize: number;
+  distance: typeof qdrantDistance;
+};
+
 type QdrantApiResponse<T> = {
   result?: T;
   status?: string;
@@ -25,14 +32,17 @@ type RawQdrantSearchHit = {
   payload?: Record<string, unknown> | null;
 };
 
-const qdrantDistance = "Cosine";
+const qdrantDistance = "Cosine" as const;
 
-export async function ensureQdrantCollection(collectionName: string, config = getVectorConfig()) {
+export async function ensureQdrantCollection(
+  collectionName: string,
+  config = getVectorConfig()
+): Promise<QdrantCollectionEnsureResult> {
   const collectionPath = `/collections/${encodeURIComponent(collectionName)}`;
   const existing = await qdrantFetch(collectionPath, { method: "GET" }, config);
 
   if (existing.ok) {
-    return;
+    return collectionEnsureResult(collectionName, config, false);
   }
 
   if (existing.status !== 404) {
@@ -53,6 +63,8 @@ export async function ensureQdrantCollection(collectionName: string, config = ge
     },
     config
   );
+
+  return collectionEnsureResult(collectionName, config, true);
 }
 
 export async function upsertQdrantPoints(collectionName: string, points: QdrantPoint[], config = getVectorConfig()) {
@@ -136,4 +148,17 @@ function qdrantFetch(path: string, init: RequestInit, config: VectorConfig) {
       ...init.headers
     }
   });
+}
+
+function collectionEnsureResult(
+  collectionName: string,
+  config: VectorConfig,
+  created: boolean
+): QdrantCollectionEnsureResult {
+  return {
+    collectionName,
+    created,
+    vectorSize: config.embeddingDimensions,
+    distance: qdrantDistance
+  };
 }

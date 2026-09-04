@@ -15,17 +15,30 @@ async function main() {
   const publishers = getPublishers();
   const personas = getPersonas();
 
+  await ensureCatalogCollection("publishers", config.publishersCollection, config);
   console.log(`Ingesting ${publishers.length} publishers into ${config.publishersCollection}.`);
-  await ensureQdrantCollection(config.publishersCollection, config);
   const publisherPoints = await buildPublisherPoints(publishers, config);
   await upsertQdrantPoints(config.publishersCollection, publisherPoints, config);
 
+  await ensureCatalogCollection("personas", config.personasCollection, config);
   console.log(`Ingesting ${personas.length} personas into ${config.personasCollection}.`);
-  await ensureQdrantCollection(config.personasCollection, config);
   const personaPoints = await buildPersonaPoints(personas, config);
   await upsertQdrantPoints(config.personasCollection, personaPoints, config);
 
   console.log("Qdrant ingestion complete.");
+}
+
+async function ensureCatalogCollection(
+  label: "publishers" | "personas",
+  collectionName: string,
+  config: ReturnType<typeof getVectorConfig>
+) {
+  const collection = await ensureQdrantCollection(collectionName, config);
+  const action = collection.created ? "Created" : "Using existing";
+
+  console.log(
+    `${action} ${label} collection ${collection.collectionName} (${collection.vectorSize} dimensions, ${collection.distance} distance).`
+  );
 }
 
 async function buildPublisherPoints(publishers: Publisher[], config: ReturnType<typeof getVectorConfig>) {

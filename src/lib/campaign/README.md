@@ -39,7 +39,7 @@ docker compose up -d qdrant
 npm run ingest:qdrant
 ```
 
-The ingestion script embeds `data/publishers.json` and `data/shopper_personas.json`, then upserts two Qdrant collections. Runtime retrieval embeds the extracted advertiser profile, searches publishers and personas, hydrates full records from local JSON, and adds semantic retrieval signals. If embeddings or Qdrant fail, campaign generation fails clearly so setup issues are visible during development.
+The ingestion script creates missing Qdrant collections, embeds `data/publishers.json` and `data/shopper_personas.json`, then upserts catalog points. Runtime retrieval embeds the extracted advertiser profile, searches publishers and personas, hydrates full records from local JSON, and adds semantic retrieval signals. If embeddings or Qdrant fail, campaign generation fails clearly so setup issues are visible during development.
 
 ## OpenAI Runtime Config
 
