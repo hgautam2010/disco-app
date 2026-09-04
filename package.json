@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "tsc --noEmit",
     "test": "vitest run",
-    "eval": "tsx evals/runEvals.ts"
+    "eval": "tsx evals/runEvals.ts",
+    "ingest:qdrant": "tsx scripts/ingestQdrant.ts"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",
