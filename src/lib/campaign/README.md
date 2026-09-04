@@ -30,9 +30,11 @@ Final campaign warnings remain cumulative in the API result. Pipeline trace warn
 
 Trace snapshots are business payloads and normalized results. OpenAI stages show the exact prompt input payload, parsed model output, and normalized stage output. Deterministic stages show stage input and stage output. The trace intentionally does not include raw system prompts, JSON schema payloads, request headers, or secrets.
 
-## Model Selection
+## OpenAI Runtime Config
 
-All OpenAI-backed stages use `OPENAI_MODEL` by default. Override a single stage only when you want a different cost, latency, or quality profile:
+`OPENAI_MODEL` is the shared fallback model. If it is set, every blank stage model override uses it. Without env values, extraction and repair default to `gpt-5.6-luna`, while ranking, persona selection, and execution default to `gpt-5.6-terra`.
+
+Override a single stage only when you want a different cost, latency, or quality profile:
 
 - `OPENAI_EXTRACT_MODEL`: advertiser profile extraction
 - `OPENAI_RANK_PUBLISHERS_MODEL`: publisher ranking
@@ -41,6 +43,14 @@ All OpenAI-backed stages use `OPENAI_MODEL` by default. Override a single stage 
 - `OPENAI_REPAIR_MODEL`: Zod repair retry
 
 Blank stage overrides are ignored and fall back to `OPENAI_MODEL`.
+
+The same file also owns runtime speed controls:
+
+- `OPENAI_REASONING_EFFORT` plus per-stage reasoning overrides
+- `OPENAI_MAX_OUTPUT_TOKENS` plus per-stage output-token overrides
+- `OPENAI_SERVICE_TIER`
+
+Each OpenAI trace records the requested reasoning effort, max output tokens, requested service tier, and actual service tier returned by the API when present.
 
 ## Stage Anatomy
 

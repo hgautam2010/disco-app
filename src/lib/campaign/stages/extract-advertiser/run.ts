@@ -1,4 +1,9 @@
-import { getOpenAIModelForStage } from "../../shared/openaiClient";
+import {
+  getOpenAIModelForStage,
+  getOpenAIRequestConfigForStage,
+  toResponsesRequestConfig,
+  toTraceRequestConfig
+} from "../../shared/openaiClient";
 import { readStagePrompt } from "../../shared/prompts";
 import { generateAndValidateWithRepairResult, type RepairableStructuredRequest } from "../../shared/structuredGeneration";
 import type { AdvertiserProfile, PipelineStageResult } from "../../types";
@@ -12,8 +17,10 @@ export async function extractAdvertiserProfile(
   const promptInput = {
     advertiserDescription
   };
+  const requestConfig = getOpenAIRequestConfigForStage("extract");
   const request: RepairableStructuredRequest = {
     model: getOpenAIModelForStage("extract"),
+    ...toResponsesRequestConfig(requestConfig),
     input: [
       {
         role: "system",
@@ -48,6 +55,7 @@ export async function extractAdvertiserProfile(
       name: "extract",
       source: "openai",
       model: result.model,
+      requestConfig: toTraceRequestConfig(requestConfig, result.serviceTier),
       promptInput,
       modelOutput: result.data,
       stageOutput: profile,

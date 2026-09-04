@@ -1,4 +1,9 @@
-import { getOpenAIModelForStage } from "../../shared/openaiClient";
+import {
+  getOpenAIModelForStage,
+  getOpenAIRequestConfigForStage,
+  toResponsesRequestConfig,
+  toTraceRequestConfig
+} from "../../shared/openaiClient";
 import { readStagePrompt } from "../../shared/prompts";
 import { generateAndValidateWithRepairResult, type RepairableStructuredRequest } from "../../shared/structuredGeneration";
 import { stageLocalWarnings } from "../../shared/warnings";
@@ -11,8 +16,10 @@ export async function rankPublisherStrategy(
 ): Promise<PipelineStageResult<LockedPublisherStrategy>> {
   const startedAt = Date.now();
   const payload = toPublisherRankingPayload(candidates);
+  const requestConfig = getOpenAIRequestConfigForStage("rank_publishers");
   const request: RepairableStructuredRequest = {
     model: getOpenAIModelForStage("rank_publishers"),
+    ...toResponsesRequestConfig(requestConfig),
     input: [
       {
         role: "system",
@@ -46,6 +53,7 @@ export async function rankPublisherStrategy(
       name: "rank_publishers",
       source: "openai",
       model: result.model,
+      requestConfig: toTraceRequestConfig(requestConfig, result.serviceTier),
       promptInput: payload,
       modelOutput: result.data,
       stageOutput: {

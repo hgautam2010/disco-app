@@ -1,6 +1,11 @@
 import type { ZodError } from "zod";
 import { getPersonas, getPublishers } from "../../data";
-import { createStructuredResponse, getOpenAIModelForStage } from "./openaiClient";
+import {
+  createStructuredResponse,
+  getOpenAIModelForStage,
+  getOpenAIRequestConfigForStage,
+  toResponsesRequestConfig
+} from "./openaiClient";
 import { readSharedPrompt } from "./prompts";
 
 export async function repairStructuredResponse({
@@ -16,8 +21,11 @@ export async function repairStructuredResponse({
   validationError: ZodError;
   repairContext: unknown;
 }) {
+  const requestConfig = getOpenAIRequestConfigForStage("repair");
+
   return createStructuredResponse<unknown>({
     model: getOpenAIModelForStage("repair"),
+    ...toResponsesRequestConfig(requestConfig),
     input: [
       {
         role: "system",

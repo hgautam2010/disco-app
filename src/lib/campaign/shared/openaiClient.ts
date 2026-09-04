@@ -1,4 +1,4 @@
-import type { TokenUsage } from "../../types";
+import type { CampaignStageRequestConfig, TokenUsage } from "../../types";
 import { emptyTokenUsage } from "./tokenUsage";
 
 export type ResponsesApiBody = {
@@ -10,10 +10,16 @@ export type ResponsesApiBody = {
   text: {
     format: Record<string, unknown>;
   };
+  reasoning?: {
+    effort: OpenAIReasoningEffort;
+  };
+  max_output_tokens?: number;
+  service_tier?: OpenAIServiceTier;
 };
 
 type ResponsesApiResult = {
   model?: string;
+  service_tier?: string | null;
   output_text?: string;
   output?: {
     content?: {
@@ -40,12 +46,23 @@ export type StructuredResponse<T> = {
   data: T;
   model: string;
   usage: TokenUsage;
+  serviceTier?: string;
 };
 
 export type OpenAIModelStage = "extract" | "rank_publishers" | "select_personas" | "execute" | "repair";
 
+export type OpenAIReasoningEffort = "none" | "low" | "medium" | "high" | "xhigh" | "max";
+
+export type OpenAIServiceTier = "auto" | "default" | "flex" | "fast" | "priority" | "ultrafast";
+
+export type OpenAIRequestConfig = {
+  reasoningEffort: OpenAIReasoningEffort;
+  maxOutputTokens: number;
+  serviceTier?: OpenAIServiceTier;
+};
+
 const responsesEndpoint = "https://api.openai.com/v1/responses";
-const defaultOpenAIModel = "gpt-5.1";
+const defaultOpenAIModel = "gpt-5.6-terra";
 
 const stageModelEnvVars: Record<OpenAIModelStage, string> = {
   extract: "OPENAI_EXTRACT_MODEL",
@@ -54,6 +71,46 @@ const stageModelEnvVars: Record<OpenAIModelStage, string> = {
   execute: "OPENAI_EXECUTION_MODEL",
   repair: "OPENAI_REPAIR_MODEL"
 };
+
+const defaultModelByStage: Partial<Record<OpenAIModelStage, string>> = {
+  extract: "gpt-5.6-luna",
+  repair: "gpt-5.6-luna"
+};
+
+const stageReasoningEnvVars: Record<OpenAIModelStage, string> = {
+  extract: "OPENAI_EXTRACT_REASONING_EFFORT",
+  rank_publishers: "OPENAI_RANK_PUBLISHERS_REASONING_EFFORT",
+  select_personas: "OPENAI_SELECT_PERSONAS_REASONING_EFFORT",
+  execute: "OPENAI_EXECUTION_REASONING_EFFORT",
+  repair: "OPENAI_REPAIR_REASONING_EFFORT"
+};
+
+const stageMaxOutputTokenEnvVars: Record<OpenAIModelStage, string> = {
+  extract: "OPENAI_EXTRACT_MAX_OUTPUT_TOKENS",
+  rank_publishers: "OPENAI_RANK_PUBLISHERS_MAX_OUTPUT_TOKENS",
+  select_personas: "OPENAI_SELECT_PERSONAS_MAX_OUTPUT_TOKENS",
+  execute: "OPENAI_EXECUTION_MAX_OUTPUT_TOKENS",
+  repair: "OPENAI_REPAIR_MAX_OUTPUT_TOKENS"
+};
+
+const defaultReasoningEffortByStage: Record<OpenAIModelStage, OpenAIReasoningEffort> = {
+  extract: "none",
+  rank_publishers: "low",
+  select_personas: "low",
+  execute: "low",
+  repair: "none"
+};
+
+const defaultMaxOutputTokensByStage: Record<OpenAIModelStage, number> = {
+  extract: 1000,
+  rank_publishers: 2600,
+  select_personas: 2600,
+  execute: 3600,
+  repair: 2200
+};
+
+const allowedReasoningEfforts: OpenAIReasoningEffort[] = ["none", "low", "medium", "high", "xhigh", "max"];
+const allowedServiceTiers: OpenAIServiceTier[] = ["auto", "default", "flex", "fast", "priority", "ultrafast"];
 
 export function hasOpenAIKey() {
   return Boolean(process.env.OPENAI_API_KEY);
@@ -64,7 +121,43 @@ export function getOpenAIModel() {
 }
 
 export function getOpenAIModelForStage(stage: OpenAIModelStage) {
-  return readEnv(stageModelEnvVars[stage]) ?? getOpenAIModel();
+  return readEnv(stageModelEnvVars[stage]) ?? readEnv("OPENAI_MODEL") ?? defaultModelByStage[stage] ?? getOpenAIModel();
+}
+
+export function getOpenAIRequestConfigForStage(stage: OpenAIModelStage): OpenAIRequestConfig {
+  return {
+    reasoningEffort:
+      readEnumEnv(stageReasoningEnvVars[stage], allowedReasoningEfforts) ??
+      readEnumEnv("OPENAI_REASONING_EFFORT", allowedReasoningEfforts) ??
+      defaultReasoningEffortByStage[stage],
+    maxOutputTokens:
+      readPositiveIntegerEnv(stageMaxOutputTokenEnvVars[stage]) ??
+      readPositiveIntegerEnv("OPENAI_MAX_OUTPUT_TOKENS") ??
+      defaultMaxOutputTokensByStage[stage],
+    serviceTier: readEnumEnv("OPENAI_SERVICE_TIER", allowedServiceTiers)
+  };
+}
+
+export function toResponsesRequestConfig(config: OpenAIRequestConfig) {
+  return {
+    reasoning: {
+      effort: config.reasoningEffort
+    },
+    max_output_tokens: config.maxOutputTokens,
+    ...(config.serviceTier ? { service_tier: config.serviceTier } : {})
+  } satisfies Pick<ResponsesApiBody, "reasoning" | "max_output_tokens" | "service_tier">;
+}
+
+export function toTraceRequestConfig(
+  config: OpenAIRequestConfig,
+  actualServiceTier?: string
+): CampaignStageRequestConfig {
+  return {
+    reasoningEffort: config.reasoningEffort,
+    maxOutputTokens: config.maxOutputTokens,
+    serviceTier: config.serviceTier ?? "auto",
+    actualServiceTier
+  };
 }
 
 export async function createStructuredResponse<T>(body: ResponsesApiBody): Promise<StructuredResponse<T>> {
@@ -98,13 +191,35 @@ export async function createStructuredResponse<T>(body: ResponsesApiBody): Promi
   return {
     data: JSON.parse(outputText) as T,
     model: json.model ?? body.model,
-    usage: normalizeUsage(json.usage)
+    usage: normalizeUsage(json.usage),
+    serviceTier: json.service_tier ?? undefined
   };
 }
 
 function readEnv(name: string) {
   const value = process.env[name]?.trim();
   return value ? value : undefined;
+}
+
+function readEnumEnv<T extends string>(name: string, allowedValues: T[]) {
+  const value = readEnv(name);
+
+  if (!value) {
+    return undefined;
+  }
+
+  return allowedValues.includes(value as T) ? (value as T) : undefined;
+}
+
+function readPositiveIntegerEnv(name: string) {
+  const value = readEnv(name);
+
+  if (!value) {
+    return undefined;
+  }
+
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : undefined;
 }
 
 function extractOutputText(result: ResponsesApiResult) {

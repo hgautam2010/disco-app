@@ -22,10 +22,18 @@ export type TokenUsage = {
   reasoningOutputTokens: number;
 };
 
+export type CampaignStageRequestConfig = {
+  reasoningEffort?: string;
+  maxOutputTokens?: number;
+  serviceTier?: string;
+  actualServiceTier?: string;
+};
+
 export type CampaignStageTrace = {
   name: CampaignStageName;
   source: CampaignStageSource;
   model: string;
+  requestConfig?: CampaignStageRequestConfig;
   promptInput: unknown;
   modelOutput: unknown;
   stageOutput: unknown;

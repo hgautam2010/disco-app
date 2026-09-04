@@ -18,6 +18,7 @@ export type StructuredGenerationResult<T> = {
   apiCalls: number;
   attempts: number;
   model: string;
+  serviceTier?: string;
   tokenUsage: TokenUsage;
   repaired: boolean;
 };
@@ -93,6 +94,7 @@ export async function generateAndValidateWithRepairResult<T>({
       apiCalls: 1,
       attempts: 1,
       model: original.model,
+      serviceTier: original.serviceTier,
       tokenUsage: original.usage,
       repaired: false
     };
@@ -115,6 +117,7 @@ export async function generateAndValidateWithRepairResult<T>({
       apiCalls: 2,
       attempts: 2,
       model: original.model,
+      serviceTier: original.serviceTier,
       tokenUsage: addTokenUsage(original.usage, repairUsage),
       repaired: true
     };

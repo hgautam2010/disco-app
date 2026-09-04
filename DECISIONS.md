@@ -27,7 +27,19 @@ This is easier to explain, debug, and evaluate than one large prompt because eve
 
 Tradeoff: the normal path uses 4 OpenAI calls instead of 1. The benefit is better inspectability and stricter validation.
 
-## 3. Keep Retrieval Deterministic
+## 3. Tune OpenAI Runtime Per Stage
+
+The OpenAI client uses stage-level defaults for model, reasoning effort, and output-token caps.
+
+- Extraction and repair default to low-latency settings because they are schema-focused.
+- Publisher ranking, persona selection, and execution default to `low` reasoning effort for faster response time.
+- `OPENAI_SERVICE_TIER` can opt into a faster OpenAI service tier when available.
+
+The trace records the requested settings and the service tier reported by the API, which makes latency and quality tradeoffs visible during demos.
+
+Tradeoff: lower reasoning effort can reduce nuanced judgment quality, so the important ranking and execution stages can be bumped to `medium` through env vars without code changes.
+
+## 4. Keep Retrieval Deterministic
 
 The retrieval stage uses local scoring code to shortlist publishers and personas before OpenAI ranks the final choices.
 
@@ -35,7 +47,7 @@ This keeps prompts smaller and prevents the model from choosing IDs outside the 
 
 Tradeoff: the current scoring rules are simple and tuned to the supplied catalog. If the catalog grows significantly, this should move to embeddings or indexed retrieval.
 
-## 4. Use Controlled Extraction Taxonomy
+## 5. Use Controlled Extraction Taxonomy
 
 Advertiser extraction uses controlled values for `category`, `secondaryCategories`, and `productSignals`.
 
@@ -45,7 +57,7 @@ This improves predictability because downstream scoring can depend on known valu
 
 Tradeoff: unknown or new business types may be mapped to `unknown` until the taxonomy is expanded.
 
-## 5. Validate Every Model Response With Zod
+## 6. Validate Every Model Response With Zod
 
 Each OpenAI-backed stage requests structured JSON and validates the result with Zod.
 
@@ -59,7 +71,7 @@ If validation fails, the app makes one repair call with:
 
 Tradeoff: repair improves reliability but can double API calls in the worst case.
 
-## 6. Normalize Model Decisions Against Local Data
+## 7. Normalize Model Decisions Against Local Data
 
 Model output is treated as a proposal, not final truth.
 
@@ -74,13 +86,14 @@ Normalization ensures:
 
 This keeps the final campaign internally consistent even when a model response is slightly messy.
 
-## 7. Make Pipeline Trace Visible
+## 8. Make Pipeline Trace Visible
 
 The final response includes a `pipeline` trace with:
 
 - stage name,
 - source,
 - model,
+- request config,
 - prompt input for OpenAI-backed stages,
 - parsed model output for OpenAI-backed stages,
 - normalized stage output,
@@ -97,7 +110,7 @@ This makes the app easier to demo and gives a clear answer to cost, latency, rel
 
 Tradeoff: trace snapshots can be verbose, so they are collapsed by default and intentionally exclude raw system prompts, JSON schemas, request headers, and secrets.
 
-## 8. Use Offline Evals for Regression Coverage
+## 9. Use Offline Evals for Regression Coverage
 
 The eval harness runs representative advertiser cases through deterministic retrieval and scoring.
 
@@ -118,7 +131,7 @@ It checks:
 
 Tradeoff: offline evals do not fully grade OpenAI writing quality. They are strongest for retrieval, taxonomy, ranking expectations, and regression detection.
 
-## 9. Keep the Code Walkthrough-Oriented
+## 10. Keep the Code Walkthrough-Oriented
 
 The code is organized around the pipeline rather than around generic abstractions.
 
@@ -132,7 +145,7 @@ Runtime prompts live in the top-level `prompts/` directory so the submission has
 
 This makes it easy to modify one stage without mentally loading the entire system, while keeping prompt review separate from implementation code.
 
-## 10. What I Would Improve Next
+## 11. What I Would Improve Next
 
 Given more time, the next production improvements would be:
 

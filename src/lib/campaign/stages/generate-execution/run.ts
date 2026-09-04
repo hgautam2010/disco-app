@@ -1,5 +1,10 @@
 import { getPersonas, getPublishers } from "../../../data";
-import { getOpenAIModelForStage } from "../../shared/openaiClient";
+import {
+  getOpenAIModelForStage,
+  getOpenAIRequestConfigForStage,
+  toResponsesRequestConfig,
+  toTraceRequestConfig
+} from "../../shared/openaiClient";
 import { readStagePrompt } from "../../shared/prompts";
 import {
   generateAndValidateWithRepairResult,
@@ -17,7 +22,8 @@ export async function generateExecutionStage(
 ): Promise<PipelineStageResult<CampaignExecution>> {
   const startedAt = Date.now();
   const payload = toExecutionPayload(advertiserDescription, strategy);
-  const result = await generateExecutionForPayload(payload);
+  const requestConfig = getOpenAIRequestConfigForStage("execute");
+  const result = await generateExecutionForPayload(payload, requestConfig);
   const execution = normalizeExecution({
     strategy,
     execution: result.data
@@ -30,6 +36,7 @@ export async function generateExecutionStage(
       name: "execute",
       source: "openai",
       model: result.model,
+      requestConfig: toTraceRequestConfig(requestConfig, result.serviceTier),
       promptInput: payload,
       modelOutput: result.data,
       stageOutput: {
@@ -105,9 +112,13 @@ function toExecutionPayload(advertiserDescription: string, strategy: LockedCampa
   };
 }
 
-function generateExecutionForPayload(payload: ReturnType<typeof toExecutionPayload>) {
+function generateExecutionForPayload(
+  payload: ReturnType<typeof toExecutionPayload>,
+  requestConfig = getOpenAIRequestConfigForStage("execute")
+) {
   const request: RepairableStructuredRequest = {
     model: getOpenAIModelForStage("execute"),
+    ...toResponsesRequestConfig(requestConfig),
     input: [
       {
         role: "system",

@@ -2,7 +2,7 @@
 
 import { AlertTriangle, CheckCircle2, Copy, Loader2, Maximize2, X } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
-import type { CampaignResult, ExampleAdvertiser } from "@/lib/types";
+import type { CampaignResult, CampaignStageRequestConfig, ExampleAdvertiser } from "@/lib/types";
 import { AdvertiserForm } from "./AdvertiserForm";
 import { CampaignConfig } from "./CampaignConfig";
 import { CreativeVariants } from "./CreativeVariants";
@@ -204,6 +204,7 @@ function PipelineSummary({ result }: { result: CampaignResult }) {
                   <span>{formatNumber(stage.tokenUsage.totalTokens)} tokens</span>
                   <span>{formatDuration(stage.durationMs)}</span>
                   <span>{stage.repaired ? "repaired" : "valid"}</span>
+                  <TraceRuntimeConfig config={stage.requestConfig} />
                 </div>
                 <details className="pipeline-stage-io">
                   <summary>Trace data</summary>
@@ -250,6 +251,33 @@ function PipelineSummary({ result }: { result: CampaignResult }) {
       ) : null}
     </div>
   );
+}
+
+function TraceRuntimeConfig({ config }: { config?: CampaignStageRequestConfig }) {
+  if (!config) {
+    return null;
+  }
+
+  return (
+    <>
+      {config.reasoningEffort ? <span>effort {config.reasoningEffort}</span> : null}
+      {typeof config.maxOutputTokens === "number" ? (
+        <span>max {formatNumber(config.maxOutputTokens)} output</span>
+      ) : null}
+      {config.serviceTier ? <span>{formatServiceTier(config)}</span> : null}
+    </>
+  );
+}
+
+function formatServiceTier(config: CampaignStageRequestConfig) {
+  const requestedTier = config.serviceTier ?? "auto";
+  const actualTier = config.actualServiceTier;
+
+  if (actualTier && actualTier !== requestedTier) {
+    return `tier ${actualTier} (${requestedTier} requested)`;
+  }
+
+  return `tier ${actualTier ?? requestedTier}`;
 }
 
 function TraceJsonPanel({

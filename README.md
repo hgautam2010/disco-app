@@ -10,7 +10,7 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Set `OPENAI_API_KEY` in `.env.local`. `OPENAI_MODEL` defaults to `gpt-5.1`; optional per-stage overrides are documented in `.env.example`.
+Set `OPENAI_API_KEY` in `.env.local`. The shared model default is `gpt-5.6-terra`, with lower-latency `gpt-5.6-luna` defaults for extraction and repair. Optional per-stage model, reasoning effort, output-token, and service-tier overrides are documented in `.env.example`.
 
 ## What I Built
 
@@ -22,7 +22,7 @@ extract -> retrieve -> rank_publishers -> select_personas -> generate_execution 
 
 Extraction, publisher ranking, persona selection, and execution are separate OpenAI stages with prompts in `prompts/`. Retrieval and final assembly are deterministic TypeScript. Each model response is structured JSON, validated with Zod, and gets one repair retry if it misses the schema.
 
-The UI shows publisher recommendations with reasoning, exclusions, selected personas, 3 to 5 persona-specific creative variants, campaign config, score signals, API call counts, token usage, and a per-stage trace. Trace panels expose prompt input, parsed model output, normalized stage output, stage-local warnings, and highlighted JSON modals for inspection.
+The UI shows publisher recommendations with reasoning, exclusions, selected personas, 3 to 5 persona-specific creative variants, campaign config, score signals, API call counts, token usage, and a per-stage trace. Trace panels expose model settings, reasoning effort, output cap, service tier, prompt input, parsed model output, normalized stage output, stage-local warnings, and highlighted JSON modals for inspection.
 
 ## Core Files
 

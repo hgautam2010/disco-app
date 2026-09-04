@@ -171,7 +171,22 @@ Worst-case total: 8 OpenAI calls.
 
 Retrieval and assembly are deterministic and do not call OpenAI.
 
-## 10. Validation and Repair
+## 10. Speed and Quality Controls
+
+OpenAI runtime defaults live in:
+
+`src/lib/campaign/shared/openaiClient.ts`
+
+The app supports:
+
+- `OPENAI_MODEL` and per-stage model overrides,
+- `OPENAI_REASONING_EFFORT` and per-stage reasoning overrides,
+- `OPENAI_MAX_OUTPUT_TOKENS` and per-stage output-token overrides,
+- `OPENAI_SERVICE_TIER` for faster serving when available.
+
+The default shape is optimized for a fast take-home demo: extraction and repair use `none` reasoning effort, while ranking, persona selection, and execution use `low`. If output quality needs more careful judgment, bump ranking/persona/execution to `medium` in `.env.local`.
+
+## 11. Validation and Repair
 
 Shared logic:
 
@@ -188,7 +203,7 @@ Each OpenAI-backed stage:
 5. Makes one repair call if validation fails.
 6. Throws a structured error if repair also fails.
 
-## 11. Token Usage and Trace
+## 12. Token Usage and Trace
 
 Shared files:
 
@@ -200,6 +215,9 @@ Each stage trace records:
 - stage name,
 - source,
 - model,
+- reasoning effort,
+- max output tokens,
+- service tier,
 - prompt input for OpenAI stages or stage input for deterministic stages,
 - parsed model output for OpenAI stages,
 - normalized stage output,
@@ -218,7 +236,7 @@ The trace UI starts compact. Expanding `Trace data` shows inline JSON previews, 
 
 This makes the pipeline easy to inspect during demos without flooding the page. The trace shows business payloads and parsed outputs, not request headers, raw schemas, secrets, or full system prompt text.
 
-## 12. Evals and Tests
+## 13. Evals and Tests
 
 Run:
 
@@ -249,12 +267,13 @@ Eval files:
 
 Current eval suite has 14 cases and covers happy paths, ambiguous inputs, unknown-category handling, B2B bad-fit behavior, expected exclusions, forbidden top publishers, price tiers, and product-signal taxonomy.
 
-## 13. How to Modify Safely
+## 14. How to Modify Safely
 
 Common changes:
 
 - Add a new category or product signal in `src/lib/advertiserTaxonomy.ts`.
 - Update extraction behavior in `prompts/extract-advertiser.md`.
+- Change model, reasoning, output cap, or service tier defaults in `src/lib/campaign/shared/openaiClient.ts`.
 - Update a stage response shape in that stage's `schema.ts`.
 - Update stage repair/cleanup in that stage's `normalize.ts`.
 - Tune deterministic retrieval in `publisherScoring.ts` or `personaScoring.ts`.

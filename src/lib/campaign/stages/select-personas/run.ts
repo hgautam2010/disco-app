@@ -1,4 +1,9 @@
-import { getOpenAIModelForStage } from "../../shared/openaiClient";
+import {
+  getOpenAIModelForStage,
+  getOpenAIRequestConfigForStage,
+  toResponsesRequestConfig,
+  toTraceRequestConfig
+} from "../../shared/openaiClient";
 import { readStagePrompt } from "../../shared/prompts";
 import { generateAndValidateWithRepairResult, type RepairableStructuredRequest } from "../../shared/structuredGeneration";
 import { stageLocalWarnings } from "../../shared/warnings";
@@ -17,8 +22,10 @@ export async function selectPersonaStrategy(
 ): Promise<PipelineStageResult<LockedCampaignStrategy>> {
   const startedAt = Date.now();
   const payload = toPersonaSelectionPayload(candidates, publisherStrategy);
+  const requestConfig = getOpenAIRequestConfigForStage("select_personas");
   const request: RepairableStructuredRequest = {
     model: getOpenAIModelForStage("select_personas"),
+    ...toResponsesRequestConfig(requestConfig),
     input: [
       {
         role: "system",
@@ -52,6 +59,7 @@ export async function selectPersonaStrategy(
       name: "select_personas",
       source: "openai",
       model: result.model,
+      requestConfig: toTraceRequestConfig(requestConfig, result.serviceTier),
       promptInput: payload,
       modelOutput: result.data,
       stageOutput: {
