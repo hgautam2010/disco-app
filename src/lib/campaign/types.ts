@@ -5,6 +5,8 @@ import type {
   CampaignStageTrace,
   CreativeVariant,
   ExcludedPublisher,
+  Persona,
+  Publisher,
   ScoredPersona,
   ScoredPublisher
 } from "../types";
@@ -16,6 +18,13 @@ export type CampaignCandidates = {
   publisherCandidates: ScoredPublisher[];
   personaCandidates: ScoredPersona[];
   exclusionCandidates: ExcludedPublisher[];
+  warnings: string[];
+};
+
+export type CampaignCatalogue = {
+  advertiserProfile: AdvertiserProfile;
+  publishers: Publisher[];
+  personas: Persona[];
   warnings: string[];
 };
 

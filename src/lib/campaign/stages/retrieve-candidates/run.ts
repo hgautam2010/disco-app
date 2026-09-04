@@ -3,11 +3,57 @@ import { selectPersonas, scorePersonas } from "../../../personaScoring";
 import { scorePublishers } from "../../../publisherScoring";
 import type { ExcludedPublisher, Persona, Publisher, ScoredPersona, ScoredPublisher } from "../../../types";
 import { emptyTokenUsage } from "../../shared/tokenUsage";
-import type { AdvertiserProfile, CampaignCandidates, PipelineStageResult } from "../../types";
+import type { AdvertiserProfile, CampaignCandidates, CampaignCatalogue, PipelineStageResult } from "../../types";
 
 const defaultPublisherCandidateLimit = 10;
 const defaultPersonaCandidateLimit = 8;
 const defaultExclusionCandidateLimit = 8;
+
+export function loadCampaignCatalogue(
+  advertiserProfile: AdvertiserProfile,
+  options: {
+    publishers?: Publisher[];
+    personas?: Persona[];
+  } = {}
+): PipelineStageResult<CampaignCatalogue> {
+  const startedAt = Date.now();
+  const publishers = options.publishers ?? getPublishers();
+  const personas = options.personas ?? getPersonas();
+  const warnings = catalogueWarnings(publishers, personas);
+  const data = {
+    advertiserProfile,
+    publishers,
+    personas,
+    warnings
+  };
+
+  return {
+    data,
+    trace: {
+      name: "retrieve",
+      source: "deterministic",
+      model: "code",
+      promptInput: {
+        advertiserProfile
+      },
+      modelOutput: null,
+      stageOutput: {
+        advertiserProfile,
+        publisherCount: publishers.length,
+        personaCount: personas.length,
+        publishers,
+        personas,
+        warnings
+      },
+      durationMs: Date.now() - startedAt,
+      apiCalls: 0,
+      attempts: 0,
+      tokenUsage: emptyTokenUsage(),
+      repaired: false,
+      warnings
+    }
+  };
+}
 
 export function retrieveCampaignCandidates(
   advertiserProfile: AdvertiserProfile,
@@ -71,6 +117,20 @@ export function retrieveCampaignCandidates(
       warnings
     }
   };
+}
+
+function catalogueWarnings(publishers: Publisher[], personas: Persona[]) {
+  const warnings: string[] = [];
+
+  if (publishers.length < 3) {
+    warnings.push("Publisher catalogue has fewer than three entries; recommendations may be incomplete.");
+  }
+
+  if (personas.length < 3) {
+    warnings.push("Persona catalogue has fewer than three entries; creative coverage may be incomplete.");
+  }
+
+  return warnings;
 }
 
 function buildExclusionCandidates(
