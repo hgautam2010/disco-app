@@ -16,6 +16,8 @@ Set `OPENAI_API_KEY` in `.env.local`. The shared model default is `gpt-5.6-terra
 
 Qdrant is required on this branch. The app retrieves publisher and persona candidates from Qdrant at runtime, so ingestion must be run before generating a campaign. The ingestion script creates missing publisher/persona collections automatically.
 
+`npm run ingest:qdrant` loads `.env.local` and `.env` before reading `OPENAI_API_KEY`, `QDRANT_URL`, and embedding settings.
+
 ## What I Built
 
 The app uses a staged OpenAI pipeline:

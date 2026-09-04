@@ -1,3 +1,4 @@
+import { loadProjectEnv } from "../src/lib/env/loadProjectEnv";
 import { getPersonas, getPublishers } from "../src/lib/data";
 import {
   personaEmbeddingTextVersion,
@@ -10,10 +11,16 @@ import { getVectorConfig } from "../src/lib/vector/config";
 import { ensureQdrantCollection, qdrantPointId, upsertQdrantPoints, type QdrantPoint } from "../src/lib/vector/qdrantClient";
 import type { Persona, Publisher } from "../src/lib/types";
 
+const loadedEnv = loadProjectEnv();
+
 async function main() {
   const config = getVectorConfig();
   const publishers = getPublishers();
   const personas = getPersonas();
+
+  if (loadedEnv.loadedFiles.length > 0) {
+    console.log(`Loaded env files: ${loadedEnv.loadedFiles.join(", ")}.`);
+  }
 
   await ensureCatalogCollection("publishers", config.publishersCollection, config);
   console.log(`Ingesting ${publishers.length} publishers into ${config.publishersCollection}.`);
