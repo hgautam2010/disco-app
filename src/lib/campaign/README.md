@@ -18,7 +18,7 @@ Shared helpers live in `shared` when they are used by multiple stages.
 The campaign path is intentionally linear:
 
 1. `extract-advertiser` turns the pitch into controlled advertiser fields.
-2. `retrieve-candidates` builds bounded publisher and persona candidate sets in code.
+2. `retrieve-candidates` builds bounded publisher and persona candidate sets with local scoring or optional Qdrant retrieval.
 3. `rank-publishers` asks OpenAI to choose recommended and excluded publishers from those candidates.
 4. `select-personas` asks OpenAI to choose personas from the locked candidate set and publisher strategy.
 5. `generate-execution` asks OpenAI for persona-specific creative and campaign config.
@@ -28,7 +28,25 @@ Every stage returns `PipelineStageResult<T>`, which means the data and trace mov
 
 Final campaign warnings remain cumulative in the API result. Pipeline trace warnings are stage-local, so a warning created during retrieval does not appear again under ranking, persona selection, or execution unless that stage adds a new warning.
 
-Trace snapshots are business payloads and normalized results. OpenAI stages show the exact prompt input payload, parsed model output, and normalized stage output. Deterministic stages show stage input and stage output. The trace intentionally does not include raw system prompts, JSON schema payloads, request headers, or secrets.
+Trace snapshots are business payloads and normalized results. OpenAI stages show the exact prompt input payload, parsed model output, and normalized stage output. Deterministic stages show stage input and stage output. Qdrant retrieval shows the retrieval query, returned hit IDs/scores, and hydrated stage output. The trace intentionally does not include raw system prompts, JSON schema payloads, request headers, or secrets.
+
+## Retrieval Config
+
+Local retrieval is the default:
+
+```bash
+CAMPAIGN_RETRIEVER=local
+```
+
+Qdrant retrieval is optional:
+
+```bash
+docker compose up -d qdrant
+npm run ingest:qdrant
+CAMPAIGN_RETRIEVER=qdrant
+```
+
+The ingestion script embeds `data/publishers.json` and `data/shopper_personas.json`, then upserts two Qdrant collections. Runtime Qdrant retrieval embeds the extracted advertiser profile, searches publishers and personas, hydrates full records from local JSON, adds semantic retrieval signals, and falls back to local retrieval if embeddings or Qdrant fail.
 
 ## OpenAI Runtime Config
 
@@ -49,6 +67,8 @@ The same file also owns runtime speed controls:
 - `OPENAI_REASONING_EFFORT` plus per-stage reasoning overrides
 - `OPENAI_MAX_OUTPUT_TOKENS` plus per-stage output-token overrides
 - `OPENAI_SERVICE_TIER`
+- `OPENAI_EMBEDDING_MODEL`
+- `OPENAI_EMBEDDING_DIMENSIONS`
 
 Each OpenAI trace records the requested reasoning effort, max output tokens, requested service tier, and actual service tier returned by the API when present.
 
@@ -66,6 +86,7 @@ OpenAI-backed stage prompts live in the top-level `prompts/` directory so every 
 - Change expected model JSON in that stage's `schema.ts`.
 - Change allowed extraction categories or product signals in `../advertiserTaxonomy.ts`.
 - Change data passed between stages in `types.ts`.
-- Change catalog shortlist logic in `retrieve-candidates/run.ts`, `publisherScoring.ts`, or `personaScoring.ts`.
+- Change local catalog shortlist logic in `retrieve-candidates/run.ts`, `publisherScoring.ts`, or `personaScoring.ts`.
+- Change vector retrieval in `retrieve-candidates/vectorRetriever.ts` or `../vector/*`.
 - Change safety repair in the stage's `normalize.ts` or in `shared/repairResponse.ts`.
 - Add a new stage by creating a stage folder, returning a `PipelineStageResult`, wiring it in `pipeline.ts`, and adding focused tests/evals.

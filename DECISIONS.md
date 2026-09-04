@@ -39,13 +39,18 @@ The trace records the requested settings and the service tier reported by the AP
 
 Tradeoff: lower reasoning effort can reduce nuanced judgment quality, so the important ranking and execution stages can be bumped to `medium` through env vars without code changes.
 
-## 4. Keep Retrieval Deterministic
+## 4. Keep Retrieval Swappable
 
-The retrieval stage uses local scoring code to shortlist publishers and personas before OpenAI ranks the final choices.
+The retrieval stage has two backends:
 
-This keeps prompts smaller and prevents the model from choosing IDs outside the catalog. It also gives the app useful offline eval coverage without requiring an API call.
+- `local`: deterministic TypeScript scoring over the provided JSON catalog.
+- `qdrant`: semantic retrieval from Qdrant, using OpenAI embeddings for the advertiser query and catalog records.
 
-Tradeoff: the current scoring rules are simple and tuned to the supplied catalog. If the catalog grows significantly, this should move to embeddings or indexed retrieval.
+`local` stays the default so the take-home runs with only `npm install && npm run dev`. Qdrant is opt-in through `CAMPAIGN_RETRIEVER=qdrant`.
+
+When Qdrant is enabled, the app still hydrates full publisher and persona records from local JSON. Qdrant returns IDs and similarity scores; local code adds business scoring, fills sparse results, builds exclusions, and falls back to local retrieval if Qdrant or embeddings are unavailable.
+
+Tradeoff: Qdrant is more production-like for larger catalogs, but it adds ingestion, an embedding call at runtime, and local infrastructure. The fallback keeps demos reliable.
 
 ## 5. Use Controlled Extraction Taxonomy
 
@@ -96,6 +101,7 @@ The final response includes a `pipeline` trace with:
 - request config,
 - prompt input for OpenAI-backed stages,
 - parsed model output for OpenAI-backed stages,
+- retriever input and Qdrant hit output for vector-backed retrieval,
 - normalized stage output,
 - duration,
 - API calls,
@@ -151,7 +157,8 @@ Given more time, the next production improvements would be:
 
 - persisted campaign drafts,
 - persisted run logs for traces and warnings,
-- embeddings-backed retrieval for larger catalogs,
+- incremental embedding refresh jobs,
+- managed Qdrant indexes,
 - per-stage eval fixtures,
 - human feedback labels,
-- monitoring for repair rate, schema failures, token usage, latency, and per-stage model performance.
+- monitoring for repair rate, schema failures, token usage, latency, retrieval hit quality, and per-stage model performance.

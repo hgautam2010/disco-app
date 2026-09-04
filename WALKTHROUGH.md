@@ -66,16 +66,30 @@ Folder:
 
 `src/lib/campaign/stages/retrieve-candidates`
 
-This stage is deterministic. It uses the extracted advertiser profile to score the local publisher and persona catalog.
+This stage defaults to deterministic retrieval. It uses the extracted advertiser profile to score the local publisher and persona catalog.
 
 Supporting files:
 
+- `src/lib/campaign/stages/retrieve-candidates/run.ts`
+- `src/lib/campaign/stages/retrieve-candidates/vectorRetriever.ts`
 - `src/lib/publisherScoring.ts`
 - `src/lib/personaScoring.ts`
+- `src/lib/vector/embeddingText.ts`
+- `src/lib/vector/openaiEmbeddings.ts`
+- `src/lib/vector/qdrantClient.ts`
 - `data/publishers.json`
 - `data/shopper_personas.json`
 
 The output is a bounded candidate set. OpenAI does not receive the full catalog in later stages; it receives the shortlisted options.
+
+Optional Qdrant mode:
+
+```bash
+docker compose up -d qdrant
+npm run ingest:qdrant
+```
+
+Then set `CAMPAIGN_RETRIEVER=qdrant`. Runtime retrieval embeds the extracted advertiser profile, searches publisher and persona collections, hydrates records from local JSON, adds semantic retrieval signals, and falls back to local retrieval with a warning if Qdrant is unavailable.
 
 ## 5. Rank Publishers
 
@@ -161,15 +175,19 @@ Normal flow:
 - persona selection: 1 call,
 - execution generation: 1 call.
 
-Normal total: 4 OpenAI calls.
+Normal total with local retrieval: 4 OpenAI calls.
+
+With `CAMPAIGN_RETRIEVER=qdrant`, retrieval adds one OpenAI embeddings call for the advertiser query and two Qdrant search requests. Normal total with Qdrant retrieval: 5 OpenAI calls plus Qdrant search.
 
 Worst case:
 
 - each OpenAI stage can make one repair retry if Zod validation fails.
 
-Worst-case total: 8 OpenAI calls.
+Worst-case total with local retrieval: 8 OpenAI calls.
 
-Retrieval and assembly are deterministic and do not call OpenAI.
+Worst-case total with Qdrant retrieval: 9 OpenAI calls plus Qdrant search.
+
+Assembly is deterministic and does not call OpenAI. Retrieval does not call OpenAI in local mode; Qdrant mode calls OpenAI once for the query embedding.
 
 ## 10. Speed and Quality Controls
 
@@ -220,6 +238,7 @@ Each stage trace records:
 - service tier,
 - prompt input for OpenAI stages or stage input for deterministic stages,
 - parsed model output for OpenAI stages,
+- Qdrant hit output for vector retrieval,
 - normalized stage output,
 - duration,
 - API calls,
@@ -257,6 +276,7 @@ Important test files:
 - `src/__tests__/campaignEngine.test.ts`
 - `src/__tests__/campaignWarnings.test.ts`
 - `src/__tests__/openaiClient.test.ts`
+- `src/__tests__/vectorRetrieval.test.ts`
 
 Eval files:
 
@@ -274,6 +294,8 @@ Common changes:
 - Add a new category or product signal in `src/lib/advertiserTaxonomy.ts`.
 - Update extraction behavior in `prompts/extract-advertiser.md`.
 - Change model, reasoning, output cap, or service tier defaults in `src/lib/campaign/shared/openaiClient.ts`.
+- Change retrieval backend with `CAMPAIGN_RETRIEVER=local` or `CAMPAIGN_RETRIEVER=qdrant`.
+- Change Qdrant ingestion/search behavior in `src/lib/vector/*` or `retrieve-candidates/vectorRetriever.ts`.
 - Update a stage response shape in that stage's `schema.ts`.
 - Update stage repair/cleanup in that stage's `normalize.ts`.
 - Tune deterministic retrieval in `publisherScoring.ts` or `personaScoring.ts`.
