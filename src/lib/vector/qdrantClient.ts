@@ -135,19 +135,26 @@ async function qdrantRequest<T>(
   return (await response.json()) as QdrantApiResponse<T>;
 }
 
-function qdrantFetch(path: string, init: RequestInit, config: VectorConfig) {
+async function qdrantFetch(path: string, init: RequestInit, config: VectorConfig) {
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
     ...(config.qdrantApiKey ? { "api-key": config.qdrantApiKey } : {})
   };
+  const url = `${config.qdrantUrl.replace(/\/$/, "")}${path}`;
 
-  return fetch(`${config.qdrantUrl.replace(/\/$/, "")}${path}`, {
-    ...init,
-    headers: {
-      ...headers,
-      ...init.headers
-    }
-  });
+  try {
+    return await fetch(url, {
+      ...init,
+      headers: {
+        ...headers,
+        ...init.headers
+      }
+    });
+  } catch (error) {
+    throw new Error(
+      `Qdrant network request failed for ${path}. Check QDRANT_URL and QDRANT_API_KEY. ${errorMessage(error)}`
+    );
+  }
 }
 
 function collectionEnsureResult(
@@ -161,4 +168,8 @@ function collectionEnsureResult(
     vectorSize: config.embeddingDimensions,
     distance: qdrantDistance
   };
+}
+
+function errorMessage(error: unknown) {
+  return error instanceof Error ? error.message : "Unknown network error.";
 }

@@ -7,6 +7,7 @@ import { advertiserToRetrievalQuery, personaToEmbeddingText, publisherToEmbeddin
 import { ensureQdrantCollection, qdrantPointId } from "@/lib/vector/qdrantClient";
 
 const vectorEnvNames = [
+  "VERCEL",
   "QDRANT_URL",
   "QDRANT_API_KEY",
   "QDRANT_PUBLISHERS_COLLECTION",
@@ -79,6 +80,20 @@ describe("vector retrieval helpers", () => {
     );
   });
 
+  it("rejects localhost Qdrant URLs on Vercel", async () => {
+    await withVectorEnv(
+      {
+        VERCEL: "1",
+        QDRANT_URL: undefined
+      },
+      () => {
+        expect(() => getVectorConfig()).toThrow(
+          "QDRANT_URL must be set to a publicly reachable Qdrant endpoint on Vercel."
+        );
+      }
+    );
+  });
+
   it("creates stable UUID point IDs for Qdrant", () => {
     const first = qdrantPointId("publisher", "pub_001");
     const second = qdrantPointId("publisher", "pub_001");
@@ -120,6 +135,20 @@ describe("vector retrieval helpers", () => {
         distance: "Cosine"
       }
     });
+  });
+
+  it("adds Qdrant context to network failures", async () => {
+    vi.spyOn(globalThis, "fetch").mockRejectedValueOnce(new TypeError("fetch failed"));
+
+    await expect(
+      ensureQdrantCollection("disco_publishers", {
+        qdrantUrl: "https://qdrant.example.test",
+        publishersCollection: "disco_publishers",
+        personasCollection: "disco_personas",
+        embeddingModel: "text-embedding-3-small",
+        embeddingDimensions: 1536
+      })
+    ).rejects.toThrow("Qdrant network request failed for /collections/disco_publishers");
   });
 
   it("reuses an existing Qdrant collection", async () => {

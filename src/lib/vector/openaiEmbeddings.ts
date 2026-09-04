@@ -58,18 +58,24 @@ export async function createEmbeddings(input: string[], config: VectorConfig = g
     };
   }
 
-  const response = await fetch(embeddingsEndpoint, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      model: config.embeddingModel,
-      input,
-      dimensions: config.embeddingDimensions
-    })
-  });
+  let response: Response;
+
+  try {
+    response = await fetch(embeddingsEndpoint, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: config.embeddingModel,
+        input,
+        dimensions: config.embeddingDimensions
+      })
+    });
+  } catch (error) {
+    throw new Error(`OpenAI embeddings network request failed. Check OPENAI_API_KEY. ${errorMessage(error)}`);
+  }
 
   if (!response.ok) {
     const errorBody = await response.text();
@@ -92,4 +98,8 @@ export async function createEmbeddings(input: string[], config: VectorConfig = g
       totalTokens: json.usage?.total_tokens ?? 0
     }
   };
+}
+
+function errorMessage(error: unknown) {
+  return error instanceof Error ? error.message : "Unknown network error.";
 }

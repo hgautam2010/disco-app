@@ -18,6 +18,24 @@ Qdrant is required on this branch. The app retrieves publisher and persona candi
 
 `npm run ingest:qdrant` loads `.env.local` and `.env` before reading `OPENAI_API_KEY`, `QDRANT_URL`, and embedding settings.
 
+## Deploy on Vercel
+
+Vercel cannot use the local Docker Qdrant instance. Set `QDRANT_URL` to a hosted Qdrant endpoint that Vercel can reach, plus `QDRANT_API_KEY` if that endpoint requires auth. Do not deploy with `QDRANT_URL=http://localhost:6333`.
+
+Required Vercel env:
+
+```bash
+OPENAI_API_KEY=
+QDRANT_URL=https://your-qdrant-cluster.example
+QDRANT_API_KEY=
+QDRANT_PUBLISHERS_COLLECTION=disco_publishers
+QDRANT_PERSONAS_COLLECTION=disco_personas
+OPENAI_EMBEDDING_MODEL=text-embedding-3-small
+OPENAI_EMBEDDING_DIMENSIONS=1536
+```
+
+Before using the deployed app, run `npm run ingest:qdrant` against the same hosted Qdrant URL so both collections exist and contain catalog points.
+
 ## What I Built
 
 The app uses a staged OpenAI pipeline:

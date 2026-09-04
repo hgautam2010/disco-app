@@ -41,6 +41,8 @@ npm run ingest:qdrant
 
 The ingestion script creates missing Qdrant collections, embeds `data/publishers.json` and `data/shopper_personas.json`, then upserts catalog points. Runtime retrieval embeds the extracted advertiser profile, searches publishers and personas, hydrates full records from local JSON, and adds semantic retrieval signals. If embeddings or Qdrant fail, campaign generation fails clearly so setup issues are visible during development.
 
+For Vercel, `QDRANT_URL` must point at a hosted Qdrant endpoint. `http://localhost:6333` only works for local Docker and is rejected in Vercel functions with a clear configuration error.
+
 ## OpenAI Runtime Config
 
 `OPENAI_MODEL` is the shared fallback model. If it is set, every blank stage model override uses it. Without env values, extraction and repair default to `gpt-5.6-luna`, while ranking, persona selection, and execution default to `gpt-5.6-terra`.
