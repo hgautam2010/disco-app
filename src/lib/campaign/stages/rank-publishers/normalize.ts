@@ -1,4 +1,4 @@
-import type { ExcludedPublisher, ScoredPublisher } from "../../../types";
+import type { ExcludedPublisher, Publisher, ScoredPublisher } from "../../../types";
 import type { PublisherRankingResponse } from "./schema";
 import {
   clampScore,
@@ -7,15 +7,15 @@ import {
   nonEmptySignals,
   normalizedScore
 } from "../../shared/normalization";
-import type { CampaignCandidates, LockedPublisherStrategy } from "../../types";
+import type { CampaignCandidates, CampaignCatalogue, LockedPublisherStrategy } from "../../types";
 
 export function normalizePublisherStrategy(
-  candidates: CampaignCandidates,
+  candidates: CampaignCandidates | CampaignCatalogue,
   ranking: PublisherRankingResponse
 ): LockedPublisherStrategy {
   const warnings = new Set([...candidates.warnings, ...ranking.warnings]);
-  const publisherCandidateById = new Map(candidates.publisherCandidates.map((item) => [item.publisher.id, item]));
-  const exclusionCandidateById = new Map(candidates.exclusionCandidates.map((item) => [item.publisher.id, item]));
+  const publisherCandidateById = new Map(toPublisherCandidates(candidates).map((item) => [item.publisher.id, item]));
+  const exclusionCandidateById = new Map(toExclusionCandidates(candidates).map((item) => [item.publisher.id, item]));
   const recommendedPublishers = normalizeRecommendedPublishers(ranking, publisherCandidateById, warnings);
   const recommendedIds = new Set(recommendedPublishers.map((item) => item.publisher.id));
   const excludedPublishers = normalizeExcludedPublishers(
@@ -32,6 +32,50 @@ export function normalizePublisherStrategy(
     recommendedPublishers,
     excludedPublishers,
     warnings: Array.from(warnings)
+  };
+}
+
+function toPublisherCandidates(candidates: CampaignCandidates | CampaignCatalogue): ScoredPublisher[] {
+  if ("publisherCandidates" in candidates) {
+    return candidates.publisherCandidates;
+  }
+
+  return candidates.publishers.map((publisher) => scoredPublisherFromCatalogue(publisher, 50));
+}
+
+function toExclusionCandidates(candidates: CampaignCandidates | CampaignCatalogue): ExcludedPublisher[] {
+  if ("exclusionCandidates" in candidates) {
+    return candidates.exclusionCandidates;
+  }
+
+  return candidates.publishers.map((publisher) => ({
+    publisher,
+    score: 20,
+    reason: "Not selected by the publisher ranking stage.",
+    signals: [
+      {
+        label: "Catalogue fallback",
+        detail: "Available as an exclusion fallback if the model returns invalid or duplicate IDs.",
+        weight: 20
+      }
+    ]
+  }));
+}
+
+function scoredPublisherFromCatalogue(publisher: Publisher, score: number): ScoredPublisher {
+  return {
+    publisher,
+    score,
+    normalizedScore: normalizedScore(score),
+    reasons: [`${publisher.name} is available in the supplied publisher catalogue.`],
+    risks: [],
+    signals: [
+      {
+        label: "Catalogue publisher",
+        detail: "Publisher was supplied to the ranking stage.",
+        weight: score
+      }
+    ]
   };
 }
 
@@ -71,7 +115,7 @@ function normalizeRecommendedPublishers(
     min: 3,
     max: 5,
     warnings,
-    warning: "Filled recommended publishers from deterministic candidate retrieval."
+    warning: "Filled recommended publishers from the supplied publisher catalogue."
   });
 
   return recommended.slice(0, 5);
@@ -79,7 +123,7 @@ function normalizeRecommendedPublishers(
 
 function normalizeExcludedPublishers(
   ranking: PublisherRankingResponse,
-  candidates: CampaignCandidates,
+  candidates: CampaignCandidates | CampaignCatalogue,
   publisherCandidateById: Map<string, ScoredPublisher>,
   exclusionCandidateById: Map<string, ExcludedPublisher>,
   recommendedIds: Set<string>,
@@ -112,8 +156,8 @@ function normalizeExcludedPublishers(
     ];
   });
   const exclusionFillCandidates = [
-    ...candidates.exclusionCandidates,
-    ...candidates.publisherCandidates
+    ...toExclusionCandidates(candidates),
+    ...toPublisherCandidates(candidates)
       .filter((item) => !recommendedIds.has(item.publisher.id))
       .map((item) => ({
         publisher: item.publisher,
@@ -130,7 +174,7 @@ function normalizeExcludedPublishers(
     min: 3,
     max: 8,
     warnings,
-    warning: "Filled excluded publishers from deterministic candidate retrieval."
+    warning: "Filled excluded publishers from the supplied publisher catalogue."
   });
 
   return excluded.slice(0, 8);

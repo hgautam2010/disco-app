@@ -9,10 +9,10 @@ import { generateAndValidateWithRepairResult, type RepairableStructuredRequest }
 import { stageLocalWarnings } from "../../shared/warnings";
 import { normalizePublisherStrategy } from "./normalize";
 import { publisherRankingResponseJsonSchema, publisherRankingResponseSchema } from "./schema";
-import type { CampaignCandidates, LockedPublisherStrategy, PipelineStageResult } from "../../types";
+import type { CampaignCandidates, CampaignCatalogue, LockedPublisherStrategy, PipelineStageResult } from "../../types";
 
 export async function rankPublisherStrategy(
-  candidates: CampaignCandidates
+  candidates: CampaignCandidates | CampaignCatalogue
 ): Promise<PipelineStageResult<LockedPublisherStrategy>> {
   const startedAt = Date.now();
   const payload = toPublisherRankingPayload(candidates);
@@ -71,7 +71,23 @@ export async function rankPublisherStrategy(
   };
 }
 
-function toPublisherRankingPayload(candidates: CampaignCandidates) {
+function toPublisherRankingPayload(candidates: CampaignCandidates | CampaignCatalogue) {
+  if ("publishers" in candidates) {
+    return {
+      advertiserProfile: candidates.advertiserProfile,
+      publisherCatalogue: candidates.publishers.map((publisher) => ({
+        publisherId: publisher.id,
+        name: publisher.name,
+        category: publisher.category,
+        subcategories: publisher.subcategories,
+        monthlyImpressions: publisher.monthly_impressions,
+        averageOrderValueUsd: publisher.avg_order_value_usd,
+        audience: publisher.audience,
+        notes: publisher.notes
+      }))
+    };
+  }
+
   return {
     advertiserProfile: candidates.advertiserProfile,
     publisherCandidates: candidates.publisherCandidates.map((item) => ({
