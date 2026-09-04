@@ -11,13 +11,14 @@ import { normalizePersonaStrategy } from "./normalize";
 import { personaSelectionResponseJsonSchema, personaSelectionResponseSchema } from "./schema";
 import type {
   CampaignCandidates,
+  CampaignCatalogue,
   LockedCampaignStrategy,
   LockedPublisherStrategy,
   PipelineStageResult
 } from "../../types";
 
 export async function selectPersonaStrategy(
-  candidates: CampaignCandidates,
+  candidates: CampaignCandidates | CampaignCatalogue,
   publisherStrategy: LockedPublisherStrategy
 ): Promise<PipelineStageResult<LockedCampaignStrategy>> {
   const startedAt = Date.now();
@@ -76,9 +77,8 @@ export async function selectPersonaStrategy(
   };
 }
 
-function toPersonaSelectionPayload(candidates: CampaignCandidates, publisherStrategy: LockedPublisherStrategy) {
-  return {
-    advertiserProfile: candidates.advertiserProfile,
+function toPersonaSelectionPayload(candidates: CampaignCandidates | CampaignCatalogue, publisherStrategy: LockedPublisherStrategy) {
+  const publisherPayload = {
     recommendedPublishers: publisherStrategy.recommendedPublishers.map((item) => ({
       publisherId: item.publisher.id,
       name: item.publisher.name,
@@ -100,7 +100,31 @@ function toPersonaSelectionPayload(candidates: CampaignCandidates, publisherStra
       notes: item.publisher.notes,
       reason: item.reason,
       signals: item.signals
-    })),
+    }))
+  };
+
+  if ("personas" in candidates) {
+    return {
+      advertiserProfile: candidates.advertiserProfile,
+      ...publisherPayload,
+      personaCatalogue: candidates.personas.map((persona) => ({
+        personaId: persona.id,
+        name: persona.name,
+        ageRange: persona.age_range,
+        genderSkew: persona.gender_skew,
+        description: persona.description,
+        categoryAffinities: persona.category_affinities,
+        priceSensitivity: persona.price_sensitivity,
+        messagingPreferences: persona.messaging_preferences,
+        disinterestedIn: persona.disinterested_in,
+        typicalAovUsd: persona.typical_aov_usd
+      }))
+    };
+  }
+
+  return {
+    advertiserProfile: candidates.advertiserProfile,
+    ...publisherPayload,
     personaCandidates: candidates.personaCandidates.map((item) => ({
       personaId: item.persona.id,
       name: item.persona.name,

@@ -5,7 +5,7 @@ The user will provide:
 - one validated advertiser profile
 - locked recommended publishers
 - locked excluded publishers
-- a bounded shopper persona candidate set
+- the full shopper persona catalogue
 
 Return JSON only.
 
@@ -13,11 +13,11 @@ Return JSON only.
 
 Select the shopper personas most likely to respond to the advertiser on the locked publisher plan.
 
-Select 3 to 5 personas from the persona candidates. Rank by advertiser fit, publisher context, category affinities, messaging preferences, price sensitivity, disinterest conflicts, and likely purchase behavior.
+Select 3 to 5 personas from the full persona catalogue. Rank by advertiser fit, publisher context, category affinities, messaging preferences, price sensitivity, disinterest conflicts, and likely purchase behavior.
 
 ## Field Semantics
 
-- selectedPersonas: 3 to 5 persona IDs from the supplied persona candidates, ordered by expected response.
+- selectedPersonas: 3 to 5 persona IDs from the supplied persona catalogue, ordered by expected response.
 - personaId: the exact supplied persona ID. Do not rewrite names or create new IDs.
 - score: 0 to 100 confidence-weighted response score. Reserve 90+ for unusually strong persona, product, and publisher-context matches.
 - reasons: concrete evidence for why this persona is likely to respond.
@@ -31,7 +31,7 @@ Select 3 to 5 personas from the persona candidates. Rank by advertiser fit, publ
 - 90-100: exceptional response fit with strong category affinity, price fit, messaging fit, and no material disinterest conflict.
 - 75-89: strong response fit with one minor caveat.
 - 55-74: plausible response fit, but messaging or price sensitivity needs care.
-- 30-54: weak fit or meaningful tradeoff; select only if candidate pool is thin.
+- 30-54: weak fit or meaningful tradeoff; select only if the catalogue has few strong matches.
 - 0-29: clear mismatch or disinterest conflict.
 
 ## Tie-Breakers
@@ -56,7 +56,7 @@ Select 3 to 5 personas from the persona candidates. Rank by advertiser fit, publ
 - Do not write creative.
 - Do not build campaign config.
 - Use only supplied persona IDs.
-- Preserve candidate facts; do not invent persona facts.
+- Preserve catalogue facts; do not invent persona facts.
 - Use scores from 0 to 100.
 - Include messaging angles that creative can safely use later.
 - If the advertiser profile is vague, keep scores conservative and add a warning.

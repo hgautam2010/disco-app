@@ -1,4 +1,4 @@
-import type { ScoredPersona } from "../../../types";
+import type { Persona, ScoredPersona } from "../../../types";
 import {
   clampScore,
   fillUniqueFromCandidates,
@@ -6,22 +6,48 @@ import {
   nonEmptySignals,
   normalizedScore
 } from "../../shared/normalization";
-import type { CampaignCandidates, LockedCampaignStrategy, LockedPublisherStrategy } from "../../types";
+import type { CampaignCandidates, CampaignCatalogue, LockedCampaignStrategy, LockedPublisherStrategy } from "../../types";
 import type { PersonaSelectionResponse } from "./schema";
 
 export function normalizePersonaStrategy(
-  candidates: CampaignCandidates,
+  candidates: CampaignCandidates | CampaignCatalogue,
   publisherStrategy: LockedPublisherStrategy,
   selection: PersonaSelectionResponse
 ): LockedCampaignStrategy {
   const warnings = new Set([...publisherStrategy.warnings, ...candidates.warnings, ...selection.warnings]);
-  const personaCandidateById = new Map(candidates.personaCandidates.map((item) => [item.persona.id, item]));
+  const personaCandidateById = new Map(toPersonaCandidates(candidates).map((item) => [item.persona.id, item]));
   const selectedPersonas = normalizeSelectedPersonas(selection, personaCandidateById, warnings);
 
   return {
     ...publisherStrategy,
     selectedPersonas,
     warnings: Array.from(warnings)
+  };
+}
+
+function toPersonaCandidates(candidates: CampaignCandidates | CampaignCatalogue): ScoredPersona[] {
+  if ("personaCandidates" in candidates) {
+    return candidates.personaCandidates;
+  }
+
+  return candidates.personas.map((persona) => scoredPersonaFromCatalogue(persona, 50));
+}
+
+function scoredPersonaFromCatalogue(persona: Persona, score: number): ScoredPersona {
+  return {
+    persona,
+    score,
+    normalizedScore: normalizedScore(score),
+    reasons: [`${persona.name} is available in the supplied persona catalogue.`],
+    risks: [],
+    messagingAngles: nonEmptyArray(persona.messaging_preferences.slice(0, 2), "clear product value"),
+    signals: [
+      {
+        label: "Catalogue persona",
+        detail: "Persona was supplied to the selection stage.",
+        weight: score
+      }
+    ]
   };
 }
 
@@ -65,7 +91,7 @@ function normalizeSelectedPersonas(
     min: 3,
     max: 5,
     warnings,
-    warning: "Filled selected personas from deterministic candidate retrieval."
+    warning: "Filled selected personas from the supplied persona catalogue."
   });
 
   return selected.slice(0, 5);
