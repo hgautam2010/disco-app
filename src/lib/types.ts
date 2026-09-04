@@ -12,7 +12,7 @@ export type CampaignStageName =
   | "execute"
   | "assemble";
 
-export type CampaignStageSource = "deterministic" | "openai";
+export type CampaignStageSource = "deterministic" | "openai" | "qdrant";
 
 export type TokenUsage = {
   inputTokens: number;

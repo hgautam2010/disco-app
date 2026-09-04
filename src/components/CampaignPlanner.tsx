@@ -196,7 +196,7 @@ function PipelineSummary({ result }: { result: CampaignResult }) {
               <div className="pipeline-stage" key={stage.name}>
                 <div>
                   <strong>{stageName}</strong>
-                  <span>{stage.source === "openai" ? stage.model : "code"}</span>
+                  <span>{stage.source === "deterministic" ? "code" : stage.model}</span>
                 </div>
                 <div className="pipeline-stage-metrics">
                   <span>{stage.apiCalls} calls</span>
@@ -215,10 +215,10 @@ function PipelineSummary({ result }: { result: CampaignResult }) {
                       value={stage.promptInput}
                       onOpen={setSelectedJsonPanel}
                     />
-                    {stage.source === "openai" ? (
+                    {stage.modelOutput !== null ? (
                       <TraceJsonPanel
                         stageName={stageName}
-                        title="Model output"
+                        title={stage.source === "qdrant" ? "Retriever output" : "Model output"}
                         value={stage.modelOutput}
                         onOpen={setSelectedJsonPanel}
                       />

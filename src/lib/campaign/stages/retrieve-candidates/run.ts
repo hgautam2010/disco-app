@@ -1,30 +1,24 @@
-import { getPersonas, getPublishers } from "../../../data";
 import { selectPersonas, scorePersonas } from "../../../personaScoring";
 import { scorePublishers } from "../../../publisherScoring";
-import type { ExcludedPublisher, Persona, Publisher, ScoredPersona, ScoredPublisher } from "../../../types";
+import { getVectorConfig } from "../../../vector/config";
 import { emptyTokenUsage } from "../../shared/tokenUsage";
+import { uniqueWarnings } from "../../shared/warnings";
 import type { AdvertiserProfile, CampaignCandidates, PipelineStageResult } from "../../types";
-
-const defaultPublisherCandidateLimit = 10;
-const defaultPersonaCandidateLimit = 8;
-const defaultExclusionCandidateLimit = 8;
+import {
+  buildExclusionCandidates,
+  candidateWarnings,
+  resolveCandidateRetrievalOptions,
+  type CandidateRetrievalOptions
+} from "./helpers";
+import { retrieveCampaignCandidatesFromQdrant } from "./vectorRetriever";
 
 export function retrieveCampaignCandidates(
   advertiserProfile: AdvertiserProfile,
-  options: {
-    publishers?: Publisher[];
-    personas?: Persona[];
-    publisherCandidateLimit?: number;
-    personaCandidateLimit?: number;
-    exclusionCandidateLimit?: number;
-  } = {}
+  options: CandidateRetrievalOptions = {}
 ): PipelineStageResult<CampaignCandidates> {
   const startedAt = Date.now();
-  const publishers = options.publishers ?? getPublishers();
-  const personas = options.personas ?? getPersonas();
-  const personaCandidateLimit = options.personaCandidateLimit ?? defaultPersonaCandidateLimit;
-  const publisherCandidateLimit = options.publisherCandidateLimit ?? defaultPublisherCandidateLimit;
-  const exclusionCandidateLimit = options.exclusionCandidateLimit ?? defaultExclusionCandidateLimit;
+  const { publishers, personas, publisherCandidateLimit, personaCandidateLimit, exclusionCandidateLimit } =
+    resolveCandidateRetrievalOptions(options);
   const scoredPersonas = scorePersonas(advertiserProfile, personas);
   const personaCandidates = scoredPersonas.slice(0, Math.max(5, personaCandidateLimit));
   const publisherPersonaSeed = selectPersonas(scoredPersonas, 5);
@@ -73,55 +67,51 @@ export function retrieveCampaignCandidates(
   };
 }
 
-function buildExclusionCandidates(
-  allPublisherScores: ScoredPublisher[],
-  publisherCandidates: ScoredPublisher[],
-  limit: number
-): ExcludedPublisher[] {
-  const candidateIds = new Set(publisherCandidates.map((item) => item.publisher.id));
-
-  return allPublisherScores
-    .filter((item) => !candidateIds.has(item.publisher.id))
-    .slice(-Math.max(3, limit))
-    .reverse()
-    .map((item) => ({
-      publisher: item.publisher,
-      score: item.score,
-      reason: exclusionReasonFor(item),
-      signals: item.signals
-    }));
-}
-
-function exclusionReasonFor(item: ScoredPublisher) {
-  if (item.risks.length > 0) {
-    return item.risks[0];
-  }
-
-  if (item.signals.length === 0) {
-    return "No meaningful category, audience, or product-signal overlap with the advertiser profile.";
-  }
-
-  return "Lower fit than the retrieved publisher candidate set.";
-}
-
-function candidateWarnings(
+export async function retrieveCampaignCandidatesForRuntime(
   advertiserProfile: AdvertiserProfile,
-  publisherCandidates: ScoredPublisher[],
-  personaCandidates: ScoredPersona[]
-) {
-  const warnings: string[] = [];
+  options: CandidateRetrievalOptions = {}
+): Promise<PipelineStageResult<CampaignCandidates>> {
+  const vectorConfig = getVectorConfig();
 
-  if (advertiserProfile.category === "b2b_saas") {
-    warnings.push("Publisher catalog is consumer-commerce oriented; B2B recommendations are directional.");
+  if (vectorConfig.retriever !== "qdrant") {
+    return retrieveCampaignCandidates(advertiserProfile, options);
   }
 
-  if (publisherCandidates.length < 5) {
-    warnings.push("Publisher candidate pool is narrow; strategy should use conservative budgets.");
+  try {
+    return await retrieveCampaignCandidatesFromQdrant(advertiserProfile, options, vectorConfig);
+  } catch (error) {
+    return withQdrantFallbackWarning(retrieveCampaignCandidates(advertiserProfile, options), error);
   }
+}
 
-  if (personaCandidates.length < 5) {
-    warnings.push("Persona candidate pool is narrow; creative should avoid over-specific audience claims.");
-  }
+function withQdrantFallbackWarning(
+  fallback: PipelineStageResult<CampaignCandidates>,
+  error: unknown
+): PipelineStageResult<CampaignCandidates> {
+  const fallbackReason = error instanceof Error ? error.message : "Unknown Qdrant retrieval error.";
+  const warning = `Qdrant retrieval failed; fell back to local candidate retrieval. Reason: ${fallbackReason}`;
+  const warnings = uniqueWarnings([...fallback.data.warnings, warning]);
+  const data = {
+    ...fallback.data,
+    warnings
+  };
 
-  return warnings;
+  return {
+    data,
+    trace: {
+      ...fallback.trace,
+      promptInput: {
+        requestedRetriever: "qdrant",
+        fallbackReason,
+        fallbackInput: fallback.trace.promptInput
+      },
+      stageOutput: {
+        publisherCandidates: data.publisherCandidates,
+        personaCandidates: data.personaCandidates,
+        exclusionCandidates: data.exclusionCandidates,
+        warnings
+      },
+      warnings
+    }
+  };
 }
