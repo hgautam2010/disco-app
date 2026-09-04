@@ -53,7 +53,7 @@ This stage reads the advertiser pitch and returns:
 
 Key files:
 
-- `prompt.md`: explains the extraction job and allowed values.
+- `prompts/extract-advertiser.md`: explains the extraction job and allowed values.
 - `schema.ts`: defines the Zod and JSON schema contract.
 - `normalize.ts`: trims free-text fields, deduplicates arrays, and adds extraction warnings.
 - `run.ts`: sends the OpenAI request and returns a `PipelineStageResult`.
@@ -177,7 +177,7 @@ Shared logic:
 
 - `src/lib/campaign/shared/structuredGeneration.ts`
 - `src/lib/campaign/shared/repairResponse.ts`
-- `src/lib/campaign/shared/repair-response.md`
+- `prompts/repair-response.md`
 
 Each OpenAI-backed stage:
 
@@ -254,7 +254,7 @@ Current eval suite has 14 cases and covers happy paths, ambiguous inputs, unknow
 Common changes:
 
 - Add a new category or product signal in `src/lib/advertiserTaxonomy.ts`.
-- Update extraction behavior in `extract-advertiser/prompt.md`.
+- Update extraction behavior in `prompts/extract-advertiser.md`.
 - Update a stage response shape in that stage's `schema.ts`.
 - Update stage repair/cleanup in that stage's `normalize.ts`.
 - Tune deterministic retrieval in `publisherScoring.ts` or `personaScoring.ts`.

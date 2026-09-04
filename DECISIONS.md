@@ -125,11 +125,12 @@ The code is organized around the pipeline rather than around generic abstraction
 Each stage folder has predictable files:
 
 - `run.ts`
-- `prompt.md`
 - `schema.ts`
 - `normalize.ts` when needed
 
-This makes it easy to modify one stage without mentally loading the entire system.
+Runtime prompts live in the top-level `prompts/` directory so the submission has one obvious place to review every prompt used by the app.
+
+This makes it easy to modify one stage without mentally loading the entire system, while keeping prompt review separate from implementation code.
 
 ## 10. What I Would Improve Next
 

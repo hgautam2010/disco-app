@@ -45,13 +45,14 @@ Blank stage overrides are ignored and fall back to `OPENAI_MODEL`.
 ## Stage Anatomy
 
 - `run.ts`: the stage entry point. It should return a `PipelineStageResult`.
-- `prompt.md`: the system prompt for OpenAI-backed stages.
 - `schema.ts`: the Zod and JSON schema contract for model output.
 - `normalize.ts`: candidate-set repair and consistency rules, when the stage needs them.
 
+OpenAI-backed stage prompts live in the top-level `prompts/` directory so every runtime prompt is easy to review in one place.
+
 ## Modification Guide
 
-- Change prompt behavior in the stage's `prompt.md`.
+- Change prompt behavior in `prompts/<stage-name>.md`.
 - Change expected model JSON in that stage's `schema.ts`.
 - Change allowed extraction categories or product signals in `../advertiserTaxonomy.ts`.
 - Change data passed between stages in `types.ts`.

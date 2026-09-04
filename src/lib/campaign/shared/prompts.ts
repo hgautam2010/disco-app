@@ -1,10 +1,11 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 
-const stagePromptPath = (stageName: string) =>
-  path.join(process.cwd(), "src", "lib", "campaign", "stages", stageName, "prompt.md");
+const promptsRoot = path.join(process.cwd(), "prompts");
 
-const sharedPromptPath = (name: string) => path.join(process.cwd(), "src", "lib", "campaign", "shared", name);
+const stagePromptPath = (stageName: string) => path.join(promptsRoot, `${stageName}.md`);
+
+const sharedPromptPath = (name: string) => path.join(promptsRoot, name);
 
 export function readStagePrompt(stageName: string) {
   return readFileSync(stagePromptPath(stageName), "utf8").trim();
