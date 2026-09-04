@@ -31,13 +31,14 @@ Tradeoff: the normal path uses 4 OpenAI calls instead of 1. The benefit is bette
 
 The OpenAI client uses stage-level defaults for model, reasoning effort, and output-token caps.
 
-- Extraction and repair default to low-latency settings because they are schema-focused.
-- Publisher ranking, persona selection, and execution default to `low` reasoning effort for faster response time.
+- Extraction and repair default to `gpt-5.4-nano` because they are schema-focused.
+- Publisher ranking, persona selection, and execution default to `gpt-5.4-mini` for a faster demo while keeping structured output support.
+- All stages default to `none` reasoning effort to avoid hidden reasoning-token latency.
 - `OPENAI_SERVICE_TIER` can opt into a faster OpenAI service tier when available.
 
 The trace records the requested settings and the service tier reported by the API, which makes latency and quality tradeoffs visible during demos.
 
-Tradeoff: lower reasoning effort can reduce nuanced judgment quality, so the important ranking and execution stages can be bumped to `medium` through env vars without code changes.
+Tradeoff: faster models and lower reasoning effort can reduce nuanced judgment quality, so ranking, persona selection, or execution can be bumped to `gpt-5.6-terra` or `medium` reasoning through env vars without code changes.
 
 ## 4. Keep Retrieval Deterministic
 

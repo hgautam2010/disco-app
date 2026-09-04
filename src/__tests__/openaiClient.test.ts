@@ -32,10 +32,10 @@ const openAIEnvNames = [
 describe("OpenAI model selection", () => {
   it("uses the default model when no env model is configured", () => {
     withOpenAIEnv({}, () => {
-      expect(getOpenAIModel()).toBe("gpt-5.6-terra");
-      expect(getOpenAIModelForStage("extract")).toBe("gpt-5.6-luna");
-      expect(getOpenAIModelForStage("rank_publishers")).toBe("gpt-5.6-terra");
-      expect(getOpenAIModelForStage("repair")).toBe("gpt-5.6-luna");
+      expect(getOpenAIModel()).toBe("gpt-5.4-mini");
+      expect(getOpenAIModelForStage("extract")).toBe("gpt-5.4-nano");
+      expect(getOpenAIModelForStage("rank_publishers")).toBe("gpt-5.4-mini");
+      expect(getOpenAIModelForStage("repair")).toBe("gpt-5.4-nano");
     });
   });
 
@@ -79,22 +79,22 @@ describe("OpenAI request config", () => {
     withOpenAIEnv({}, () => {
       expect(getOpenAIRequestConfigForStage("extract")).toEqual({
         reasoningEffort: "none",
-        maxOutputTokens: 1000,
+        maxOutputTokens: 800,
         serviceTier: undefined
       });
       expect(getOpenAIRequestConfigForStage("rank_publishers")).toEqual({
-        reasoningEffort: "low",
-        maxOutputTokens: 2600,
+        reasoningEffort: "none",
+        maxOutputTokens: 2000,
         serviceTier: undefined
       });
       expect(getOpenAIRequestConfigForStage("execute")).toEqual({
-        reasoningEffort: "low",
-        maxOutputTokens: 3600,
+        reasoningEffort: "none",
+        maxOutputTokens: 3000,
         serviceTier: undefined
       });
       expect(getOpenAIRequestConfigForStage("repair")).toEqual({
         reasoningEffort: "none",
-        maxOutputTokens: 2200,
+        maxOutputTokens: 1800,
         serviceTier: undefined
       });
     });
@@ -144,8 +144,8 @@ describe("OpenAI request config", () => {
       },
       () => {
         expect(getOpenAIRequestConfigForStage("rank_publishers")).toEqual({
-          reasoningEffort: "low",
-          maxOutputTokens: 2600,
+          reasoningEffort: "none",
+          maxOutputTokens: 2000,
           serviceTier: undefined
         });
       }

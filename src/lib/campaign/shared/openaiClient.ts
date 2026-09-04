@@ -62,7 +62,7 @@ export type OpenAIRequestConfig = {
 };
 
 const responsesEndpoint = "https://api.openai.com/v1/responses";
-const defaultOpenAIModel = "gpt-5.6-terra";
+const defaultOpenAIModel = "gpt-5.4-mini";
 
 const stageModelEnvVars: Record<OpenAIModelStage, string> = {
   extract: "OPENAI_EXTRACT_MODEL",
@@ -73,8 +73,8 @@ const stageModelEnvVars: Record<OpenAIModelStage, string> = {
 };
 
 const defaultModelByStage: Partial<Record<OpenAIModelStage, string>> = {
-  extract: "gpt-5.6-luna",
-  repair: "gpt-5.6-luna"
+  extract: "gpt-5.4-nano",
+  repair: "gpt-5.4-nano"
 };
 
 const stageReasoningEnvVars: Record<OpenAIModelStage, string> = {
@@ -95,18 +95,18 @@ const stageMaxOutputTokenEnvVars: Record<OpenAIModelStage, string> = {
 
 const defaultReasoningEffortByStage: Record<OpenAIModelStage, OpenAIReasoningEffort> = {
   extract: "none",
-  rank_publishers: "low",
-  select_personas: "low",
-  execute: "low",
+  rank_publishers: "none",
+  select_personas: "none",
+  execute: "none",
   repair: "none"
 };
 
 const defaultMaxOutputTokensByStage: Record<OpenAIModelStage, number> = {
-  extract: 1000,
-  rank_publishers: 2600,
-  select_personas: 2600,
-  execute: 3600,
-  repair: 2200
+  extract: 800,
+  rank_publishers: 2000,
+  select_personas: 2200,
+  execute: 3000,
+  repair: 1800
 };
 
 const allowedReasoningEfforts: OpenAIReasoningEffort[] = ["none", "low", "medium", "high", "xhigh", "max"];

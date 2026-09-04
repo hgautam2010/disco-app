@@ -10,7 +10,7 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Set `OPENAI_API_KEY` in `.env.local`. The shared model default is `gpt-5.6-terra`, with lower-latency `gpt-5.6-luna` defaults for extraction and repair. Optional per-stage model, reasoning effort, output-token, and service-tier overrides are documented in `.env.example`.
+Set `OPENAI_API_KEY` in `.env.local`. The shared model default is `gpt-5.4-mini`, with lower-latency `gpt-5.4-nano` defaults for extraction and repair. Optional per-stage model, reasoning effort, output-token, and service-tier overrides are documented in `.env.example`.
 
 ## What I Built
 

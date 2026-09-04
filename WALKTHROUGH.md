@@ -184,7 +184,7 @@ The app supports:
 - `OPENAI_MAX_OUTPUT_TOKENS` and per-stage output-token overrides,
 - `OPENAI_SERVICE_TIER` for faster serving when available.
 
-The default shape is optimized for a fast take-home demo: extraction and repair use `none` reasoning effort, while ranking, persona selection, and execution use `low`. If output quality needs more careful judgment, bump ranking/persona/execution to `medium` in `.env.local`.
+The default shape is optimized for a fast take-home demo: extraction and repair use `gpt-5.4-nano`, ranking/persona/execution use `gpt-5.4-mini`, and every stage uses `none` reasoning effort. If output quality needs more careful judgment, bump ranking/persona/execution to `gpt-5.6-terra` or `medium` reasoning in `.env.local`.
 
 ## 11. Validation and Repair
 

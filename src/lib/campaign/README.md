@@ -32,7 +32,7 @@ Trace snapshots are business payloads and normalized results. OpenAI stages show
 
 ## OpenAI Runtime Config
 
-`OPENAI_MODEL` is the shared fallback model. If it is set, every blank stage model override uses it. Without env values, extraction and repair default to `gpt-5.6-luna`, while ranking, persona selection, and execution default to `gpt-5.6-terra`.
+`OPENAI_MODEL` is the shared fallback model. If it is set, every blank stage model override uses it. Without env values, extraction and repair default to `gpt-5.4-nano`, while ranking, persona selection, and execution default to `gpt-5.4-mini`.
 
 Override a single stage only when you want a different cost, latency, or quality profile:
 
