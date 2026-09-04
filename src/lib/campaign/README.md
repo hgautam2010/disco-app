@@ -18,7 +18,7 @@ Shared helpers live in `shared` when they are used by multiple stages.
 The campaign path is intentionally linear:
 
 1. `extract-advertiser` turns the pitch into controlled advertiser fields.
-2. `retrieve-candidates` builds bounded publisher and persona candidate sets with local scoring or optional Qdrant retrieval.
+2. `retrieve-candidates` builds bounded publisher and persona candidate sets with Qdrant retrieval plus local business scoring.
 3. `rank-publishers` asks OpenAI to choose recommended and excluded publishers from those candidates.
 4. `select-personas` asks OpenAI to choose personas from the locked candidate set and publisher strategy.
 5. `generate-execution` asks OpenAI for persona-specific creative and campaign config.
@@ -32,21 +32,14 @@ Trace snapshots are business payloads and normalized results. OpenAI stages show
 
 ## Retrieval Config
 
-Local retrieval is the default:
-
-```bash
-CAMPAIGN_RETRIEVER=local
-```
-
-Qdrant retrieval is optional:
+Qdrant retrieval is required for the runtime campaign path:
 
 ```bash
 docker compose up -d qdrant
 npm run ingest:qdrant
-CAMPAIGN_RETRIEVER=qdrant
 ```
 
-The ingestion script embeds `data/publishers.json` and `data/shopper_personas.json`, then upserts two Qdrant collections. Runtime Qdrant retrieval embeds the extracted advertiser profile, searches publishers and personas, hydrates full records from local JSON, adds semantic retrieval signals, and falls back to local retrieval if embeddings or Qdrant fail.
+The ingestion script embeds `data/publishers.json` and `data/shopper_personas.json`, then upserts two Qdrant collections. Runtime retrieval embeds the extracted advertiser profile, searches publishers and personas, hydrates full records from local JSON, and adds semantic retrieval signals. If embeddings or Qdrant fail, campaign generation fails clearly so setup issues are visible during development.
 
 ## OpenAI Runtime Config
 

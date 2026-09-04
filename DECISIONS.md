@@ -39,18 +39,19 @@ The trace records the requested settings and the service tier reported by the AP
 
 Tradeoff: lower reasoning effort can reduce nuanced judgment quality, so the important ranking and execution stages can be bumped to `medium` through env vars without code changes.
 
-## 4. Keep Retrieval Swappable
+## 4. Use Qdrant for Runtime Retrieval
 
-The retrieval stage has two backends:
+Runtime retrieval is Qdrant-backed on this branch:
 
-- `local`: deterministic TypeScript scoring over the provided JSON catalog.
-- `qdrant`: semantic retrieval from Qdrant, using OpenAI embeddings for the advertiser query and catalog records.
+- catalog ingestion embeds `data/publishers.json` and `data/shopper_personas.json`,
+- Qdrant stores publisher and persona points in separate collections,
+- runtime embeds the extracted advertiser profile,
+- Qdrant returns publisher and persona IDs plus similarity scores,
+- local TypeScript hydrates the full records, adds business scoring, fills sparse results, and builds exclusions.
 
-`local` stays the default so the take-home runs with only `npm install && npm run dev`. Qdrant is opt-in through `CAMPAIGN_RETRIEVER=qdrant`.
+This is more representative of a production catalog search path than prompt-stuffing the full publisher/persona catalog or relying only on hand-tuned rules.
 
-When Qdrant is enabled, the app still hydrates full publisher and persona records from local JSON. Qdrant returns IDs and similarity scores; local code adds business scoring, fills sparse results, builds exclusions, and falls back to local retrieval if Qdrant or embeddings are unavailable.
-
-Tradeoff: Qdrant is more production-like for larger catalogs, but it adds ingestion, an embedding call at runtime, and local infrastructure. The fallback keeps demos reliable.
+Tradeoff: Qdrant is now required for runtime campaign generation, so local setup needs Docker plus `npm run ingest:qdrant`. The remaining local scoring code is still useful as a deterministic business layer after semantic retrieval and as an offline eval path.
 
 ## 5. Use Controlled Extraction Taxonomy
 

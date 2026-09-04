@@ -38,6 +38,10 @@ export async function retrieveCampaignCandidatesFromQdrant(
     warnings: personaWarnings,
     filledFromLocal: filledPersonaCount
   } = buildVectorPersonaCandidates(scoredPersonas, personaHits, personaLimit);
+  if (personaCandidates.length === filledPersonaCount) {
+    throw new Error("Qdrant persona retrieval returned no valid catalog hits. Run npm run ingest:qdrant.");
+  }
+
   const publisherPersonaSeed = selectPersonas(personaCandidates.length >= 3 ? personaCandidates : scoredPersonas, 5);
   const publisherScores = scorePublishers(advertiserProfile, publisherPersonaSeed, publishers);
   const {
@@ -45,6 +49,10 @@ export async function retrieveCampaignCandidatesFromQdrant(
     warnings: publisherWarnings,
     filledFromLocal: filledPublisherCount
   } = buildVectorPublisherCandidates(publisherScores.allPublishers, publisherHits, publisherLimit);
+  if (publisherCandidates.length === filledPublisherCount) {
+    throw new Error("Qdrant publisher retrieval returned no valid catalog hits. Run npm run ingest:qdrant.");
+  }
+
   const exclusionCandidates = buildExclusionCandidates(
     publisherScores.allPublishers,
     publisherCandidates,

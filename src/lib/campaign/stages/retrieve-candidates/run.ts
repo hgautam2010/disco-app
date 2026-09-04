@@ -2,7 +2,6 @@ import { selectPersonas, scorePersonas } from "../../../personaScoring";
 import { scorePublishers } from "../../../publisherScoring";
 import { getVectorConfig } from "../../../vector/config";
 import { emptyTokenUsage } from "../../shared/tokenUsage";
-import { uniqueWarnings } from "../../shared/warnings";
 import type { AdvertiserProfile, CampaignCandidates, PipelineStageResult } from "../../types";
 import {
   buildExclusionCandidates,
@@ -71,47 +70,5 @@ export async function retrieveCampaignCandidatesForRuntime(
   advertiserProfile: AdvertiserProfile,
   options: CandidateRetrievalOptions = {}
 ): Promise<PipelineStageResult<CampaignCandidates>> {
-  const vectorConfig = getVectorConfig();
-
-  if (vectorConfig.retriever !== "qdrant") {
-    return retrieveCampaignCandidates(advertiserProfile, options);
-  }
-
-  try {
-    return await retrieveCampaignCandidatesFromQdrant(advertiserProfile, options, vectorConfig);
-  } catch (error) {
-    return withQdrantFallbackWarning(retrieveCampaignCandidates(advertiserProfile, options), error);
-  }
-}
-
-function withQdrantFallbackWarning(
-  fallback: PipelineStageResult<CampaignCandidates>,
-  error: unknown
-): PipelineStageResult<CampaignCandidates> {
-  const fallbackReason = error instanceof Error ? error.message : "Unknown Qdrant retrieval error.";
-  const warning = `Qdrant retrieval failed; fell back to local candidate retrieval. Reason: ${fallbackReason}`;
-  const warnings = uniqueWarnings([...fallback.data.warnings, warning]);
-  const data = {
-    ...fallback.data,
-    warnings
-  };
-
-  return {
-    data,
-    trace: {
-      ...fallback.trace,
-      promptInput: {
-        requestedRetriever: "qdrant",
-        fallbackReason,
-        fallbackInput: fallback.trace.promptInput
-      },
-      stageOutput: {
-        publisherCandidates: data.publisherCandidates,
-        personaCandidates: data.personaCandidates,
-        exclusionCandidates: data.exclusionCandidates,
-        warnings
-      },
-      warnings
-    }
-  };
+  return retrieveCampaignCandidatesFromQdrant(advertiserProfile, options, getVectorConfig());
 }

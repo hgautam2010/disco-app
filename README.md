@@ -7,19 +7,14 @@ A Next.js prototype for Disco's ad placement and creative generation take-home. 
 ```bash
 npm install
 cp .env.example .env.local
+docker compose up -d qdrant
+npm run ingest:qdrant
 npm run dev
 ```
 
 Set `OPENAI_API_KEY` in `.env.local`. The shared model default is `gpt-5.6-terra`, with lower-latency `gpt-5.6-luna` defaults for extraction and repair. Optional per-stage model, reasoning effort, output-token, and service-tier overrides are documented in `.env.example`.
 
-Optional Qdrant retrieval:
-
-```bash
-docker compose up -d qdrant
-npm run ingest:qdrant
-```
-
-Then set `CAMPAIGN_RETRIEVER=qdrant` in `.env.local`. If Qdrant or embeddings are unavailable, the app falls back to local retrieval with a stage warning.
+Qdrant is required on this branch. The app retrieves publisher and persona candidates from Qdrant at runtime, so ingestion must be run before generating a campaign.
 
 ## What I Built
 
@@ -29,7 +24,7 @@ The app uses a staged OpenAI pipeline:
 extract -> retrieve -> rank_publishers -> select_personas -> generate_execution -> assemble
 ```
 
-Extraction, publisher ranking, persona selection, and execution are separate OpenAI stages with prompts in `prompts/`. Retrieval defaults to deterministic TypeScript and can optionally use Qdrant semantic retrieval. Final assembly is deterministic TypeScript. Each model response is structured JSON, validated with Zod, and gets one repair retry if it misses the schema.
+Extraction, publisher ranking, persona selection, and execution are separate OpenAI stages with prompts in `prompts/`. Retrieval uses Qdrant semantic search backed by OpenAI embeddings, then local TypeScript hydrates records, applies business scoring, and builds exclusions. Final assembly is deterministic TypeScript. Each model response is structured JSON, validated with Zod, and gets one repair retry if it misses the schema.
 
 The UI shows publisher recommendations with reasoning, exclusions, selected personas, 3 to 5 persona-specific creative variants, campaign config, score signals, API call counts, token usage, and a per-stage trace. Trace panels expose model settings, reasoning effort, output cap, service tier, prompt input, parsed model output, normalized stage output, stage-local warnings, and highlighted JSON modals for inspection.
 
@@ -56,7 +51,7 @@ npm run eval
 npm run build
 ```
 
-Unit tests cover scoring, schemas, normalization, candidate retrieval, vector retrieval helpers, Qdrant fallback behavior, trace summaries, warning behavior, stage model selection, and OpenAI key handling. The eval harness runs 14 advertiser cases and the latest offline score is `100`.
+Unit tests cover scoring, schemas, normalization, candidate retrieval, vector retrieval helpers, required Qdrant runtime behavior, trace summaries, warning behavior, stage model selection, and OpenAI key handling. The eval harness runs 14 advertiser cases and the latest offline score is `100`.
 
 ## What I Cut
 

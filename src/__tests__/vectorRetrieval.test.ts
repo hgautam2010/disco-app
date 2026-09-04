@@ -7,7 +7,6 @@ import { advertiserToRetrievalQuery, personaToEmbeddingText, publisherToEmbeddin
 import { qdrantPointId } from "@/lib/vector/qdrantClient";
 
 const vectorEnvNames = [
-  "CAMPAIGN_RETRIEVER",
   "QDRANT_URL",
   "QDRANT_API_KEY",
   "QDRANT_PUBLISHERS_COLLECTION",
@@ -48,7 +47,6 @@ describe("vector retrieval helpers", () => {
   it("reads vector config from env with safe defaults", async () => {
     await withVectorEnv(
       {
-        CAMPAIGN_RETRIEVER: "qdrant",
         QDRANT_URL: "https://example-qdrant.test",
         QDRANT_PUBLISHERS_COLLECTION: "publishers_test",
         QDRANT_PERSONAS_COLLECTION: "personas_test",
@@ -57,7 +55,6 @@ describe("vector retrieval helpers", () => {
       },
       () => {
         expect(getVectorConfig()).toEqual({
-          retriever: "qdrant",
           qdrantUrl: "https://example-qdrant.test",
           qdrantApiKey: undefined,
           publishersCollection: "publishers_test",
@@ -70,11 +67,9 @@ describe("vector retrieval helpers", () => {
 
     await withVectorEnv(
       {
-        CAMPAIGN_RETRIEVER: "vectorish",
         OPENAI_EMBEDDING_DIMENSIONS: "-1"
       },
       () => {
-        expect(getVectorConfig().retriever).toBe("local");
         expect(getVectorConfig().embeddingDimensions).toBe(1536);
       }
     );
@@ -90,22 +85,15 @@ describe("vector retrieval helpers", () => {
     expect(first).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
   });
 
-  it("falls back to local retrieval when qdrant is enabled but unavailable", async () => {
+  it("requires embeddings for runtime retrieval", async () => {
     await withVectorEnv(
       {
-        CAMPAIGN_RETRIEVER: "qdrant",
         OPENAI_API_KEY: undefined
       },
       async () => {
-        const result = await retrieveCampaignCandidatesForRuntime(advertiserAnalysisFixture());
-
-        expect(result.trace.source).toBe("deterministic");
-        expect(result.data.publisherCandidates.length).toBeGreaterThanOrEqual(5);
-        expect(result.data.personaCandidates.length).toBeGreaterThanOrEqual(5);
-        expect(result.data.warnings.some((warning) => warning.includes("Qdrant retrieval failed"))).toBe(true);
-        expect(result.trace.promptInput).toMatchObject({
-          requestedRetriever: "qdrant"
-        });
+        await expect(retrieveCampaignCandidatesForRuntime(advertiserAnalysisFixture())).rejects.toThrow(
+          "OPENAI_API_KEY is required to create embeddings."
+        );
       }
     );
   });

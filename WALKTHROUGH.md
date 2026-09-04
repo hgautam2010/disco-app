@@ -66,7 +66,7 @@ Folder:
 
 `src/lib/campaign/stages/retrieve-candidates`
 
-This stage defaults to deterministic retrieval. It uses the extracted advertiser profile to score the local publisher and persona catalog.
+This stage uses Qdrant semantic retrieval. It embeds the extracted advertiser profile, searches publisher and persona collections, then hydrates the matched IDs back into full local catalog records.
 
 Supporting files:
 
@@ -82,14 +82,14 @@ Supporting files:
 
 The output is a bounded candidate set. OpenAI does not receive the full catalog in later stages; it receives the shortlisted options.
 
-Optional Qdrant mode:
+Required Qdrant setup:
 
 ```bash
 docker compose up -d qdrant
 npm run ingest:qdrant
 ```
 
-Then set `CAMPAIGN_RETRIEVER=qdrant`. Runtime retrieval embeds the extracted advertiser profile, searches publisher and persona collections, hydrates records from local JSON, adds semantic retrieval signals, and falls back to local retrieval with a warning if Qdrant is unavailable.
+Runtime retrieval adds semantic retrieval signals and deterministic business scoring. If Qdrant is unavailable or the catalog has not been ingested, campaign generation fails clearly instead of silently switching retrievers.
 
 ## 5. Rank Publishers
 
@@ -171,23 +171,20 @@ The UI does not render a separate global warnings banner. Warnings are easier to
 Normal flow:
 
 - extraction: 1 call,
+- retrieval query embedding: 1 call,
 - publisher ranking: 1 call,
 - persona selection: 1 call,
 - execution generation: 1 call.
 
-Normal total with local retrieval: 4 OpenAI calls.
-
-With `CAMPAIGN_RETRIEVER=qdrant`, retrieval adds one OpenAI embeddings call for the advertiser query and two Qdrant search requests. Normal total with Qdrant retrieval: 5 OpenAI calls plus Qdrant search.
+Normal total: 5 OpenAI calls plus two Qdrant search requests.
 
 Worst case:
 
 - each OpenAI stage can make one repair retry if Zod validation fails.
 
-Worst-case total with local retrieval: 8 OpenAI calls.
+Worst-case total: 9 OpenAI calls plus two Qdrant search requests.
 
-Worst-case total with Qdrant retrieval: 9 OpenAI calls plus Qdrant search.
-
-Assembly is deterministic and does not call OpenAI. Retrieval does not call OpenAI in local mode; Qdrant mode calls OpenAI once for the query embedding.
+Assembly is deterministic and does not call OpenAI. Retrieval calls OpenAI once for the query embedding.
 
 ## 10. Speed and Quality Controls
 
@@ -294,7 +291,6 @@ Common changes:
 - Add a new category or product signal in `src/lib/advertiserTaxonomy.ts`.
 - Update extraction behavior in `prompts/extract-advertiser.md`.
 - Change model, reasoning, output cap, or service tier defaults in `src/lib/campaign/shared/openaiClient.ts`.
-- Change retrieval backend with `CAMPAIGN_RETRIEVER=local` or `CAMPAIGN_RETRIEVER=qdrant`.
 - Change Qdrant ingestion/search behavior in `src/lib/vector/*` or `retrieve-candidates/vectorRetriever.ts`.
 - Update a stage response shape in that stage's `schema.ts`.
 - Update stage repair/cleanup in that stage's `normalize.ts`.

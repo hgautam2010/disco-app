@@ -1,7 +1,4 @@
-export type CampaignRetriever = "local" | "qdrant";
-
 export type VectorConfig = {
-  retriever: CampaignRetriever;
   qdrantUrl: string;
   qdrantApiKey?: string;
   publishersCollection: string;
@@ -11,7 +8,6 @@ export type VectorConfig = {
 };
 
 const defaultVectorConfig: VectorConfig = {
-  retriever: "local",
   qdrantUrl: "http://localhost:6333",
   publishersCollection: "disco_publishers",
   personasCollection: "disco_personas",
@@ -21,7 +17,6 @@ const defaultVectorConfig: VectorConfig = {
 
 export function getVectorConfig(): VectorConfig {
   return {
-    retriever: readRetrieverEnv() ?? defaultVectorConfig.retriever,
     qdrantUrl: readEnv("QDRANT_URL") ?? defaultVectorConfig.qdrantUrl,
     qdrantApiKey: readEnv("QDRANT_API_KEY"),
     publishersCollection: readEnv("QDRANT_PUBLISHERS_COLLECTION") ?? defaultVectorConfig.publishersCollection,
@@ -30,12 +25,6 @@ export function getVectorConfig(): VectorConfig {
     embeddingDimensions:
       readPositiveIntegerEnv("OPENAI_EMBEDDING_DIMENSIONS") ?? defaultVectorConfig.embeddingDimensions
   };
-}
-
-function readRetrieverEnv(): CampaignRetriever | undefined {
-  const value = readEnv("CAMPAIGN_RETRIEVER");
-
-  return value === "local" || value === "qdrant" ? value : undefined;
 }
 
 function readEnv(name: string) {
