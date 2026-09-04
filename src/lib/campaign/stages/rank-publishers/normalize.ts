@@ -7,20 +7,20 @@ import {
   nonEmptySignals,
   normalizedScore
 } from "../../shared/normalization";
-import type { CampaignCandidates, CampaignCatalogue, LockedPublisherStrategy } from "../../types";
+import type { CampaignCatalogue, LockedPublisherStrategy } from "../../types";
 
 export function normalizePublisherStrategy(
-  candidates: CampaignCandidates | CampaignCatalogue,
+  catalogue: CampaignCatalogue,
   ranking: PublisherRankingResponse
 ): LockedPublisherStrategy {
-  const warnings = new Set([...candidates.warnings, ...ranking.warnings]);
-  const publisherCandidateById = new Map(toPublisherCandidates(candidates).map((item) => [item.publisher.id, item]));
-  const exclusionCandidateById = new Map(toExclusionCandidates(candidates).map((item) => [item.publisher.id, item]));
+  const warnings = new Set([...catalogue.warnings, ...ranking.warnings]);
+  const publisherCandidateById = new Map(toPublisherCandidates(catalogue).map((item) => [item.publisher.id, item]));
+  const exclusionCandidateById = new Map(toExclusionCandidates(catalogue).map((item) => [item.publisher.id, item]));
   const recommendedPublishers = normalizeRecommendedPublishers(ranking, publisherCandidateById, warnings);
   const recommendedIds = new Set(recommendedPublishers.map((item) => item.publisher.id));
   const excludedPublishers = normalizeExcludedPublishers(
     ranking,
-    candidates,
+    catalogue,
     publisherCandidateById,
     exclusionCandidateById,
     recommendedIds,
@@ -28,27 +28,19 @@ export function normalizePublisherStrategy(
   );
 
   return {
-    advertiserAnalysis: candidates.advertiserProfile,
+    advertiserAnalysis: catalogue.advertiserProfile,
     recommendedPublishers,
     excludedPublishers,
     warnings: Array.from(warnings)
   };
 }
 
-function toPublisherCandidates(candidates: CampaignCandidates | CampaignCatalogue): ScoredPublisher[] {
-  if ("publisherCandidates" in candidates) {
-    return candidates.publisherCandidates;
-  }
-
-  return candidates.publishers.map((publisher) => scoredPublisherFromCatalogue(publisher, 50));
+function toPublisherCandidates(catalogue: CampaignCatalogue): ScoredPublisher[] {
+  return catalogue.publishers.map((publisher) => scoredPublisherFromCatalogue(publisher, 50));
 }
 
-function toExclusionCandidates(candidates: CampaignCandidates | CampaignCatalogue): ExcludedPublisher[] {
-  if ("exclusionCandidates" in candidates) {
-    return candidates.exclusionCandidates;
-  }
-
-  return candidates.publishers.map((publisher) => ({
+function toExclusionCandidates(catalogue: CampaignCatalogue): ExcludedPublisher[] {
+  return catalogue.publishers.map((publisher) => ({
     publisher,
     score: 20,
     reason: "Not selected by the publisher ranking stage.",
@@ -90,7 +82,7 @@ function normalizeRecommendedPublishers(
 
     if (!candidate || seen.has(item.publisherId)) {
       if (!candidate) {
-        warnings.add(`Dropped recommended publisher outside candidate set: ${item.publisherId}.`);
+        warnings.add(`Dropped recommended publisher outside supplied publisher catalogue: ${item.publisherId}.`);
       }
       return [];
     }
@@ -123,7 +115,7 @@ function normalizeRecommendedPublishers(
 
 function normalizeExcludedPublishers(
   ranking: PublisherRankingResponse,
-  candidates: CampaignCandidates | CampaignCatalogue,
+  catalogue: CampaignCatalogue,
   publisherCandidateById: Map<string, ScoredPublisher>,
   exclusionCandidateById: Map<string, ExcludedPublisher>,
   recommendedIds: Set<string>,
@@ -137,7 +129,7 @@ function normalizeExcludedPublishers(
 
     if (!candidate || seen.has(item.publisherId) || recommendedIds.has(item.publisherId)) {
       if (!candidate) {
-        warnings.add(`Dropped excluded publisher outside candidate set: ${item.publisherId}.`);
+        warnings.add(`Dropped excluded publisher outside supplied publisher catalogue: ${item.publisherId}.`);
       }
       if (recommendedIds.has(item.publisherId)) {
         warnings.add(`Dropped excluded publisher already recommended: ${item.publisherId}.`);
@@ -156,8 +148,8 @@ function normalizeExcludedPublishers(
     ];
   });
   const exclusionFillCandidates = [
-    ...toExclusionCandidates(candidates),
-    ...toPublisherCandidates(candidates)
+    ...toExclusionCandidates(catalogue),
+    ...toPublisherCandidates(catalogue)
       .filter((item) => !recommendedIds.has(item.publisher.id))
       .map((item) => ({
         publisher: item.publisher,

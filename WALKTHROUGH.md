@@ -60,22 +60,24 @@ Key files:
 
 The important design point: this stage does not choose publishers, personas, creative, or campaign config.
 
-## 4. Retrieve Candidates
+## 4. Load Full Catalogue
 
 Folder:
 
 `src/lib/campaign/stages/retrieve-candidates`
 
-This stage is deterministic. It uses the extracted advertiser profile to score the local publisher and persona catalog.
+This stage is deterministic. It loads the supplied publisher and persona catalogues without scoring, sorting, slicing, or preselecting.
 
 Supporting files:
 
-- `src/lib/publisherScoring.ts`
-- `src/lib/personaScoring.ts`
 - `data/publishers.json`
 - `data/shopper_personas.json`
 
-The output is a bounded candidate set. OpenAI does not receive the full catalog in later stages; it receives the shortlisted options.
+The output is `CampaignCatalogue`: advertiser profile, full publishers, full personas, and any catalogue-level warnings. OpenAI receives only the relevant full catalogue for the next decision:
+
+- publisher ranking receives all publishers,
+- persona selection receives all personas,
+- execution receives only the selected publishers and personas.
 
 ## 5. Rank Publishers
 
@@ -92,7 +94,7 @@ This OpenAI stage chooses:
 - scoring signals,
 - warnings.
 
-The model can only choose from publisher IDs passed in the candidate payload. The normalizer drops unknown IDs and fills missing recommendations from retrieval results if needed.
+The model can only choose from publisher IDs in the supplied publisher catalogue. The normalizer drops unknown IDs and fills missing recommendations from the same catalogue if needed.
 
 ## 6. Select Personas
 
@@ -100,7 +102,7 @@ Folder:
 
 `src/lib/campaign/stages/select-personas`
 
-This OpenAI stage chooses shopper personas from the candidate set, using the locked publisher strategy as context.
+This OpenAI stage chooses shopper personas from the full persona catalogue, using the locked publisher strategy as context.
 
 The output includes:
 
@@ -111,7 +113,7 @@ The output includes:
 - messaging angles,
 - warnings.
 
-The normalizer validates every persona ID against local catalog data.
+The normalizer validates every persona ID against the supplied persona catalogue.
 
 ## 7. Generate Creative and Config
 
@@ -276,7 +278,8 @@ Common changes:
 - Change model, reasoning, output cap, or service tier defaults in `src/lib/campaign/shared/openaiClient.ts`.
 - Update a stage response shape in that stage's `schema.ts`.
 - Update stage repair/cleanup in that stage's `normalize.ts`.
-- Tune deterministic retrieval in `publisherScoring.ts` or `personaScoring.ts`.
+- Change catalogue loading in `src/lib/campaign/stages/retrieve-candidates/run.ts`.
+- Tune ranking or persona-selection behavior in the matching prompt file under `prompts/`.
 - Add eval coverage in `evals/fixtures/advertiser-cases.json`.
 
 After any change, run lint, tests, evals, and build.

@@ -5,7 +5,7 @@ Start in `pipeline.ts` to see the full campaign flow.
 Each stage folder owns one responsibility and keeps related files together:
 
 - `extract-advertiser`: pitch to structured advertiser profile
-- `retrieve-candidates`: publisher and persona shortlisting from the local catalog
+- `retrieve-candidates`: full publisher and persona catalogue loading
 - `rank-publishers`: publisher recommendations and exclusions
 - `select-personas`: shopper persona selection
 - `generate-execution`: creative variants and campaign config
@@ -18,15 +18,15 @@ Shared helpers live in `shared` when they are used by multiple stages.
 The campaign path is intentionally linear:
 
 1. `extract-advertiser` turns the pitch into controlled advertiser fields.
-2. `retrieve-candidates` builds bounded publisher and persona candidate sets in code.
-3. `rank-publishers` asks OpenAI to choose recommended and excluded publishers from those candidates.
-4. `select-personas` asks OpenAI to choose personas from the locked candidate set and publisher strategy.
+2. `retrieve-candidates` loads the full supplied publisher and persona catalogues.
+3. `rank-publishers` asks OpenAI to choose recommended and excluded publishers from the full publisher catalogue.
+4. `select-personas` asks OpenAI to choose personas from the full persona catalogue and locked publisher strategy.
 5. `generate-execution` asks OpenAI for persona-specific creative and campaign config.
 6. `assemble` validates the final result and attaches pipeline trace metadata.
 
 Every stage returns `PipelineStageResult<T>`, which means the data and trace move together. The final `pipeline` object includes API calls, attempts, repair count, model name, latency, stage-local warnings, token usage, prompt input, model output, and normalized stage output per stage.
 
-Final campaign warnings remain cumulative in the API result. Pipeline trace warnings are stage-local, so a warning created during retrieval does not appear again under ranking, persona selection, or execution unless that stage adds a new warning.
+Final campaign warnings remain cumulative in the API result. Pipeline trace warnings are stage-local, so a warning created during catalogue loading does not appear again under ranking, persona selection, or execution unless that stage adds a new warning.
 
 Trace snapshots are business payloads and normalized results. OpenAI stages show the exact prompt input payload, parsed model output, and normalized stage output. Deterministic stages show stage input and stage output. The trace intentionally does not include raw system prompts, JSON schema payloads, request headers, or secrets.
 
@@ -66,6 +66,6 @@ OpenAI-backed stage prompts live in the top-level `prompts/` directory so every 
 - Change expected model JSON in that stage's `schema.ts`.
 - Change allowed extraction categories or product signals in `../advertiserTaxonomy.ts`.
 - Change data passed between stages in `types.ts`.
-- Change catalog shortlist logic in `retrieve-candidates/run.ts`, `publisherScoring.ts`, or `personaScoring.ts`.
+- Change catalogue loading in `retrieve-candidates/run.ts`.
 - Change safety repair in the stage's `normalize.ts` or in `shared/repairResponse.ts`.
 - Add a new stage by creating a stage folder, returning a `PipelineStageResult`, wiring it in `pipeline.ts`, and adding focused tests/evals.

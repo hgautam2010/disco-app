@@ -20,7 +20,7 @@ The app uses a staged OpenAI pipeline:
 extract -> retrieve -> rank_publishers -> select_personas -> generate_execution -> assemble
 ```
 
-Extraction, publisher ranking, persona selection, and execution are separate OpenAI stages with prompts in `prompts/`. Retrieval and final assembly are deterministic TypeScript. Each model response is structured JSON, validated with Zod, and gets one repair retry if it misses the schema.
+Extraction, publisher ranking, persona selection, and execution are separate OpenAI stages with prompts in `prompts/`. The catalogue-loading and final assembly stages are deterministic TypeScript. Publisher ranking receives the full publisher catalogue, persona selection receives the full persona catalogue, and each model response is structured JSON validated with Zod plus one repair retry if it misses the schema.
 
 The UI shows publisher recommendations with reasoning, exclusions, selected personas, 3 to 5 persona-specific creative variants, campaign config, score signals, API call counts, token usage, and a per-stage trace. Trace panels expose model settings, reasoning effort, output cap, service tier, prompt input, parsed model output, normalized stage output, stage-local warnings, and highlighted JSON modals for inspection.
 
@@ -44,7 +44,7 @@ npm run eval
 npm run build
 ```
 
-Unit tests cover scoring, schemas, normalization, candidate retrieval, trace summaries, warning behavior, stage model selection, and OpenAI key handling. The eval harness runs 14 advertiser cases and the latest offline score is `100`.
+Unit tests cover schemas, normalization, full catalogue loading, trace summaries, warning behavior, stage model selection, OpenAI key handling, and eval-only scoring helpers. The eval harness runs 14 advertiser cases and the latest offline score is `100`.
 
 ## What I Cut
 
@@ -52,7 +52,7 @@ I kept this to text creative and a small local catalog. I did not add auth, pers
 
 ## What Is Hard
 
-The hard part is keeping recommendations grounded in catalog facts while still letting the model make nuanced calls. The staged design makes extraction, retrieval, ranking, persona selection, creative, and config separately inspectable and easier to evaluate.
+The hard part is keeping recommendations grounded in catalog facts while still letting the model make nuanced calls. The staged design makes extraction, catalogue loading, ranking, persona selection, creative, and config separately inspectable and easier to evaluate.
 
 ## Another Week
 

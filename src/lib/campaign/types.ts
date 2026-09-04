@@ -4,22 +4,11 @@ import type {
   CampaignResult,
   CampaignStageTrace,
   CreativeVariant,
-  ExcludedPublisher,
   Persona,
-  Publisher,
-  ScoredPersona,
-  ScoredPublisher
+  Publisher
 } from "../types";
 
 export type AdvertiserProfile = AdvertiserAnalysis;
-
-export type CampaignCandidates = {
-  advertiserProfile: AdvertiserProfile;
-  publisherCandidates: ScoredPublisher[];
-  personaCandidates: ScoredPersona[];
-  exclusionCandidates: ExcludedPublisher[];
-  warnings: string[];
-};
 
 export type CampaignCatalogue = {
   advertiserProfile: AdvertiserProfile;

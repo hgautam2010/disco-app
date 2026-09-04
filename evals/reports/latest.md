@@ -25,9 +25,9 @@ Average score: 100
 
 - pass extraction-category-taxonomy: Category: pet_food
 - pass extraction-category: Category: pet_food
-- pass candidate-publisher-recall: Candidates: Pawline, Tailcrate, Ruffco, Movewell, Kitchenly, Daily Form, Pantrygood, Pop & Sip, Studiogrid, Linden Park
+- pass catalogue-publisher-coverage: Catalogue: Swiftcart, Movewell, Studiogrid, Marlowe & Co., Linden Park, Everbody, Pawline, Pantrygood, Ruffco, Heartfoot, Northbed, Daily Form, Velvetline, Hearthstone Goods, Kitchenly, Stride & Stem, Cloudfoot, Tailcrate, Strandlab, Pop & Sip
 - pass publisher-fit: Top 3: Pawline, Tailcrate, Ruffco
-- pass candidate-persona-recall: Candidates: The Pet Parent, The Busy Parent, The Convenience-First Millennial, The Wellness Optimizer, The Gifter, The Sustainability Buyer, The Fitness Enthusiast, The Affluent Classic
+- pass catalogue-persona-coverage: Catalogue: The Wellness Optimizer, The Busy Parent, The Gen Z Aesthete, The Pet Parent, The Affluent Classic, The Sustainability Buyer, The Convenience-First Millennial, The Value-Conscious Shopper, The Fitness Enthusiast, The Gifter
 - pass persona-fit: Selected: The Pet Parent, The Busy Parent, The Convenience-First Millennial, The Wellness Optimizer
 - pass exclusion-fit: Excluded: Everbody, Strandlab, Velvetline, Cloudfoot, Stride & Stem
 - pass price-tier: Price tier: premium
@@ -39,9 +39,9 @@ Average score: 100
 
 - pass extraction-category-taxonomy: Category: sustainable_apparel
 - pass extraction-category: Category: sustainable_apparel
-- pass candidate-publisher-recall: Candidates: Stride & Stem, Movewell, Cloudfoot, Marlowe & Co., Linden Park, Everbody, Heartfoot, Pantrygood, Daily Form, Studiogrid
+- pass catalogue-publisher-coverage: Catalogue: Swiftcart, Movewell, Studiogrid, Marlowe & Co., Linden Park, Everbody, Pawline, Pantrygood, Ruffco, Heartfoot, Northbed, Daily Form, Velvetline, Hearthstone Goods, Kitchenly, Stride & Stem, Cloudfoot, Tailcrate, Strandlab, Pop & Sip
 - pass publisher-fit: Top 3: Stride & Stem, Movewell, Cloudfoot
-- pass candidate-persona-recall: Candidates: The Sustainability Buyer, The Fitness Enthusiast, The Wellness Optimizer, The Gen Z Aesthete, The Gifter, The Pet Parent, The Value-Conscious Shopper, The Busy Parent
+- pass catalogue-persona-coverage: Catalogue: The Wellness Optimizer, The Busy Parent, The Gen Z Aesthete, The Pet Parent, The Affluent Classic, The Sustainability Buyer, The Convenience-First Millennial, The Value-Conscious Shopper, The Fitness Enthusiast, The Gifter
 - pass persona-fit: Selected: The Sustainability Buyer, The Fitness Enthusiast, The Wellness Optimizer, The Gen Z Aesthete
 - pass exclusion-fit: Excluded: Swiftcart, Strandlab, Tailcrate, Velvetline, Ruffco
 - pass price-tier: Price tier: premium
@@ -53,9 +53,9 @@ Average score: 100
 
 - pass extraction-category-taxonomy: Category: functional_beverages
 - pass extraction-category: Category: functional_beverages
-- pass candidate-publisher-recall: Candidates: Pop & Sip, Pantrygood, Daily Form, Movewell, Swiftcart, Studiogrid, Kitchenly, Ruffco, Northbed, Velvetline
+- pass catalogue-publisher-coverage: Catalogue: Swiftcart, Movewell, Studiogrid, Marlowe & Co., Linden Park, Everbody, Pawline, Pantrygood, Ruffco, Heartfoot, Northbed, Daily Form, Velvetline, Hearthstone Goods, Kitchenly, Stride & Stem, Cloudfoot, Tailcrate, Strandlab, Pop & Sip
 - pass publisher-fit: Top 3: Pop & Sip, Pantrygood, Daily Form
-- pass candidate-persona-recall: Candidates: The Wellness Optimizer, The Sustainability Buyer, The Fitness Enthusiast, The Gen Z Aesthete, The Pet Parent, The Convenience-First Millennial, The Busy Parent, The Gifter
+- pass catalogue-persona-coverage: Catalogue: The Wellness Optimizer, The Busy Parent, The Gen Z Aesthete, The Pet Parent, The Affluent Classic, The Sustainability Buyer, The Convenience-First Millennial, The Value-Conscious Shopper, The Fitness Enthusiast, The Gifter
 - pass persona-fit: Selected: The Wellness Optimizer, The Sustainability Buyer, The Fitness Enthusiast, The Gen Z Aesthete
 - pass exclusion-fit: Excluded: Stride & Stem, Heartfoot, Everbody, Linden Park, Marlowe & Co.
 - pass price-tier: Price tier: mid_market
@@ -67,9 +67,9 @@ Average score: 100
 
 - pass extraction-category-taxonomy: Category: luxury_accessories
 - pass extraction-category: Category: luxury_accessories
-- pass candidate-publisher-recall: Candidates: Linden Park, Marlowe & Co., Stride & Stem, Everbody, Movewell, Heartfoot, Cloudfoot, Pantrygood, Hearthstone Goods, Northbed
+- pass catalogue-publisher-coverage: Catalogue: Swiftcart, Movewell, Studiogrid, Marlowe & Co., Linden Park, Everbody, Pawline, Pantrygood, Ruffco, Heartfoot, Northbed, Daily Form, Velvetline, Hearthstone Goods, Kitchenly, Stride & Stem, Cloudfoot, Tailcrate, Strandlab, Pop & Sip
 - pass publisher-fit: Top 3: Linden Park, Marlowe & Co., Stride & Stem
-- pass candidate-persona-recall: Candidates: The Gifter, The Affluent Classic, The Value-Conscious Shopper, The Gen Z Aesthete, The Wellness Optimizer, The Pet Parent, The Convenience-First Millennial, The Busy Parent
+- pass catalogue-persona-coverage: Catalogue: The Wellness Optimizer, The Busy Parent, The Gen Z Aesthete, The Pet Parent, The Affluent Classic, The Sustainability Buyer, The Convenience-First Millennial, The Value-Conscious Shopper, The Fitness Enthusiast, The Gifter
 - pass persona-fit: Selected: The Gifter, The Affluent Classic, The Value-Conscious Shopper
 - pass exclusion-fit: Excluded: Pop & Sip, Strandlab, Tailcrate, Kitchenly, Velvetline
 - pass price-tier: Price tier: luxury
@@ -81,9 +81,9 @@ Average score: 100
 
 - pass extraction-category-taxonomy: Category: wellness
 - pass extraction-category: Category: wellness
-- pass candidate-publisher-recall: Candidates: Studiogrid, Daily Form, Pantrygood, Movewell, Ruffco, Pawline, Kitchenly, Pop & Sip, Tailcrate, Swiftcart
+- pass catalogue-publisher-coverage: Catalogue: Swiftcart, Movewell, Studiogrid, Marlowe & Co., Linden Park, Everbody, Pawline, Pantrygood, Ruffco, Heartfoot, Northbed, Daily Form, Velvetline, Hearthstone Goods, Kitchenly, Stride & Stem, Cloudfoot, Tailcrate, Strandlab, Pop & Sip
 - pass publisher-fit: Top 3: Studiogrid, Daily Form, Pantrygood
-- pass candidate-persona-recall: Candidates: The Sustainability Buyer, The Wellness Optimizer, The Pet Parent, The Convenience-First Millennial, The Fitness Enthusiast, The Busy Parent, The Gen Z Aesthete, The Affluent Classic
+- pass catalogue-persona-coverage: Catalogue: The Wellness Optimizer, The Busy Parent, The Gen Z Aesthete, The Pet Parent, The Affluent Classic, The Sustainability Buyer, The Convenience-First Millennial, The Value-Conscious Shopper, The Fitness Enthusiast, The Gifter
 - pass persona-fit: Selected: The Sustainability Buyer, The Wellness Optimizer, The Pet Parent, The Convenience-First Millennial
 - pass exclusion-fit: Excluded: Cloudfoot, Stride & Stem, Hearthstone Goods, Heartfoot, Everbody
 - pass price-tier: Price tier: mid_market
@@ -94,9 +94,9 @@ Average score: 100
 
 - pass extraction-category-taxonomy: Category: refillable_products
 - pass extraction-category: Category: refillable_products
-- pass candidate-publisher-recall: Candidates: Pantrygood, Hearthstone Goods, Northbed, Swiftcart, Kitchenly, Movewell, Ruffco, Stride & Stem, Cloudfoot, Pawline
+- pass catalogue-publisher-coverage: Catalogue: Swiftcart, Movewell, Studiogrid, Marlowe & Co., Linden Park, Everbody, Pawline, Pantrygood, Ruffco, Heartfoot, Northbed, Daily Form, Velvetline, Hearthstone Goods, Kitchenly, Stride & Stem, Cloudfoot, Tailcrate, Strandlab, Pop & Sip
 - pass publisher-fit: Top 3: Pantrygood, Hearthstone Goods, Northbed
-- pass candidate-persona-recall: Candidates: The Sustainability Buyer, The Busy Parent, The Gifter, The Wellness Optimizer, The Affluent Classic, The Value-Conscious Shopper, The Pet Parent, The Convenience-First Millennial
+- pass catalogue-persona-coverage: Catalogue: The Wellness Optimizer, The Busy Parent, The Gen Z Aesthete, The Pet Parent, The Affluent Classic, The Sustainability Buyer, The Convenience-First Millennial, The Value-Conscious Shopper, The Fitness Enthusiast, The Gifter
 - pass persona-fit: Selected: The Sustainability Buyer, The Busy Parent, The Gifter
 - pass exclusion-fit: Excluded: Daily Form, Pop & Sip, Strandlab, Tailcrate, Velvetline
 - pass price-tier: Price tier: mid_market
@@ -109,9 +109,9 @@ Average score: 100
 
 - pass extraction-category-taxonomy: Category: supplements
 - pass extraction-category: Category: supplements
-- pass candidate-publisher-recall: Candidates: Daily Form, Movewell, Studiogrid, Pantrygood, Pawline, Kitchenly, Cloudfoot, Tailcrate, Ruffco, Pop & Sip
+- pass catalogue-publisher-coverage: Catalogue: Swiftcart, Movewell, Studiogrid, Marlowe & Co., Linden Park, Everbody, Pawline, Pantrygood, Ruffco, Heartfoot, Northbed, Daily Form, Velvetline, Hearthstone Goods, Kitchenly, Stride & Stem, Cloudfoot, Tailcrate, Strandlab, Pop & Sip
 - pass publisher-fit: Top 3: Daily Form, Movewell, Studiogrid
-- pass candidate-persona-recall: Candidates: The Fitness Enthusiast, The Wellness Optimizer, The Convenience-First Millennial, The Pet Parent, The Sustainability Buyer, The Gen Z Aesthete, The Busy Parent, The Gifter
+- pass catalogue-persona-coverage: Catalogue: The Wellness Optimizer, The Busy Parent, The Gen Z Aesthete, The Pet Parent, The Affluent Classic, The Sustainability Buyer, The Convenience-First Millennial, The Value-Conscious Shopper, The Fitness Enthusiast, The Gifter
 - pass persona-fit: Selected: The Fitness Enthusiast, The Wellness Optimizer, The Convenience-First Millennial, The Pet Parent
 - pass exclusion-fit: Excluded: Stride & Stem, Hearthstone Goods, Heartfoot, Everbody, Marlowe & Co.
 - pass price-tier: Price tier: mid_market
@@ -124,9 +124,9 @@ Average score: 100
 
 - pass extraction-category-taxonomy: Category: beauty
 - pass extraction-category: Category: beauty
-- pass candidate-publisher-recall: Candidates: Velvetline, Strandlab, Movewell, Pop & Sip, Studiogrid, Pantrygood, Ruffco, Everbody, Pawline, Heartfoot
+- pass catalogue-publisher-coverage: Catalogue: Swiftcart, Movewell, Studiogrid, Marlowe & Co., Linden Park, Everbody, Pawline, Pantrygood, Ruffco, Heartfoot, Northbed, Daily Form, Velvetline, Hearthstone Goods, Kitchenly, Stride & Stem, Cloudfoot, Tailcrate, Strandlab, Pop & Sip
 - pass publisher-fit: Top 3: Velvetline, Strandlab, Movewell
-- pass candidate-persona-recall: Candidates: The Gen Z Aesthete, The Sustainability Buyer, The Gifter, The Wellness Optimizer, The Pet Parent, The Convenience-First Millennial, The Fitness Enthusiast, The Busy Parent
+- pass catalogue-persona-coverage: Catalogue: The Wellness Optimizer, The Busy Parent, The Gen Z Aesthete, The Pet Parent, The Affluent Classic, The Sustainability Buyer, The Convenience-First Millennial, The Value-Conscious Shopper, The Fitness Enthusiast, The Gifter
 - pass persona-fit: Selected: The Gen Z Aesthete, The Sustainability Buyer, The Gifter
 - pass exclusion-fit: Excluded: Daily Form, Cloudfoot, Stride & Stem, Kitchenly, Linden Park
 - pass price-tier: Price tier: mid_market
@@ -137,9 +137,9 @@ Average score: 100
 
 - pass extraction-category-taxonomy: Category: home_goods
 - pass extraction-category: Category: home_goods
-- pass candidate-publisher-recall: Candidates: Northbed, Hearthstone Goods, Heartfoot, Pawline, Pop & Sip, Movewell, Studiogrid, Marlowe & Co., Linden Park, Stride & Stem
+- pass catalogue-publisher-coverage: Catalogue: Swiftcart, Movewell, Studiogrid, Marlowe & Co., Linden Park, Everbody, Pawline, Pantrygood, Ruffco, Heartfoot, Northbed, Daily Form, Velvetline, Hearthstone Goods, Kitchenly, Stride & Stem, Cloudfoot, Tailcrate, Strandlab, Pop & Sip
 - pass publisher-fit: Top 3: Northbed, Hearthstone Goods, Heartfoot
-- pass candidate-persona-recall: Candidates: The Gifter, The Sustainability Buyer, The Affluent Classic, The Gen Z Aesthete, The Pet Parent, The Convenience-First Millennial, The Busy Parent, The Wellness Optimizer
+- pass catalogue-persona-coverage: Catalogue: The Wellness Optimizer, The Busy Parent, The Gen Z Aesthete, The Pet Parent, The Affluent Classic, The Sustainability Buyer, The Convenience-First Millennial, The Value-Conscious Shopper, The Fitness Enthusiast, The Gifter
 - pass persona-fit: Selected: The Gifter, The Sustainability Buyer, The Affluent Classic
 - pass exclusion-fit: Excluded: Strandlab, Tailcrate, Velvetline, Swiftcart, Everbody
 - pass price-tier: Price tier: premium
@@ -152,9 +152,9 @@ Average score: 100
 
 - pass extraction-category-taxonomy: Category: pet_food
 - pass extraction-category: Category: pet_food
-- pass candidate-publisher-recall: Candidates: Pawline, Tailcrate, Ruffco, Kitchenly, Movewell, Pantrygood, Daily Form, Swiftcart, Everbody, Heartfoot
+- pass catalogue-publisher-coverage: Catalogue: Swiftcart, Movewell, Studiogrid, Marlowe & Co., Linden Park, Everbody, Pawline, Pantrygood, Ruffco, Heartfoot, Northbed, Daily Form, Velvetline, Hearthstone Goods, Kitchenly, Stride & Stem, Cloudfoot, Tailcrate, Strandlab, Pop & Sip
 - pass publisher-fit: Top 3: Pawline, Tailcrate, Ruffco
-- pass candidate-persona-recall: Candidates: The Pet Parent, The Busy Parent, The Convenience-First Millennial, The Value-Conscious Shopper, The Sustainability Buyer, The Gen Z Aesthete, The Gifter, The Wellness Optimizer
+- pass catalogue-persona-coverage: Catalogue: The Wellness Optimizer, The Busy Parent, The Gen Z Aesthete, The Pet Parent, The Affluent Classic, The Sustainability Buyer, The Convenience-First Millennial, The Value-Conscious Shopper, The Fitness Enthusiast, The Gifter
 - pass persona-fit: Selected: The Pet Parent, The Busy Parent, The Convenience-First Millennial, The Value-Conscious Shopper
 - pass exclusion-fit: Excluded: Hearthstone Goods, Northbed, Stride & Stem, Marlowe & Co., Linden Park
 - pass price-tier: Price tier: value
@@ -167,9 +167,9 @@ Average score: 100
 
 - pass extraction-category-taxonomy: Category: home_goods
 - pass extraction-category: Category: home_goods
-- pass candidate-publisher-recall: Candidates: Northbed, Hearthstone Goods, Heartfoot, Pawline, Stride & Stem, Cloudfoot, Pop & Sip, Movewell, Pantrygood, Studiogrid
+- pass catalogue-publisher-coverage: Catalogue: Swiftcart, Movewell, Studiogrid, Marlowe & Co., Linden Park, Everbody, Pawline, Pantrygood, Ruffco, Heartfoot, Northbed, Daily Form, Velvetline, Hearthstone Goods, Kitchenly, Stride & Stem, Cloudfoot, Tailcrate, Strandlab, Pop & Sip
 - pass publisher-fit: Top 3: Northbed, Hearthstone Goods, Heartfoot
-- pass candidate-persona-recall: Candidates: The Gifter, The Sustainability Buyer, The Affluent Classic, The Gen Z Aesthete, The Pet Parent, The Convenience-First Millennial, The Wellness Optimizer, The Busy Parent
+- pass catalogue-persona-coverage: Catalogue: The Wellness Optimizer, The Busy Parent, The Gen Z Aesthete, The Pet Parent, The Affluent Classic, The Sustainability Buyer, The Convenience-First Millennial, The Value-Conscious Shopper, The Fitness Enthusiast, The Gifter
 - pass persona-fit: Selected: The Gifter, The Sustainability Buyer, The Affluent Classic
 - pass exclusion-fit: Excluded: Strandlab, Tailcrate, Velvetline, Swiftcart, Everbody
 - pass price-tier: Price tier: premium
@@ -195,15 +195,15 @@ Average score: 100
 - pass ambiguity-level: Ambiguity: low
 - pass product-signal-recall: Signals: convenience
 - pass product-signal-taxonomy: Signals: convenience
-- pass candidate-warning: Candidate warnings: Publisher catalog is consumer-commerce oriented; B2B recommendations are directional.
+- pass catalogue-warning: Catalogue warnings: Publisher catalog is consumer-commerce oriented; B2B recommendations are directional.
 
 ### conflicting-luxury-value
 
 - pass extraction-category-taxonomy: Category: luxury_accessories
 - pass extraction-category: Category: luxury_accessories
-- pass candidate-publisher-recall: Candidates: Linden Park, Marlowe & Co., Stride & Stem, Everbody, Movewell, Heartfoot, Cloudfoot, Pantrygood, Hearthstone Goods, Northbed
+- pass catalogue-publisher-coverage: Catalogue: Swiftcart, Movewell, Studiogrid, Marlowe & Co., Linden Park, Everbody, Pawline, Pantrygood, Ruffco, Heartfoot, Northbed, Daily Form, Velvetline, Hearthstone Goods, Kitchenly, Stride & Stem, Cloudfoot, Tailcrate, Strandlab, Pop & Sip
 - pass publisher-fit: Top 3: Linden Park, Marlowe & Co., Stride & Stem
-- pass candidate-persona-recall: Candidates: The Gifter, The Affluent Classic, The Value-Conscious Shopper, The Gen Z Aesthete, The Wellness Optimizer, The Pet Parent, The Convenience-First Millennial, The Busy Parent
+- pass catalogue-persona-coverage: Catalogue: The Wellness Optimizer, The Busy Parent, The Gen Z Aesthete, The Pet Parent, The Affluent Classic, The Sustainability Buyer, The Convenience-First Millennial, The Value-Conscious Shopper, The Fitness Enthusiast, The Gifter
 - pass persona-fit: Selected: The Gifter, The Affluent Classic, The Value-Conscious Shopper
 - pass exclusion-fit: Excluded: Pop & Sip, Strandlab, Tailcrate, Kitchenly, Velvetline
 - pass price-tier: Price tier: luxury

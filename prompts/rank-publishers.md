@@ -26,13 +26,13 @@ Rank publisher fit before shopper personas, creative, or campaign config are fin
 - risks: concrete concerns for a recommended publisher, such as weak price fit, audience mismatch, limited scale, or category ambiguity.
 - reason: the main catalog-grounded reason an excluded publisher should not be prioritized.
 - signals: short evidence objects that justify the score. Each signal should name the evidence, explain it, and use a weight aligned with its importance.
-- warnings: user-visible caveats about ambiguity, weak candidate pools, directional B2B fit, or tradeoffs that downstream stages should preserve.
+- warnings: user-visible caveats about ambiguity, weak catalogue fit, directional B2B fit, or tradeoffs that downstream stages should preserve.
 
 ## Score Rubric
 
 - 90-100: exceptional fit with multiple strong supplied signals across category, audience, buying context, and price/AOV.
 - 75-89: strong fit with one minor caveat or a narrower evidence base.
-- 55-74: plausible but not clearly superior; usable for testing only if stronger candidates are limited.
+- 55-74: plausible but not clearly superior; usable for testing only if stronger catalogue options are limited.
 - 30-54: weak fit, meaningful mismatch, or mostly generic audience overlap.
 - 0-29: clear mismatch or exclusion-worthy publisher.
 
@@ -59,8 +59,8 @@ Rank publisher fit before shopper personas, creative, or campaign config are fin
 - Do not build campaign config.
 - Use only supplied publisher IDs.
 - Do not include the same publisher in recommended and excluded lists.
-- Preserve candidate facts; do not invent catalog facts.
+- Preserve catalogue facts; do not invent catalog facts.
 - Use scores from 0 to 100.
 - If the advertiser profile is vague, keep scores conservative and add a warning.
-- If the candidate pool has weak B2B fit, acknowledge that recommendations are directional.
+- If the catalogue has weak B2B fit, acknowledge that recommendations are directional.
 - Return only fields required by the publisher ranking schema.

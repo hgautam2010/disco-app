@@ -3,7 +3,7 @@ import path from "node:path";
 import { getPersonas, getPublishers } from "../src/lib/data";
 import { scorePersonas, selectPersonas } from "../src/lib/personaScoring";
 import { scorePublishers } from "../src/lib/publisherScoring";
-import { retrieveCampaignCandidates } from "../src/lib/campaign/stages/retrieve-candidates/run";
+import { loadCampaignCatalogue } from "../src/lib/campaign/stages/retrieve-candidates/run";
 import {
   advertiserCategoryValues,
   productSignalValues,
@@ -22,7 +22,7 @@ type EvalCase = {
   expectedPriceTier?: PriceTier;
   expectedAmbiguityLevel?: AmbiguityLevel;
   expectedProductSignals?: ProductSignal[];
-  expectedCandidateWarnings?: string[];
+  expectedCatalogueWarnings?: string[];
   expectedResultWarnings?: string[];
   forbiddenTopPublishers?: string[];
 };
@@ -75,10 +75,10 @@ function runEvalCase(evalCase: EvalCase): EvalResult {
   const topThreePublishers = recommendedPublishers.slice(0, 3).map((item) => item.publisher.name);
   const selectedPersonas = selectedPersonaCandidates.map((item) => item.persona.name);
   const excludedPublisherNames = excludedPublishers.map((item) => item.publisher.name);
-  const candidates = retrieveCampaignCandidates(analysis).data;
-  const candidatePublishers = candidates.publisherCandidates.map((item) => item.publisher.name);
-  const candidatePersonas = candidates.personaCandidates.map((item) => item.persona.name);
-  const candidateWarnings = candidates.warnings;
+  const catalogue = loadCampaignCatalogue(analysis).data;
+  const cataloguePublishers = catalogue.publishers.map((publisher) => publisher.name);
+  const cataloguePersonas = catalogue.personas.map((persona) => persona.name);
+  const catalogueWarnings = catalogue.warnings;
 
   const checks: EvalCheck[] = [
     {
@@ -96,9 +96,9 @@ function runEvalCase(evalCase: EvalCase): EvalResult {
   if (evalCase.expectedTopPublishers.length > 0) {
     checks.push(
       {
-        name: "candidate-publisher-recall",
-        passed: evalCase.expectedTopPublishers.every((name) => candidatePublishers.includes(name)),
-        detail: `Candidates: ${candidatePublishers.join(", ")}`
+        name: "catalogue-publisher-coverage",
+        passed: evalCase.expectedTopPublishers.every((name) => cataloguePublishers.includes(name)),
+        detail: `Catalogue: ${cataloguePublishers.join(", ")}`
       },
       {
         name: "publisher-fit",
@@ -111,9 +111,9 @@ function runEvalCase(evalCase: EvalCase): EvalResult {
   if (evalCase.expectedPersonas.length > 0) {
     checks.push(
       {
-        name: "candidate-persona-recall",
-        passed: evalCase.expectedPersonas.every((name) => candidatePersonas.includes(name)),
-        detail: `Candidates: ${candidatePersonas.join(", ")}`
+        name: "catalogue-persona-coverage",
+        passed: evalCase.expectedPersonas.every((name) => cataloguePersonas.includes(name)),
+        detail: `Catalogue: ${cataloguePersonas.join(", ")}`
       },
       {
         name: "persona-fit",
@@ -160,11 +160,11 @@ function runEvalCase(evalCase: EvalCase): EvalResult {
     });
   }
 
-  if (evalCase.expectedCandidateWarnings) {
+  if (evalCase.expectedCatalogueWarnings) {
     checks.push({
-      name: "candidate-warning",
-      passed: evalCase.expectedCandidateWarnings.every((warning) => includesText(candidateWarnings, warning)),
-      detail: `Candidate warnings: ${candidateWarnings.join(" | ")}`
+      name: "catalogue-warning",
+      passed: evalCase.expectedCatalogueWarnings.every((warning) => includesText(catalogueWarnings, warning)),
+      detail: `Catalogue warnings: ${catalogueWarnings.join(" | ")}`
     });
   }
 

@@ -6,16 +6,16 @@ import {
   nonEmptySignals,
   normalizedScore
 } from "../../shared/normalization";
-import type { CampaignCandidates, CampaignCatalogue, LockedCampaignStrategy, LockedPublisherStrategy } from "../../types";
+import type { CampaignCatalogue, LockedCampaignStrategy, LockedPublisherStrategy } from "../../types";
 import type { PersonaSelectionResponse } from "./schema";
 
 export function normalizePersonaStrategy(
-  candidates: CampaignCandidates | CampaignCatalogue,
+  catalogue: CampaignCatalogue,
   publisherStrategy: LockedPublisherStrategy,
   selection: PersonaSelectionResponse
 ): LockedCampaignStrategy {
-  const warnings = new Set([...publisherStrategy.warnings, ...candidates.warnings, ...selection.warnings]);
-  const personaCandidateById = new Map(toPersonaCandidates(candidates).map((item) => [item.persona.id, item]));
+  const warnings = new Set([...publisherStrategy.warnings, ...catalogue.warnings, ...selection.warnings]);
+  const personaCandidateById = new Map(toPersonaCandidates(catalogue).map((item) => [item.persona.id, item]));
   const selectedPersonas = normalizeSelectedPersonas(selection, personaCandidateById, warnings);
 
   return {
@@ -25,12 +25,8 @@ export function normalizePersonaStrategy(
   };
 }
 
-function toPersonaCandidates(candidates: CampaignCandidates | CampaignCatalogue): ScoredPersona[] {
-  if ("personaCandidates" in candidates) {
-    return candidates.personaCandidates;
-  }
-
-  return candidates.personas.map((persona) => scoredPersonaFromCatalogue(persona, 50));
+function toPersonaCandidates(catalogue: CampaignCatalogue): ScoredPersona[] {
+  return catalogue.personas.map((persona) => scoredPersonaFromCatalogue(persona, 50));
 }
 
 function scoredPersonaFromCatalogue(persona: Persona, score: number): ScoredPersona {
@@ -62,7 +58,7 @@ function normalizeSelectedPersonas(
 
     if (!candidate || seen.has(item.personaId)) {
       if (!candidate) {
-        warnings.add(`Dropped persona outside candidate set: ${item.personaId}.`);
+        warnings.add(`Dropped persona outside supplied persona catalogue: ${item.personaId}.`);
       }
       return [];
     }

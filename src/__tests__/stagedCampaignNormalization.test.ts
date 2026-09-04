@@ -3,62 +3,61 @@ import { assembleFinalCampaign } from "@/lib/campaign/stages/assemble/run";
 import { normalizeExecution } from "@/lib/campaign/stages/generate-execution/normalize";
 import { normalizePersonaStrategy } from "@/lib/campaign/stages/select-personas/normalize";
 import { normalizePublisherStrategy } from "@/lib/campaign/stages/rank-publishers/normalize";
-import { retrieveCampaignCandidates } from "@/lib/campaign/stages/retrieve-candidates/run";
+import { loadCampaignCatalogue } from "@/lib/campaign/stages/retrieve-candidates/run";
 import { validateCampaignResult } from "@/lib/schemas";
-import type { CampaignCandidates, LockedCampaignStrategy, LockedPublisherStrategy } from "@/lib/campaign/types";
+import type { CampaignCatalogue, LockedCampaignStrategy, LockedPublisherStrategy } from "@/lib/campaign/types";
 import type { ExecutionResponse } from "@/lib/campaign/stages/generate-execution/schema";
 import type { PublisherRankingResponse } from "@/lib/campaign/stages/rank-publishers/schema";
 import type { PersonaSelectionResponse } from "@/lib/campaign/stages/select-personas/schema";
 import { advertiserAnalysisFixture } from "./helpers/advertiserAnalysis";
 
 describe("staged campaign normalization", () => {
-  it("cleans publisher ranking IDs and fills required recommendations from retrieved candidates", () => {
+  it("cleans publisher ranking IDs and fills required recommendations from the full catalogue", () => {
     const description =
       "Premium dog supplements for senior pets with mobility support, sold as a monthly subscription.";
     const profile = advertiserAnalysisFixture({ originalDescription: description });
-    const candidates = retrieveCampaignCandidates(profile).data;
-    const knownRecommendedIds = candidates.publisherCandidates.map((item) => item.publisher.id);
-    const knownExcludedIds = candidates.exclusionCandidates.map((item) => item.publisher.id);
+    const catalogue = loadCampaignCatalogue(profile).data;
+    const knownPublisherIds = catalogue.publishers.map((publisher) => publisher.id);
     const ranking: PublisherRankingResponse = {
       recommendedPublishers: [
-        strategyPublisher(knownRecommendedIds[0], 98),
-        strategyPublisher(knownRecommendedIds[0], 92),
+        strategyPublisher(knownPublisherIds[0], 98),
+        strategyPublisher(knownPublisherIds[0], 92),
         strategyPublisher("pub_missing", 88),
-        strategyPublisher(knownRecommendedIds[1], 84)
+        strategyPublisher(knownPublisherIds[1], 84)
       ],
       excludedPublishers: [
-        excludedPublisher(knownRecommendedIds[0], 10),
+        excludedPublisher(knownPublisherIds[0], 10),
         excludedPublisher("pub_missing", 8),
-        excludedPublisher(knownExcludedIds[0], 18),
-        excludedPublisher(knownExcludedIds[1], 22)
+        excludedPublisher(knownPublisherIds[2], 18),
+        excludedPublisher(knownPublisherIds[3], 22)
       ],
       warnings: ["Model noted category overlap."]
     };
 
-    const result = normalizePublisherStrategy(candidates, ranking);
+    const result = normalizePublisherStrategy(catalogue, ranking);
     const recommendedIds = result.recommendedPublishers.map((item) => item.publisher.id);
     const excludedIds = result.excludedPublishers.map((item) => item.publisher.id);
 
-    expect(recommendedIds).toContain(knownRecommendedIds[0]);
+    expect(recommendedIds).toContain(knownPublisherIds[0]);
     expect(recommendedIds).not.toContain("pub_missing");
     expect(new Set(recommendedIds).size).toBe(recommendedIds.length);
-    expect(excludedIds).not.toContain(knownRecommendedIds[0]);
+    expect(excludedIds).not.toContain(knownPublisherIds[0]);
     expect(result.recommendedPublishers.length).toBeGreaterThanOrEqual(3);
     expect(result.warnings).toEqual(
       expect.arrayContaining([
-        "Dropped recommended publisher outside candidate set: pub_missing.",
-        "Filled recommended publishers from deterministic candidate retrieval."
+        "Dropped recommended publisher outside supplied publisher catalogue: pub_missing.",
+        "Filled recommended publishers from the supplied publisher catalogue."
       ])
     );
   });
 
-  it("cleans persona selection IDs and fills required personas from retrieved candidates", () => {
+  it("cleans persona selection IDs and fills required personas from the full catalogue", () => {
     const description =
       "Premium dog supplements for senior pets with mobility support, sold as a monthly subscription.";
     const profile = advertiserAnalysisFixture({ originalDescription: description });
-    const candidates = retrieveCampaignCandidates(profile).data;
-    const publisherStrategy = publisherStrategyFromCandidates(candidates);
-    const knownPersonaIds = candidates.personaCandidates.map((item) => item.persona.id);
+    const catalogue = loadCampaignCatalogue(profile).data;
+    const publisherStrategy = publisherStrategyFromCatalogue(catalogue);
+    const knownPersonaIds = catalogue.personas.map((persona) => persona.id);
     const selection: PersonaSelectionResponse = {
       selectedPersonas: [
         strategyPersona(knownPersonaIds[0], 95),
@@ -68,7 +67,7 @@ describe("staged campaign normalization", () => {
       warnings: ["Model noted category overlap."]
     };
 
-    const result = normalizePersonaStrategy(candidates, publisherStrategy, selection);
+    const result = normalizePersonaStrategy(catalogue, publisherStrategy, selection);
     const personaIds = result.selectedPersonas.map((item) => item.persona.id);
 
     expect(personaIds).toContain(knownPersonaIds[0]);
@@ -77,8 +76,8 @@ describe("staged campaign normalization", () => {
     expect(result.selectedPersonas.length).toBeGreaterThanOrEqual(3);
     expect(result.warnings).toEqual(
       expect.arrayContaining([
-        "Dropped persona outside candidate set: persona_missing.",
-        "Filled selected personas from deterministic candidate retrieval."
+        "Dropped persona outside supplied persona catalogue: persona_missing.",
+        "Filled selected personas from the supplied persona catalogue."
       ])
     );
   });
@@ -87,9 +86,9 @@ describe("staged campaign normalization", () => {
     const description =
       "Premium dog supplements for senior pets with mobility support, sold as a monthly subscription.";
     const profile = advertiserAnalysisFixture({ originalDescription: description });
-    const candidates = retrieveCampaignCandidates(profile).data;
-    const publisherStrategy = publisherStrategyFromCandidates(candidates);
-    const strategy = campaignStrategyFromCandidates(candidates, publisherStrategy);
+    const catalogue = loadCampaignCatalogue(profile).data;
+    const publisherStrategy = publisherStrategyFromCatalogue(catalogue);
+    const strategy = campaignStrategyFromCatalogue(catalogue, publisherStrategy);
     const selectedPersonaIds = strategy.selectedPersonas.map((item) => item.persona.id);
     const recommendedPublisherIds = strategy.recommendedPublishers.map((item) => item.publisher.id);
     const execution: ExecutionResponse = {
@@ -227,21 +226,41 @@ function placement(publisherId: string) {
   };
 }
 
-function publisherStrategyFromCandidates(candidates: CampaignCandidates): LockedPublisherStrategy {
+function publisherStrategyFromCatalogue(catalogue: CampaignCatalogue): LockedPublisherStrategy {
   return {
-    advertiserAnalysis: candidates.advertiserProfile,
-    recommendedPublishers: candidates.publisherCandidates.slice(0, 3),
-    excludedPublishers: candidates.exclusionCandidates.slice(0, 3),
-    warnings: candidates.warnings
+    advertiserAnalysis: catalogue.advertiserProfile,
+    recommendedPublishers: catalogue.publishers.slice(0, 3).map((publisher, index) => ({
+      publisher,
+      score: 90 - index,
+      normalizedScore: (90 - index) / 100,
+      reasons: ["Selected from the full publisher catalogue."],
+      risks: [],
+      signals: [{ label: "Catalogue fit", detail: "Test publisher selected from catalogue.", weight: 90 - index }]
+    })),
+    excludedPublishers: catalogue.publishers.slice(3, 6).map((publisher, index) => ({
+      publisher,
+      score: 30 - index,
+      reason: "Excluded from the test recommendation set.",
+      signals: [{ label: "Lower fit", detail: "Test publisher excluded from catalogue.", weight: 30 - index }]
+    })),
+    warnings: catalogue.warnings
   };
 }
 
-function campaignStrategyFromCandidates(
-  candidates: CampaignCandidates,
+function campaignStrategyFromCatalogue(
+  catalogue: CampaignCatalogue,
   publisherStrategy: LockedPublisherStrategy
 ): LockedCampaignStrategy {
   return {
     ...publisherStrategy,
-    selectedPersonas: candidates.personaCandidates.slice(0, 3)
+    selectedPersonas: catalogue.personas.slice(0, 3).map((persona, index) => ({
+      persona,
+      score: 88 - index,
+      normalizedScore: (88 - index) / 100,
+      reasons: ["Selected from the full persona catalogue."],
+      risks: [],
+      messagingAngles: ["clear product value"],
+      signals: [{ label: "Persona fit", detail: "Test persona selected from catalogue.", weight: 88 - index }]
+    }))
   };
 }

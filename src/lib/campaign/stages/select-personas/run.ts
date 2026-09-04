@@ -10,7 +10,6 @@ import { stageLocalWarnings } from "../../shared/warnings";
 import { normalizePersonaStrategy } from "./normalize";
 import { personaSelectionResponseJsonSchema, personaSelectionResponseSchema } from "./schema";
 import type {
-  CampaignCandidates,
   CampaignCatalogue,
   LockedCampaignStrategy,
   LockedPublisherStrategy,
@@ -18,11 +17,11 @@ import type {
 } from "../../types";
 
 export async function selectPersonaStrategy(
-  candidates: CampaignCandidates | CampaignCatalogue,
+  catalogue: CampaignCatalogue,
   publisherStrategy: LockedPublisherStrategy
 ): Promise<PipelineStageResult<LockedCampaignStrategy>> {
   const startedAt = Date.now();
-  const payload = toPersonaSelectionPayload(candidates, publisherStrategy);
+  const payload = toPersonaSelectionPayload(catalogue, publisherStrategy);
   const requestConfig = getOpenAIRequestConfigForStage("select_personas");
   const request: RepairableStructuredRequest = {
     model: getOpenAIModelForStage("select_personas"),
@@ -51,8 +50,8 @@ export async function selectPersonaStrategy(
     request,
     repairContext: payload
   });
-  const strategy = normalizePersonaStrategy(candidates, publisherStrategy, result.data);
-  const traceWarnings = stageLocalWarnings(strategy.warnings, [...publisherStrategy.warnings, ...candidates.warnings]);
+  const strategy = normalizePersonaStrategy(catalogue, publisherStrategy, result.data);
+  const traceWarnings = stageLocalWarnings(strategy.warnings, [...publisherStrategy.warnings, ...catalogue.warnings]);
 
   return {
     data: strategy,
@@ -77,7 +76,7 @@ export async function selectPersonaStrategy(
   };
 }
 
-function toPersonaSelectionPayload(candidates: CampaignCandidates | CampaignCatalogue, publisherStrategy: LockedPublisherStrategy) {
+function toPersonaSelectionPayload(catalogue: CampaignCatalogue, publisherStrategy: LockedPublisherStrategy) {
   const publisherPayload = {
     recommendedPublishers: publisherStrategy.recommendedPublishers.map((item) => ({
       publisherId: item.publisher.id,
@@ -103,44 +102,20 @@ function toPersonaSelectionPayload(candidates: CampaignCandidates | CampaignCata
     }))
   };
 
-  if ("personas" in candidates) {
-    return {
-      advertiserProfile: candidates.advertiserProfile,
-      ...publisherPayload,
-      personaCatalogue: candidates.personas.map((persona) => ({
-        personaId: persona.id,
-        name: persona.name,
-        ageRange: persona.age_range,
-        genderSkew: persona.gender_skew,
-        description: persona.description,
-        categoryAffinities: persona.category_affinities,
-        priceSensitivity: persona.price_sensitivity,
-        messagingPreferences: persona.messaging_preferences,
-        disinterestedIn: persona.disinterested_in,
-        typicalAovUsd: persona.typical_aov_usd
-      }))
-    };
-  }
-
   return {
-    advertiserProfile: candidates.advertiserProfile,
+    advertiserProfile: catalogue.advertiserProfile,
     ...publisherPayload,
-    personaCandidates: candidates.personaCandidates.map((item) => ({
-      personaId: item.persona.id,
-      name: item.persona.name,
-      ageRange: item.persona.age_range,
-      genderSkew: item.persona.gender_skew,
-      description: item.persona.description,
-      categoryAffinities: item.persona.category_affinities,
-      priceSensitivity: item.persona.price_sensitivity,
-      messagingPreferences: item.persona.messaging_preferences,
-      disinterestedIn: item.persona.disinterested_in,
-      typicalAovUsd: item.persona.typical_aov_usd,
-      score: item.score,
-      deterministicReasons: item.reasons,
-      deterministicRisks: item.risks,
-      deterministicMessagingAngles: item.messagingAngles,
-      deterministicSignals: item.signals
+    personaCatalogue: catalogue.personas.map((persona) => ({
+      personaId: persona.id,
+      name: persona.name,
+      ageRange: persona.age_range,
+      genderSkew: persona.gender_skew,
+      description: persona.description,
+      categoryAffinities: persona.category_affinities,
+      priceSensitivity: persona.price_sensitivity,
+      messagingPreferences: persona.messaging_preferences,
+      disinterestedIn: persona.disinterested_in,
+      typicalAovUsd: persona.typical_aov_usd
     }))
   };
 }

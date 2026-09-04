@@ -146,7 +146,7 @@
     "expectedPriceTier": "mid_market",
     "expectedAmbiguityLevel": "low",
     "expectedProductSignals": ["convenience"],
-    "expectedCandidateWarnings": ["consumer-commerce oriented"]
+    "expectedCatalogueWarnings": ["consumer-commerce oriented"]
   },
   {
     "id": "conflicting-luxury-value",

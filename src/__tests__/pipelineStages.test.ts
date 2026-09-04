@@ -1,13 +1,14 @@
 import { describe, expect, it } from "vitest";
 import { emptyTokenUsage } from "@/lib/campaign/shared/tokenUsage";
 import { assembleFinalCampaign } from "@/lib/campaign/stages/assemble/run";
-import { retrieveCampaignCandidates } from "@/lib/campaign/stages/retrieve-candidates/run";
-import type { CampaignCandidates, CampaignExecution, LockedCampaignStrategy } from "@/lib/campaign/types";
+import { loadCampaignCatalogue } from "@/lib/campaign/stages/retrieve-candidates/run";
+import { getPersonas, getPublishers } from "@/lib/data";
+import type { CampaignCatalogue, CampaignExecution, LockedCampaignStrategy } from "@/lib/campaign/types";
 import type { CampaignStageTrace } from "@/lib/types";
 import { advertiserAnalysisFixture } from "./helpers/advertiserAnalysis";
 
 describe("production pipeline stages", () => {
-  it("retrieves bounded candidates before model ranking", () => {
+  it("loads the full catalogue before model ranking", () => {
     const profile = advertiserAnalysisFixture({
       originalDescription: "A sustainable activewear brand for women made from recycled ocean plastic.",
       category: "sustainable_apparel",
@@ -16,9 +17,9 @@ describe("production pipeline stages", () => {
       productSignals: ["sustainability", "value"],
       valuePropositions: ["specific sustainability benefit"]
     });
-    const result = retrieveCampaignCandidates(profile);
-    const publisherNames = result.data.publisherCandidates.map((item) => item.publisher.name);
-    const personaNames = result.data.personaCandidates.map((item) => item.persona.name);
+    const result = loadCampaignCatalogue(profile);
+    const publisherNames = result.data.publishers.map((publisher) => publisher.name);
+    const personaNames = result.data.personas.map((persona) => persona.name);
 
     expect(result.trace.name).toBe("retrieve");
     expect(result.trace.apiCalls).toBe(0);
@@ -26,18 +27,17 @@ describe("production pipeline stages", () => {
     expect(result.trace.model).toBe("code");
     expect(result.trace.tokenUsage.totalTokens).toBe(0);
     expect(result.trace.promptInput).toMatchObject({
-      advertiserProfile: profile,
-      publisherCandidateLimit: 10,
-      personaCandidateLimit: 8,
-      exclusionCandidateLimit: 8
+      advertiserProfile: profile
     });
     expect(result.trace.modelOutput).toBeNull();
     expect(result.trace.stageOutput).toMatchObject({
-      publisherCandidates: result.data.publisherCandidates,
-      personaCandidates: result.data.personaCandidates
+      publisherCount: getPublishers().length,
+      personaCount: getPersonas().length,
+      publishers: result.data.publishers,
+      personas: result.data.personas
     });
-    expect(result.data.publisherCandidates.length).toBeLessThanOrEqual(10);
-    expect(result.data.personaCandidates.length).toBeLessThanOrEqual(8);
+    expect(result.data.publishers).toHaveLength(getPublishers().length);
+    expect(result.data.personas).toHaveLength(getPersonas().length);
     expect(publisherNames).toContain("Stride & Stem");
     expect(personaNames).toContain("The Sustainability Buyer");
   });
@@ -53,8 +53,8 @@ describe("production pipeline stages", () => {
       purchaseModel: "one-time purchase",
       likelyObjective: "new customer acquisition"
     });
-    const candidates = retrieveCampaignCandidates(profile).data;
-    const strategy = campaignStrategyFromCandidates(candidates);
+    const catalogue = loadCampaignCatalogue(profile).data;
+    const strategy = campaignStrategyFromCatalogue(catalogue);
     const execution = executionFromStrategy(strategy);
     const traces: CampaignStageTrace[] = [
       stageTrace("extract", "openai", 1, false),
@@ -113,13 +113,33 @@ function stageTrace(
   };
 }
 
-function campaignStrategyFromCandidates(candidates: CampaignCandidates): LockedCampaignStrategy {
+function campaignStrategyFromCatalogue(catalogue: CampaignCatalogue): LockedCampaignStrategy {
   return {
-    advertiserAnalysis: candidates.advertiserProfile,
-    recommendedPublishers: candidates.publisherCandidates.slice(0, 3),
-    excludedPublishers: candidates.exclusionCandidates.slice(0, 3),
-    selectedPersonas: candidates.personaCandidates.slice(0, 3),
-    warnings: candidates.warnings
+    advertiserAnalysis: catalogue.advertiserProfile,
+    recommendedPublishers: catalogue.publishers.slice(0, 3).map((publisher, index) => ({
+      publisher,
+      score: 90 - index,
+      normalizedScore: (90 - index) / 100,
+      reasons: ["Selected from the full publisher catalogue."],
+      risks: [],
+      signals: [{ label: "Catalogue fit", detail: "Test publisher selected from catalogue.", weight: 90 - index }]
+    })),
+    excludedPublishers: catalogue.publishers.slice(3, 6).map((publisher, index) => ({
+      publisher,
+      score: 30 - index,
+      reason: "Excluded from the test recommendation set.",
+      signals: [{ label: "Lower fit", detail: "Test publisher excluded from catalogue.", weight: 30 - index }]
+    })),
+    selectedPersonas: catalogue.personas.slice(0, 3).map((persona, index) => ({
+      persona,
+      score: 88 - index,
+      normalizedScore: (88 - index) / 100,
+      reasons: ["Selected from the full persona catalogue."],
+      risks: [],
+      messagingAngles: ["clear product value"],
+      signals: [{ label: "Persona fit", detail: "Test persona selected from catalogue.", weight: 88 - index }]
+    })),
+    warnings: catalogue.warnings
   };
 }
 

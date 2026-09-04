@@ -166,7 +166,7 @@ function CampaignResultView({
 }
 
 function statusCopy(catalogSummary: CampaignPlannerProps["catalogSummary"]) {
-  return `Extraction, shortlist retrieval, publisher ranking, persona selection, and execution run across ${catalogSummary.publisherCount} publishers and ${catalogSummary.personaCount} personas.`;
+  return `Extraction, full catalogue loading, publisher ranking, persona selection, and execution run across ${catalogSummary.publisherCount} publishers and ${catalogSummary.personaCount} personas.`;
 }
 
 function PipelineSummary({ result }: { result: CampaignResult }) {

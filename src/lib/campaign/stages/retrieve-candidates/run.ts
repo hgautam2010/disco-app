@@ -1,13 +1,7 @@
 import { getPersonas, getPublishers } from "../../../data";
-import { selectPersonas, scorePersonas } from "../../../personaScoring";
-import { scorePublishers } from "../../../publisherScoring";
-import type { ExcludedPublisher, Persona, Publisher, ScoredPersona, ScoredPublisher } from "../../../types";
+import type { Persona, Publisher } from "../../../types";
 import { emptyTokenUsage } from "../../shared/tokenUsage";
-import type { AdvertiserProfile, CampaignCandidates, CampaignCatalogue, PipelineStageResult } from "../../types";
-
-const defaultPublisherCandidateLimit = 10;
-const defaultPersonaCandidateLimit = 8;
-const defaultExclusionCandidateLimit = 8;
+import type { AdvertiserProfile, CampaignCatalogue, PipelineStageResult } from "../../types";
 
 export function loadCampaignCatalogue(
   advertiserProfile: AdvertiserProfile,
@@ -19,7 +13,7 @@ export function loadCampaignCatalogue(
   const startedAt = Date.now();
   const publishers = options.publishers ?? getPublishers();
   const personas = options.personas ?? getPersonas();
-  const warnings = catalogueWarnings(publishers, personas);
+  const warnings = catalogueWarnings(advertiserProfile, publishers, personas);
   const data = {
     advertiserProfile,
     publishers,
@@ -55,72 +49,12 @@ export function loadCampaignCatalogue(
   };
 }
 
-export function retrieveCampaignCandidates(
-  advertiserProfile: AdvertiserProfile,
-  options: {
-    publishers?: Publisher[];
-    personas?: Persona[];
-    publisherCandidateLimit?: number;
-    personaCandidateLimit?: number;
-    exclusionCandidateLimit?: number;
-  } = {}
-): PipelineStageResult<CampaignCandidates> {
-  const startedAt = Date.now();
-  const publishers = options.publishers ?? getPublishers();
-  const personas = options.personas ?? getPersonas();
-  const personaCandidateLimit = options.personaCandidateLimit ?? defaultPersonaCandidateLimit;
-  const publisherCandidateLimit = options.publisherCandidateLimit ?? defaultPublisherCandidateLimit;
-  const exclusionCandidateLimit = options.exclusionCandidateLimit ?? defaultExclusionCandidateLimit;
-  const scoredPersonas = scorePersonas(advertiserProfile, personas);
-  const personaCandidates = scoredPersonas.slice(0, Math.max(5, personaCandidateLimit));
-  const publisherPersonaSeed = selectPersonas(scoredPersonas, 5);
-  const publisherScores = scorePublishers(advertiserProfile, publisherPersonaSeed, publishers);
-  const publisherCandidates = publisherScores.allPublishers.slice(0, Math.max(5, publisherCandidateLimit));
-  const exclusionCandidates = buildExclusionCandidates(
-    publisherScores.allPublishers,
-    publisherCandidates,
-    exclusionCandidateLimit
-  );
-  const warnings = candidateWarnings(advertiserProfile, publisherCandidates, personaCandidates);
-  const data = {
-    advertiserProfile,
-    publisherCandidates,
-    personaCandidates,
-    exclusionCandidates,
-    warnings
-  };
-
-  return {
-    data,
-    trace: {
-      name: "retrieve",
-      source: "deterministic",
-      model: "code",
-      promptInput: {
-        advertiserProfile,
-        publisherCandidateLimit,
-        personaCandidateLimit,
-        exclusionCandidateLimit
-      },
-      modelOutput: null,
-      stageOutput: {
-        publisherCandidates,
-        personaCandidates,
-        exclusionCandidates,
-        warnings
-      },
-      durationMs: Date.now() - startedAt,
-      apiCalls: 0,
-      attempts: 0,
-      tokenUsage: emptyTokenUsage(),
-      repaired: false,
-      warnings
-    }
-  };
-}
-
-function catalogueWarnings(publishers: Publisher[], personas: Persona[]) {
+function catalogueWarnings(advertiserProfile: AdvertiserProfile, publishers: Publisher[], personas: Persona[]) {
   const warnings: string[] = [];
+
+  if (advertiserProfile.category === "b2b_saas") {
+    warnings.push("Publisher catalog is consumer-commerce oriented; B2B recommendations are directional.");
+  }
 
   if (publishers.length < 3) {
     warnings.push("Publisher catalogue has fewer than three entries; recommendations may be incomplete.");
@@ -128,59 +62,6 @@ function catalogueWarnings(publishers: Publisher[], personas: Persona[]) {
 
   if (personas.length < 3) {
     warnings.push("Persona catalogue has fewer than three entries; creative coverage may be incomplete.");
-  }
-
-  return warnings;
-}
-
-function buildExclusionCandidates(
-  allPublisherScores: ScoredPublisher[],
-  publisherCandidates: ScoredPublisher[],
-  limit: number
-): ExcludedPublisher[] {
-  const candidateIds = new Set(publisherCandidates.map((item) => item.publisher.id));
-
-  return allPublisherScores
-    .filter((item) => !candidateIds.has(item.publisher.id))
-    .slice(-Math.max(3, limit))
-    .reverse()
-    .map((item) => ({
-      publisher: item.publisher,
-      score: item.score,
-      reason: exclusionReasonFor(item),
-      signals: item.signals
-    }));
-}
-
-function exclusionReasonFor(item: ScoredPublisher) {
-  if (item.risks.length > 0) {
-    return item.risks[0];
-  }
-
-  if (item.signals.length === 0) {
-    return "No meaningful category, audience, or product-signal overlap with the advertiser profile.";
-  }
-
-  return "Lower fit than the retrieved publisher candidate set.";
-}
-
-function candidateWarnings(
-  advertiserProfile: AdvertiserProfile,
-  publisherCandidates: ScoredPublisher[],
-  personaCandidates: ScoredPersona[]
-) {
-  const warnings: string[] = [];
-
-  if (advertiserProfile.category === "b2b_saas") {
-    warnings.push("Publisher catalog is consumer-commerce oriented; B2B recommendations are directional.");
-  }
-
-  if (publisherCandidates.length < 5) {
-    warnings.push("Publisher candidate pool is narrow; strategy should use conservative budgets.");
-  }
-
-  if (personaCandidates.length < 5) {
-    warnings.push("Persona candidate pool is narrow; creative should avoid over-specific audience claims.");
   }
 
   return warnings;

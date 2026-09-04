@@ -17,7 +17,7 @@ Tradeoff: this is still a prototype, so campaign persistence and auth are intent
 The primary flow is split into stages:
 
 1. Extract advertiser profile.
-2. Retrieve bounded publisher and persona candidates.
+2. Load the supplied publisher and persona catalogues.
 3. Rank publishers.
 4. Select personas.
 5. Generate creative and campaign config.
@@ -39,13 +39,17 @@ The trace records the requested settings and the service tier reported by the AP
 
 Tradeoff: lower reasoning effort can reduce nuanced judgment quality, so the important ranking and execution stages can be bumped to `medium` through env vars without code changes.
 
-## 4. Keep Retrieval Deterministic
+## 4. Pass Full Catalogues to Matching Stages
 
-The retrieval stage uses local scoring code to shortlist publishers and personas before OpenAI ranks the final choices.
+The retrieval stage loads the supplied JSON data without scoring, sorting, slicing, or preselecting.
 
-This keeps prompts smaller and prevents the model from choosing IDs outside the catalog. It also gives the app useful offline eval coverage without requiring an API call.
+- Publisher ranking receives the full publisher catalogue.
+- Persona selection receives the full persona catalogue plus the locked publisher strategy.
+- Execution receives only the selected publishers and personas.
 
-Tradeoff: the current scoring rules are simple and tuned to the supplied catalog. If the catalog grows significantly, this should move to embeddings or indexed retrieval.
+This makes the take-home behavior easier to explain: the model makes the actual publisher and persona decisions from the provided data, while TypeScript only loads data and validates IDs.
+
+Tradeoff: full-catalogue prompts are larger than shortlisted prompts. This is acceptable for the supplied 20-publisher and 10-persona catalogue; if the catalogue grows significantly, retrieval should move to embeddings or indexed search before calling the model.
 
 ## 5. Use Controlled Extraction Taxonomy
 
@@ -77,9 +81,9 @@ Model output is treated as a proposal, not final truth.
 
 Normalization ensures:
 
-- recommended publishers exist in the retrieved candidate set,
+- recommended publishers exist in the supplied publisher catalogue,
 - excluded publishers do not overlap with recommendations,
-- selected personas exist in the retrieved candidate set,
+- selected personas exist in the supplied persona catalogue,
 - creative variants only target locked personas,
 - budget allocations and placements only use recommended publishers,
 - budget percentages sum to 100.
@@ -112,15 +116,15 @@ Tradeoff: trace snapshots can be verbose, so they are collapsed by default and i
 
 ## 9. Use Offline Evals for Regression Coverage
 
-The eval harness runs representative advertiser cases through deterministic retrieval and scoring.
+The eval harness runs representative advertiser cases through taxonomy checks, catalogue coverage checks, and eval-only scoring helpers.
 
 It checks:
 
 - expected category,
 - taxonomy validity,
-- candidate publisher recall,
+- publisher catalogue coverage,
 - top publisher fit,
-- candidate persona recall,
+- persona catalogue coverage,
 - persona fit,
 - exclusions,
 - price tier,
@@ -129,7 +133,7 @@ It checks:
 - warning behavior,
 - forbidden top publishers.
 
-Tradeoff: offline evals do not fully grade OpenAI writing quality. They are strongest for retrieval, taxonomy, ranking expectations, and regression detection.
+Tradeoff: offline evals do not fully grade OpenAI writing quality. They are strongest for taxonomy validity, supplied data coverage, ranking expectations, and regression detection.
 
 ## 10. Keep the Code Walkthrough-Oriented
 
